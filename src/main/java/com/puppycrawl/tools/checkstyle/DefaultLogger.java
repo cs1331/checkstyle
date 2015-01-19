@@ -55,6 +55,8 @@ public class DefaultLogger extends AutomaticBean implements AuditListener {
     /** Formatter for the log message. */
     private final AuditEventFormatter formatter;
 
+    private int mErrorCount = 0;
+
     /**
      * Creates a new {@code DefaultLogger} instance.
      * @param outputStream where to log infos and errors
@@ -121,6 +123,8 @@ public class DefaultLogger extends AutomaticBean implements AuditListener {
         if (severityLevel != SeverityLevel.IGNORE) {
             final String errorMessage = formatter.format(event);
             errorWriter.println(errorMessage);
+            
+            mErrorCount++;
         }
     }
 
@@ -134,13 +138,12 @@ public class DefaultLogger extends AutomaticBean implements AuditListener {
 
     @Override
     public void auditStarted(AuditEvent event) {
-        infoWriter.println("Starting audit...");
-        infoWriter.flush();
+    	// Removed to simplify output
     }
 
     @Override
     public void auditFinished(AuditEvent event) {
-        infoWriter.println("Audit done.");
+    	infoWriter.println("Audit done. Errors (potential points off):\n" + mErrorCount);
         closeStreams();
     }
 
@@ -148,11 +151,11 @@ public class DefaultLogger extends AutomaticBean implements AuditListener {
     public void fileStarted(AuditEvent event) {
         // No need to implement this method in this class
     }
-
-    @Override
-    public void fileFinished(AuditEvent event) {
-        infoWriter.flush();
-    }
+    
+	@Override
+	public void fileFinished(AuditEvent event) {
+		// No need to implement this method in this class
+	}
 
     /**
      * Flushes the output streams and closes them if needed.

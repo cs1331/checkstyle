@@ -72,6 +72,9 @@ public final class Main {
 
     /** Name for the option 'c'. */
     private static final String OPTION_C_NAME = "c";
+    
+    /** Name for the option 'a'. */
+    private static final String OPTION_A_NAME = "a";
 
     /** Name for the option 'f'. */
     private static final String OPTION_F_NAME = "f";
@@ -264,16 +267,27 @@ public final class Main {
             }
         }
         // ensure a configuration file is specified
-        else if (cmdLine.hasOption(OPTION_C_NAME)) {
-            final String configLocation = cmdLine.getOptionValue(OPTION_C_NAME);
-            try {
+        else {
+        	final String configLocation;
+        	
+        	if (cmdLine.hasOption(OPTION_C_NAME)) {
+	            configLocation = cmdLine.getOptionValue(OPTION_C_NAME);
+	        }
+        	else if (cmdLine.hasOption(OPTION_A_NAME)) {
+        		configLocation = Main.class.getClassLoader().getResource("cs1331_with_checkstyle.xml").toString();
+            }
+        	else {
+            	configLocation = Main.class.getClassLoader().getResource("cs1331_checkstyle.xml").toString();
+            }
+        	
+        	try {
                 // test location only
                 CommonUtils.getUriByFilename(configLocation);
             }
             catch (CheckstyleException ignored) {
                 result.add(String.format("Could not find config XML file '%s'.", configLocation));
             }
-
+            
             // validate optional parameters
             if (cmdLine.hasOption(OPTION_F_NAME)) {
                 final String format = cmdLine.getOptionValue(OPTION_F_NAME);
@@ -290,9 +304,6 @@ public final class Main {
                     result.add(String.format("Could not find file '%s'.", propertiesLocation));
                 }
             }
-        }
-        else {
-            result.add("Must specify a config XML file.");
         }
 
         return result;
@@ -376,6 +387,12 @@ public final class Main {
         }
         conf.outputLocation = cmdLine.getOptionValue(OPTION_O_NAME);
         conf.configLocation = cmdLine.getOptionValue(OPTION_C_NAME);
+        if (conf.configLocation == null && cmdLine.hasOption(OPTION_A_NAME)) {
+        	conf.configLocation = Main.class.getClassLoader().getResource("cs1331_with_checkstyle.xml").toString();
+        }
+    	else if (conf.configLocation == null) {
+    		conf.configLocation = Main.class.getClassLoader().getResource("cs1331_checkstyle.xml").toString();
+        }
         conf.propertiesLocation = cmdLine.getOptionValue(OPTION_P_NAME);
         conf.files = filesToProcess;
         return conf;
