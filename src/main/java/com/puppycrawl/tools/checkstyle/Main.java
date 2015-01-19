@@ -56,6 +56,7 @@ public final class Main
             true,
             "Sets the output format. (plain|xml). Defaults to plain");
         OPTS.addOption("v", false, "Print product version and exit");
+        OPTS.addOption("j", false, "Use Javadoc XML");
     }
 
     /** Stop instances being created. */
@@ -96,12 +97,31 @@ public final class Main
                 : System.getProperties();
 
         // ensure a config file is specified
+        Configuration config = null;
         if (!line.hasOption("c")) {
-            System.out.println("Must specify a config XML file.");
-            usage();
+            if (line.hasOption("j")) {
+                try {
+                    config = ConfigurationLoader.loadConfiguration(
+                        Main.class.getClassLoader().getResource("cs1331_javadoc.xml").toString(), new PropertiesExpander(props));
+                } catch (final CheckstyleException e) {
+                    System.out.println("Error loading configuration file");
+                    e.printStackTrace(System.out);
+                    System.exit(1);
+                }
+            } else {
+                try {
+                    config = ConfigurationLoader.loadConfiguration(
+                        Main.class.getClassLoader().getResource("cs1331_checkstyle.xml").toString(), new PropertiesExpander(props));
+                } catch (final CheckstyleException e) {
+                    System.out.println("Error loading configuration file");
+                    e.printStackTrace(System.out);
+                    System.exit(1);
+                }
+            }
+        } else {
+            config = loadConfig(line, props);
         }
 
-        final Configuration config = loadConfig(line, props);
 
         // setup the output stream
         OutputStream out = null;

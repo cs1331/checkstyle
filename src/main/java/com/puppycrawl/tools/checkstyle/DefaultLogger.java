@@ -53,6 +53,8 @@ public class DefaultLogger
     /** close error stream after use */
     private final boolean mCloseError;
 
+    private int mErrorCount = 0;
+
     /**
      * Creates a new <code>DefaultLogger</code> instance.
      * @param aOS where to log infos and errors
@@ -115,6 +117,8 @@ public class DefaultLogger
             }
             sb.append(": ").append(message);
             mErrorWriter.println(sb.toString());
+
+            mErrorCount++;
         }
     }
 
@@ -132,7 +136,6 @@ public class DefaultLogger
     @Override
     public void auditStarted(AuditEvent aEvt)
     {
-        mInfoWriter.println("Starting audit...");
     }
 
     /** {@inheritDoc} */
@@ -151,7 +154,7 @@ public class DefaultLogger
     @Override
     public void auditFinished(AuditEvent aEvt)
     {
-        mInfoWriter.println("Audit done.");
+        mInfoWriter.println("Audit done. Errors (potential points off):\n" + mErrorCount);
         closeStreams();
     }
 
