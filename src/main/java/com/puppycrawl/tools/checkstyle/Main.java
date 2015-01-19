@@ -237,8 +237,10 @@ public final class Main {
             }
         }
         // ensure a configuration file is specified
-        else if (cmdLine.hasOption(OPTION_C_NAME)) {
-            final String configLocation = cmdLine.getOptionValue(OPTION_C_NAME);
+        else {
+            final String configLocation = cmdLine.getOptionValue(OPTION_C_NAME) != null
+                ? cmdLine.getOptionValue(OPTION_C_NAME)
+                : Main.class.getClassLoader().getResource("cs1331_checkstyle.xml").toString();
             try {
                 // test location only
                 CommonUtils.getUriByFilename(configLocation);
@@ -271,9 +273,6 @@ public final class Main {
                 }
             }
         }
-        else {
-            result.add("Must specify a config XML file.");
-        }
 
         return result;
     }
@@ -292,6 +291,12 @@ public final class Main {
         }
         conf.outputLocation = cmdLine.getOptionValue(OPTION_O_NAME);
         conf.configLocation = cmdLine.getOptionValue(OPTION_C_NAME);
+
+        // Default to CS1331 Config
+        if (conf.configLocation == null) {
+            conf.configLocation = Main.class.getClassLoader().getResource("cs1331_checkstyle.xml").toString();
+        }
+
         conf.propertiesLocation = cmdLine.getOptionValue(OPTION_P_NAME);
         conf.files = filesToProcess;
         return conf;
