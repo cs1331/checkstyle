@@ -150,6 +150,7 @@ public class DefaultLogger extends AutomaticBean implements AuditListener {
     @Override
     public void fileStarted(AuditEvent event) {
         // No need to implement this method in this class
+
     }
     
 	@Override
