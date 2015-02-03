@@ -154,7 +154,7 @@ public class DefaultLogger
     @Override
     public void auditFinished(AuditEvent evt)
     {
-        mInfoWriter.println("Audit done. Errors (potential points off):\n" + mErrorCount);
+        infoWriter.println("Audit done. Errors (potential points off):\n" + mErrorCount);
         closeStreams();
     }
 
