@@ -72,14 +72,4 @@ public class AllSinglelineCommentsTest extends BaseCheckTestSupport
         }
 
     }
-
-    @Test
-    public void testAllBlockComments() throws Exception
-    {
-        DefaultConfiguration checkConfig = createCheckConfig(SinglelineCommentListenerCheck.class);
-        final String[] expected = {};
-        verify(checkConfig, getPath("comments" + File.separator
-                + "InputFullOfSinglelineComments.java"), expected);
-        Assert.assertTrue(allComments.isEmpty());
-    }
 }

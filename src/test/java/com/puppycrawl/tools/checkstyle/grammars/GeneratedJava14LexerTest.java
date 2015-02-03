@@ -16,17 +16,7 @@ import org.junit.Test;
 public class GeneratedJava14LexerTest
     extends BaseCheckTestSupport
 {
-    @Test
-    public void testUnexpectedChar() throws IOException, Exception
-    {
-        final DefaultConfiguration checkConfig =
-            createCheckConfig(MemberNameCheck.class);
-        final String[] expected = {
-            "7:9: Name 'ÃЯ' must match pattern '^[a-z][a-zA-Z0-9]*$'.",
-        };
-        verify(checkConfig, getPath("grammars/InputGrammar.java"), expected);
-    }
-    
+
     @Test
     public void testSemicolonBetweenImports() throws IOException, Exception
     {

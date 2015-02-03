@@ -72,14 +72,4 @@ public class AllBlockCommentsTest extends BaseCheckTestSupport
         }
 
     }
-
-    @Test
-    public void testAllBlockComments() throws Exception
-    {
-        DefaultConfiguration checkConfig = createCheckConfig(BlockCommentListenerCheck.class);
-        final String[] expected = {};
-        verify(checkConfig, getPath("comments" + File.separator
-                + "InputFullOfBlockComments.java"), expected);
-        Assert.assertTrue(allComments.isEmpty());
-    }
 }

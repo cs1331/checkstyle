@@ -82,26 +82,6 @@ public class JavadocParseTreeTest
     }
 
     @Test
-    public void textBeforeJavadocTags()
-        throws IOException
-    {
-        String filename = folderWithInputFiles + "/javadocTags/TextBeforeJavadocTags.txt";
-        ParseTree generatedTree = parseJavadoc(getFileContent(new File(filename)));
-        ParseTree expectedTree = ParseTreeBuilder.treeTextBeforeJavadocTags();
-        compareTrees(expectedTree, generatedTree);
-    }
-
-    @Test
-    public void customJavadocTags()
-        throws IOException
-    {
-        String filename = folderWithInputFiles + "/javadocTags/CustomJavadocTags.txt";
-        ParseTree generatedTree = parseJavadoc(getFileContent(new File(filename)));
-        ParseTree expectedTree = ParseTreeBuilder.treeCustomJavadocTags();
-        compareTrees(expectedTree, generatedTree);
-    }
-
-    @Test
     public void javadocTagDescriptionWithInlineTags()
         throws IOException
     {
@@ -112,42 +92,12 @@ public class JavadocParseTreeTest
     }
 
     @Test
-    public void leadingAsterisks()
-        throws IOException
-    {
-        String filename = folderWithInputFiles + "/LeadingAsterisks.txt";
-        ParseTree generatedTree = parseJavadoc(getFileContent(new File(filename)));
-        ParseTree expectedTree = ParseTreeBuilder.treeLeadingAsterisks();
-        compareTrees(expectedTree, generatedTree);
-    }
-
-    @Test
     public void authorWithMailto()
         throws IOException
     {
         String filename = folderWithInputFiles + "/javadocTags/AuthorWithMailto.txt";
         ParseTree generatedTree = parseJavadoc(getFileContent(new File(filename)));
         ParseTree expectedTree = ParseTreeBuilder.treeAuthorWithMailto();
-        compareTrees(expectedTree, generatedTree);
-    }
-
-    @Test
-    public void htmlTagsInParagraph()
-        throws IOException
-    {
-        String filename = folderWithInputFiles + "/htmlTags/HtmlTagsInParagraph.txt";
-        ParseTree generatedTree = parseJavadoc(getFileContent(new File(filename)));
-        ParseTree expectedTree = ParseTreeBuilder.treeHtmlTagsInParagraph();
-        compareTrees(expectedTree, generatedTree);
-    }
-
-    @Test
-    public void linkInlineTags()
-        throws IOException
-    {
-        String filename = folderWithInputFiles + "/javadocTags/LinkInlineTags.txt";
-        ParseTree generatedTree = parseJavadoc(getFileContent(new File(filename)));
-        ParseTree expectedTree = ParseTreeBuilder.treeLinkInlineTags();
         compareTrees(expectedTree, generatedTree);
     }
 
@@ -172,56 +122,6 @@ public class JavadocParseTreeTest
     }
 
     @Test
-    public void serial()
-        throws IOException
-    {
-        String filename = folderWithInputFiles + "/javadocTags/Serial.txt";
-        ParseTree generatedTree = parseJavadoc(getFileContent(new File(filename)));
-        ParseTree expectedTree = ParseTreeBuilder.treeSerial();
-        compareTrees(expectedTree, generatedTree);
-    }
-
-    @Test
-    public void since()
-        throws IOException
-    {
-        String filename = folderWithInputFiles + "/javadocTags/Since.txt";
-        ParseTree generatedTree = parseJavadoc(getFileContent(new File(filename)));
-        ParseTree expectedTree = ParseTreeBuilder.treeSince();
-        compareTrees(expectedTree, generatedTree);
-    }
-
-    @Test
-    public void unclosedAndClosedParagraphs()
-        throws IOException
-    {
-        String filename = folderWithInputFiles + "/htmlTags/UnclosedAndClosedParagraphs.txt";
-        ParseTree generatedTree = parseJavadoc(getFileContent(new File(filename)));
-        ParseTree expectedTree = ParseTreeBuilder.treeUnclosedAndClosedParagraphs();
-        compareTrees(expectedTree, generatedTree);
-    }
-
-    @Test
-    public void listWithUnclosedItemInUnclosedParagraph()
-        throws IOException
-    {
-        String filename = folderWithInputFiles + "/htmlTags/ListWithUnclosedItemInUnclosedParagraph.txt";
-        ParseTree generatedTree = parseJavadoc(getFileContent(new File(filename)));
-        ParseTree expectedTree = ParseTreeBuilder.treeListWithUnclosedItemInUnclosedParagraph();
-        compareTrees(expectedTree, generatedTree);
-    }
-
-    @Test
-    public void unclosedParagraphFollowedByJavadocTag()
-        throws IOException
-    {
-        String filename = folderWithInputFiles + "/htmlTags/UnclosedParagraphFollowedByJavadocTag.txt";
-        ParseTree generatedTree = parseJavadoc(getFileContent(new File(filename)));
-        ParseTree expectedTree = ParseTreeBuilder.treeUnclosedParagraphFollowedByJavadocTag();
-        compareTrees(expectedTree, generatedTree);
-    }
-
-    @Test
     public void allJavadocInlineTags()
         throws IOException
     {
@@ -232,42 +132,12 @@ public class JavadocParseTreeTest
     }
 
     @Test
-    public void docRootInheritDoc()
-        throws IOException
-    {
-        String filename = folderWithInputFiles + "/javadocTags/DocRootInheritDoc.txt";
-        ParseTree generatedTree = parseJavadoc(getFileContent(new File(filename)));
-        ParseTree expectedTree = ParseTreeBuilder.treeDocRootInheritDoc();
-        compareTrees(expectedTree, generatedTree);
-    }
-
-    @Test
     public void fewWhiteSpacesAsSeparator()
         throws IOException
     {
         String filename = folderWithInputFiles + "/javadocTags/FewWhiteSpacesAsSeparator.txt";
         ParseTree generatedTree = parseJavadoc(getFileContent(new File(filename)));
         ParseTree expectedTree = ParseTreeBuilder.treeFewWhiteSpacesAsSeparator();
-        compareTrees(expectedTree, generatedTree);
-    }
-
-    @Test
-    public void mixedCaseOfHtmlTags()
-        throws IOException
-    {
-        String filename = folderWithInputFiles + "/htmlTags/MixedCaseOfHtmlTags.txt";
-        ParseTree generatedTree = parseJavadoc(getFileContent(new File(filename)));
-        ParseTree expectedTree = ParseTreeBuilder.treeMixedCaseOfHtmlTags();
-        compareTrees(expectedTree, generatedTree);
-    }
-
-    @Test
-    public void htmlComments()
-        throws IOException
-    {
-        String filename = folderWithInputFiles + "/htmlTags/Comments.txt";
-        ParseTree generatedTree = parseJavadoc(getFileContent(new File(filename)));
-        ParseTree expectedTree = ParseTreeBuilder.treeComments();
         compareTrees(expectedTree, generatedTree);
     }
 
