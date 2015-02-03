@@ -19,10 +19,6 @@
 
 package com.puppycrawl.tools.checkstyle.grammars;
 
-import java.io.File;
-import java.io.IOException;
-
-import org.junit.Assume;
 import org.junit.Test;
 
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
@@ -36,38 +32,6 @@ import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
  */
 public class GeneratedJava14LexerTest
     extends BaseCheckTestSupport {
-
-    /**
-     * <p>Is {@code true} if this is Windows.</p>
-     *
-     * <p>Adapted from org.apache.commons.lang3.SystemUtils.</p>
-     */
-    private static final boolean IS_WINDOWS = System.getProperty("os.name").startsWith("Windows");
-
-    @Override
-    protected String getPath(String filename) throws IOException {
-        return super.getPath("grammars" + File.separator + filename);
-    }
-
-    @Override
-    protected String getNonCompilablePath(String filename) throws IOException {
-        return super.getNonCompilablePath("grammars" + File.separator + filename);
-    }
-
-    @Test
-    public void testUnexpectedChar() throws Exception {
-        // Encoding problems can occur in Windows
-        Assume.assumeFalse(IS_WINDOWS);
-
-        final DefaultConfiguration checkConfig =
-            createCheckConfig(MemberNameCheck.class);
-        // input is 'ÃЯ'
-        final String[] expected = {
-            "7:9: Name '" + (char) 0xC3 + (char) 0x042F
-                 + "' must match pattern '^[a-z][a-zA-Z0-9]*$'.",
-        };
-        verify(checkConfig, getPath("InputGrammar.java"), expected);
-    }
 
     @Test
     public void testSemicolonBetweenImports() throws Exception {
