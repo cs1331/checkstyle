@@ -55,7 +55,8 @@ public class DefaultLogger extends AutomaticBean implements AuditListener {
     /** Formatter for the log message. */
     private final AuditEventFormatter formatter;
 
-    private int mErrorCount = 0;
+    /** Couunt of errors*/
+    private int errorCount;
 
     /**
      * Creates a new {@code DefaultLogger} instance.
@@ -123,7 +124,7 @@ public class DefaultLogger extends AutomaticBean implements AuditListener {
         if (severityLevel != SeverityLevel.IGNORE) {
             final String errorMessage = formatter.format(event);
             errorWriter.println(errorMessage);
-            mErrorCount++;
+            errorCount++;
         }
     }
 
@@ -142,7 +143,7 @@ public class DefaultLogger extends AutomaticBean implements AuditListener {
     @Override
     public void auditFinished(AuditEvent event) {
         mInfoWriter.println("Audit done. Errors (potential points off):\n"
-            + mErrorCount);
+            + errorCount);
         closeStreams();
     }
 
