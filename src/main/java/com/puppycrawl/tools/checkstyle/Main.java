@@ -102,23 +102,31 @@ public final class Main
             if (line.hasOption("j")) {
                 try {
                     config = ConfigurationLoader.loadConfiguration(
-                        Main.class.getClassLoader().getResource("cs1331_javadoc.xml").toString(), new PropertiesExpander(props));
-                } catch (final CheckstyleException e) {
-                    System.out.println("Error loading configuration file");
-                    e.printStackTrace(System.out);
-                    System.exit(1);
+                        Main.class.getClassLoader()
+                            .getResource("cs1331_javadoc.xml").toString(),
+                             new PropertiesExpander(props));
                 }
-            } else {
-                try {
-                    config = ConfigurationLoader.loadConfiguration(
-                        Main.class.getClassLoader().getResource("cs1331_checkstyle.xml").toString(), new PropertiesExpander(props));
-                } catch (final CheckstyleException e) {
+                catch (final CheckstyleException e) {
                     System.out.println("Error loading configuration file");
                     e.printStackTrace(System.out);
                     System.exit(1);
                 }
             }
-        } else {
+            else {
+                try {
+                    config = ConfigurationLoader.loadConfiguration(
+                        Main.class.getClassLoader()
+                            .getResource("cs1331_checkstyle.xml").toString(),
+                             new PropertiesExpander(props));
+                }
+                catch (final CheckstyleException e) {
+                    System.out.println("Error loading configuration file");
+                    e.printStackTrace(System.out);
+                    System.exit(1);
+                }
+            }
+        }
+        else {
             config = loadConfig(line, props);
         }
 

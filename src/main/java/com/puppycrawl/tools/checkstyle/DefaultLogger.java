@@ -52,8 +52,8 @@ public class DefaultLogger
     private final PrintWriter errorWriter;
     /** close error stream after use */
     private final boolean closeError;
-
-    private int mErrorCount = 0;
+    /** Couunt of errors*/
+    private int errorCount;
 
     /**
      * Creates a new <code>DefaultLogger</code> instance.
@@ -118,7 +118,7 @@ public class DefaultLogger
             sb.append(": ").append(message);
             errorWriter.println(sb.toString());
 
-            mErrorCount++;
+            errorCount++;
         }
     }
 
@@ -154,7 +154,7 @@ public class DefaultLogger
     @Override
     public void auditFinished(AuditEvent evt)
     {
-        infoWriter.println("Audit done. Errors (potential points off):\n" + mErrorCount);
+        infoWriter.println("Audit done. Errors (potential points off):\n" + errorCount);
         closeStreams();
     }
 
