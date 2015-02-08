@@ -102,9 +102,7 @@
         <module name="ArrayTypeStyle"/>
         <module name="TodoComment"/>
         <module name="UpperEll"/>
-        <module name="Indentation">
-            <property name="caseIndent" value="0"/>
-        </module>
+        <module name="Indentation"/>
         <module name="AnnotationLocation"/>
         <module name="NonEmptyAtclauseDescription"/>
         <module name="DefaultComesLast"/>
