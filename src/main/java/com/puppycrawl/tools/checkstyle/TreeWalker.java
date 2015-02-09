@@ -309,16 +309,14 @@ public final class TreeWalker
             final int[] acceptableTokens = check.getAcceptableTokens();
             Arrays.sort(acceptableTokens);
             for (String token : checkTokens) {
-                try {
-                    final int tokenId = TokenTypes.getTokenId(token);
-                    if (Arrays.binarySearch(acceptableTokens, tokenId) >= 0) {
-                        registerCheck(token, check);
-                    }
-                    // TODO: else log warning
+                final int tokenId = TokenTypes.getTokenId(token);
+                if (Arrays.binarySearch(acceptableTokens, tokenId) >= 0) {
+                    registerCheck(token, check);
                 }
-                catch (final IllegalArgumentException ex) {
-                    throw new CheckstyleException("illegal token \""
-                        + token + "\" in check " + check, ex);
+                else {
+                    throw new CheckstyleException("Token \""
+                        + token + "\" was not found in Acceptable tokens list"
+                                + " in check " + check);
                 }
             }
         }

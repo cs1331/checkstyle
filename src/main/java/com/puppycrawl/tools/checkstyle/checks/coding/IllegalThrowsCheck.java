@@ -23,6 +23,8 @@ import com.puppycrawl.tools.checkstyle.api.AnnotationUtility;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.FullIdent;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
+
+import java.util.Collections;
 import java.util.Set;
 
 /**
@@ -85,6 +87,12 @@ public final class IllegalThrowsCheck extends AbstractIllegalCheck
     }
 
     @Override
+    public int[] getAcceptableTokens()
+    {
+        return new int[] {TokenTypes.LITERAL_THROWS};
+    }
+
+    @Override
     public void visitToken(DetailAST detailAST)
     {
         final DetailAST methodDef = detailAST.getParent();
@@ -133,9 +141,7 @@ public final class IllegalThrowsCheck extends AbstractIllegalCheck
     public void setIgnoredMethodNames(String[] methodNames)
     {
         ignoredMethodNames.clear();
-        for (String element : methodNames) {
-            ignoredMethodNames.add(element);
-        }
+        Collections.addAll(ignoredMethodNames, methodNames);
     }
 
     /**
