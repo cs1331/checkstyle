@@ -19,8 +19,6 @@
 
 package com.puppycrawl.tools.checkstyle.grammars;
 
-import java.io.IOException;
-
 import org.junit.Test;
 
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
@@ -34,17 +32,7 @@ import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
  */
 public class GeneratedJava14LexerTest
     extends BaseCheckTestSupport {
-    @Test
-    public void testUnexpectedChar() throws IOException, Exception
-    {
-        final DefaultConfiguration checkConfig =
-            createCheckConfig(MemberNameCheck.class);
-        final String[] expected = {
-            "7:9: Name 'ÃЯ' must match pattern '^[a-z][a-zA-Z0-9]*$'.",
-        };
-        verify(checkConfig, getPath("grammars/InputGrammar.java"), expected);
-    }
-    
+
     @Test
     public void testSemicolonBetweenImports() throws Exception {
         final DefaultConfiguration checkConfig =
