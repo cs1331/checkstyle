@@ -19,7 +19,6 @@
 
 package com.puppycrawl.tools.checkstyle.checks.javadoc;
 
-<<<<<<< 8835b3bcaeb35d4e1d1704fbc1e96b3c09fd9581
 import static com.puppycrawl.tools.checkstyle.checks.javadoc.NonEmptyAtclauseDescriptionCheck.MSG_KEY;
 import static org.junit.Assert.assertArrayEquals;
 
@@ -31,9 +30,6 @@ import org.junit.Test;
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-=======
-import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
->>>>>>> Fix checkstyle errors
 
 public class NonEmptyAtclauseDescriptionCheckTest
         extends BaseCheckTestSupport {
