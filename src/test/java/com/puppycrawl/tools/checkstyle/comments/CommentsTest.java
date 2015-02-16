@@ -588,4 +588,24 @@ public class CommentsTest extends BaseCheckTestSupport
 
         return packageDef;
     }
+
+    @Test
+    public void testCompareExpectedTreeWithInput_1() throws Exception
+    {
+        DefaultConfiguration checkConfig = createCheckConfig(CompareTreesWithComments.class);
+        CompareTreesWithComments.expectedTree = buildInput_1();
+        final String[] expected = {};
+        verify(checkConfig, getPath("comments" + File.separator
+                + "InputCommentsTest_1.java"), expected);
+    }
+
+    @Test
+    public void testCompareExpectedTreeWithInput_2() throws Exception
+    {
+        DefaultConfiguration checkConfig = createCheckConfig(CompareTreesWithComments.class);
+        CompareTreesWithComments.expectedTree = buildInput_2();
+        final String[] expected = {};
+        verify(checkConfig, getPath("comments" + File.separator
+                + "InputCommentsTest_2.java"), expected);
+    }
 }
