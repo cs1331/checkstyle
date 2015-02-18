@@ -45,8 +45,12 @@ import static com.puppycrawl.tools.checkstyle.api.TokenTypes.LITERAL_RETURN;
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.EXPR;
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.LITERAL_NULL;
 
+import java.io.File;
+
+import org.junit.Test;
 
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
+import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 
 public class CommentsTest extends BaseCheckTestSupport
