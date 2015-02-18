@@ -10,21 +10,21 @@ class InputCorrectJavaDocParagraphCheck {
 
     /**
      * Some Javadoc.
-     *
-     * <p> {@code function} will never be invoked with a null value.
+     *   
+     * <p>{@code function} will never be invoked with a null value.
      *
      * @since 8.0
      */
     public static final byte NUL = 0;
-
+       
     /**
      * Some Javadoc.
      *
      * <p>Some Javadoc.
-     *
+     * 
      * <pre>
      * class Foo {
-     *
+     * 
      *   void foo() {}
      * }
      * </pre>
@@ -33,7 +33,7 @@ class InputCorrectJavaDocParagraphCheck {
      *     Documentation about GWT emulated source</a>
      */
     boolean emulated() {return false;}
-
+    
     /**
      * Some Javadoc.
      *
@@ -52,7 +52,7 @@ class InputCorrectJavaDocParagraphCheck {
          * @since 8.0
          */
         public static final byte NUL = 0;
-
+           
         /**
          * Some Javadoc.
          *
@@ -63,7 +63,7 @@ class InputCorrectJavaDocParagraphCheck {
          */
         boolean emulated() {return false;}
     }
-
+    
     InnerInputCorrectJavaDocParagraphCheck anon = new InnerInputCorrectJavaDocParagraphCheck() {
 
     	/**
@@ -76,7 +76,7 @@ class InputCorrectJavaDocParagraphCheck {
          * @since 8.0
          */
         public static final byte NUL = 0;
-
+           
         /**
          * Some Javadoc.
          *
