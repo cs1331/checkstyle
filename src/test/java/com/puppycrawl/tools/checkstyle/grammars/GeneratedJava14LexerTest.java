@@ -19,12 +19,16 @@
 
 package com.puppycrawl.tools.checkstyle.grammars;
 
+import java.io.File;
+import java.io.IOException;
+
+import org.apache.commons.lang3.SystemUtils;
+import org.junit.Assume;
 import org.junit.Test;
 
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.checks.naming.MemberNameCheck;
-import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
 
 /**
  * Tests GeneratedJava14Lexer.
@@ -33,6 +37,17 @@ import com.puppycrawl.tools.checkstyle.utils.CommonUtils;
 public class GeneratedJava14LexerTest
     extends BaseCheckTestSupport {
 
+    @Test
+    public void testUnexpectedChar() throws IOException, Exception
+    {
+        Assume.assumeFalse(SystemUtils.IS_OS_WINDOWS); // Encoding problems can occur in Windows
+        final DefaultConfiguration checkConfig =
+            createCheckConfig(MemberNameCheck.class);
+        final String[] expected = {
+            "7:9: Name 'ÃЯ' must match pattern '^[a-z][a-zA-Z0-9]*$'.",
+        };
+        verify(checkConfig, getPath("grammars/InputGrammar.java"), expected);
+    }
     @Test
     public void testSemicolonBetweenImports() throws Exception {
         final DefaultConfiguration checkConfig =
