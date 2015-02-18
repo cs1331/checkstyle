@@ -18,13 +18,16 @@
 ////////////////////////////////////////////////////////////////////////////////
 package com.puppycrawl.tools.checkstyle.comments;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.Set;
 
 import org.junit.Assert;
+import org.junit.Test;
 
 import com.google.common.collect.Sets;
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
+import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.api.Check;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
