@@ -19,7 +19,10 @@
 
 package com.puppycrawl.tools.checkstyle.checks.javadoc;
 
+import org.junit.Test;
+
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
+import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 
 public class NonEmptyAtclauseDescriptionCheckTest
         extends BaseCheckTestSupport {
