@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -22,6 +22,13 @@ import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import org.junit.Test;
 
+import static com.puppycrawl.tools.checkstyle.checks.whitespace.AbstractParenPadCheck.WS_FOLLOWED;
+import static com.puppycrawl.tools.checkstyle.checks.whitespace.AbstractParenPadCheck.WS_PRECEDED;
+import static com.puppycrawl.tools.checkstyle.checks.whitespace.AbstractParenPadCheck
+.WS_NOT_FOLLOWED;
+import static com.puppycrawl.tools.checkstyle.checks.whitespace.AbstractParenPadCheck
+.WS_NOT_PRECEDED;
+
 public class TypecastParenPadCheckTest
     extends BaseCheckTestSupport
 {
@@ -32,8 +39,8 @@ public class TypecastParenPadCheckTest
         final DefaultConfiguration checkConfig =
             createCheckConfig(TypecastParenPadCheck.class);
         final String[] expected = {
-            "89:14: '(' is followed by whitespace.",
-            "89:21: ')' is preceded with whitespace.",
+            "89:14: " + getCheckMessage(WS_FOLLOWED, "("),
+            "89:21: " + getCheckMessage(WS_PRECEDED, ")"),
         };
         verify(checkConfig, getPath("InputWhitespace.java"), expected);
     }
@@ -46,14 +53,14 @@ public class TypecastParenPadCheckTest
             createCheckConfig(TypecastParenPadCheck.class);
         checkConfig.addAttribute("option", PadOption.SPACE.toString());
         final String[] expected = {
-            "87:21: '(' is not followed by whitespace.",
-            "87:27: ')' is not preceded with whitespace.",
-            "88:14: '(' is not followed by whitespace.",
-            "88:20: ')' is not preceded with whitespace.",
-            "90:14: '(' is not followed by whitespace.",
-            "90:20: ')' is not preceded with whitespace.",
-            "241:18: '(' is not followed by whitespace.",
-            "241:21: ')' is not preceded with whitespace.",
+            "87:21: " + getCheckMessage(WS_NOT_FOLLOWED, "("),
+            "87:27: " + getCheckMessage(WS_NOT_PRECEDED, ")"),
+            "88:14: " + getCheckMessage(WS_NOT_FOLLOWED, "("),
+            "88:20: " + getCheckMessage(WS_NOT_PRECEDED, ")"),
+            "90:14: " + getCheckMessage(WS_NOT_FOLLOWED, "("),
+            "90:20: " + getCheckMessage(WS_NOT_PRECEDED, ")"),
+            "241:18: " + getCheckMessage(WS_NOT_FOLLOWED, "("),
+            "241:21: " + getCheckMessage(WS_NOT_PRECEDED, ")"),
         };
         verify(checkConfig, getPath("InputWhitespace.java"), expected);
     }

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -23,6 +23,9 @@ import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import org.junit.Before;
 import org.junit.Test;
 
+import static com.puppycrawl.tools.checkstyle.checks.whitespace.SeparatorWrapCheck.LINE_NEW;
+import static com.puppycrawl.tools.checkstyle.checks.whitespace.SeparatorWrapCheck.LINE_PREVIOUS;
+
 public class SeparatorWrapCheckTest
     extends BaseCheckTestSupport
 {
@@ -41,7 +44,7 @@ public class SeparatorWrapCheckTest
         checkConfig.addAttribute("option", "NL");
         checkConfig.addAttribute("tokens", "DOT");
         final String[] expected = {
-            "31:10: '.' should be on a new line.",
+            "31:10: " + getCheckMessage(LINE_NEW, "."),
         };
         verify(checkConfig, getPath("whitespace/InputSeparatorWrap.java"), expected);
     }
@@ -52,7 +55,7 @@ public class SeparatorWrapCheckTest
         checkConfig.addAttribute("option", "EOL");
         checkConfig.addAttribute("tokens", "COMMA");
         final String[] expected = {
-            "39:17: ',' should be on the previous line.",
+            "39:17: " + getCheckMessage(LINE_PREVIOUS, ","),
         };
         verify(checkConfig, getPath("whitespace/InputSeparatorWrap.java"), expected);
     }

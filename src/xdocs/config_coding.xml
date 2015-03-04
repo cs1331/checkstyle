@@ -415,7 +415,7 @@ number.equals(i + j);
 
           <tr>
             <td>ignoreFormat</td>
-            <td>pattern for names to ignore</td>
+            <td>pattern for names of variables and parameters to ignore</td>
             <td><a href="property_types.html#regexp">regular expression</a></td>
             <td>(not applied)</td>
           </tr>
@@ -494,13 +494,31 @@ number.equals(i + j);
         </source>
 
         <p>
-          To configure the check so that it ignores the name
-          &quot;rcsid&quot;:
+          To configure the check so that it ignores the variables and parameters named
+          &quot;test&quot;:
         </p>
         <source>
 &lt;module name=&quot;HiddenField&quot;&gt;
-    &lt;property name=&quot;ignoreFormat&quot; value=&quot;^rcsid$&quot;/&gt;
+    &lt;property name=&quot;ignoreFormat&quot; value=&quot;^test$&quot;/&gt;
 &lt;/module&gt;
+        </source>
+
+        <source>
+class SomeClass
+{
+    private List&lt;String&gt; test;
+
+    private void addTest(List&lt;String&gt; test) // no violation
+    {
+        this.test.addAll(test);
+    }
+
+    private void foo()
+    {
+        final List&lt;String&gt; test = new ArrayList&lt;&gt;(); // no violation
+        ...
+    }
+}
         </source>
 
         <p>
@@ -1775,7 +1793,7 @@ if (&quot;something&quot;.equals(x))
           <tr>
             <td>memberModifiers</td>
             <td>Check methods and fields with only corresponding modifiers.</td>
-            <td><a href="property_types.html#intSet">List of integers</a></td>
+            <td><a href="property_types.html#stringSet">List of tokens</a></td>
             <td><code>null</code></td>
           </tr>
         </table>
@@ -1819,7 +1837,7 @@ if (&quot;something&quot;.equals(x))
       <subsection name="Description">
         <p>
           According to <a
-          href="http://java.sun.com/docs/codeconv/html/CodeConventions.doc2.html#1852">
+          href="http://www.oracle.com/technetwork/java/javase/documentation/codeconventions-141855.html#1852">
           Code Conventions for the Java Programming Language</a> , the parts
           of a class or interface declaration should appear in the following
           order:

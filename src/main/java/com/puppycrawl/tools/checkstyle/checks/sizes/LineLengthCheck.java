@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -76,6 +76,13 @@ import org.apache.commons.beanutils.ConversionException;
  */
 public class LineLengthCheck extends Check
 {
+
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String MSG_KEY = "maxLineLen";
+
     /** default maximum number of columns in a line */
     private static final int DEFAULT_MAX_COLUMNS = 80;
 
@@ -113,7 +120,7 @@ public class LineLengthCheck extends Check
             if ((realLength > max)
                 && !ignorePattern.matcher(line).find())
             {
-                log(i + 1, "maxLineLen", max, realLength);
+                log(i + 1, MSG_KEY, max, realLength);
             }
         }
     }

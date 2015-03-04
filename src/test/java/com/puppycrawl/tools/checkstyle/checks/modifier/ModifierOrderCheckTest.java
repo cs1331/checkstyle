@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -25,6 +25,11 @@ import org.junit.Test;
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 
+import static com.puppycrawl.tools.checkstyle.checks.modifier.ModifierOrderCheck
+.MSG_ANNOTATION_ORDER;
+import static com.puppycrawl.tools.checkstyle.checks.modifier.ModifierOrderCheck
+.MSG_MODIFIER_ORDER;
+
 public class ModifierOrderCheckTest
     extends BaseCheckTestSupport
 {
@@ -34,12 +39,12 @@ public class ModifierOrderCheckTest
         final DefaultConfiguration checkConfig =
             createCheckConfig(ModifierOrderCheck.class);
         final String[] expected = {
-            "14:10: 'final' modifier out of order with the JLS suggestions.",
-            "18:12: 'private' modifier out of order with the JLS suggestions.",
-            "24:14: 'private' modifier out of order with the JLS suggestions.",
-            "34:13: '@MyAnnotation2' annotation modifier does not preceed non-annotation modifiers.",
-            "39:13: '@MyAnnotation2' annotation modifier does not preceed non-annotation modifiers.",
-            "49:35: '@MyAnnotation4' annotation modifier does not preceed non-annotation modifiers.",
+            "14:10: " + getCheckMessage(MSG_MODIFIER_ORDER, "final"),
+            "18:12: " + getCheckMessage(MSG_MODIFIER_ORDER, "private"),
+            "24:14: " + getCheckMessage(MSG_MODIFIER_ORDER, "private"),
+            "34:13: " + getCheckMessage(MSG_ANNOTATION_ORDER, "@MyAnnotation2"),
+            "39:13: " + getCheckMessage(MSG_ANNOTATION_ORDER, "@MyAnnotation2"),
+            "49:35: " + getCheckMessage(MSG_ANNOTATION_ORDER, "@MyAnnotation4"),
         };
         verify(checkConfig, getPath("InputModifier.java"), expected);
     }

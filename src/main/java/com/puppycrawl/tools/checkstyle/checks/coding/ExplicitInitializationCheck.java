@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -50,6 +50,13 @@ import com.puppycrawl.tools.checkstyle.checks.CheckUtils;
  */
 public class ExplicitInitializationCheck extends Check
 {
+
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String MSG_KEY = "explicit.init";
+
     @Override
     public final int[] getDefaultTokens()
     {
@@ -100,24 +107,24 @@ public class ExplicitInitializationCheck extends Check
         if (isObjectType(type)
             && (exprStart.getType() == TokenTypes.LITERAL_NULL))
         {
-            log(ident, "explicit.init", ident.getText(), "null");
+            log(ident, MSG_KEY, ident.getText(), "null");
         }
 
         final int primitiveType = type.getFirstChild().getType();
         if ((primitiveType == TokenTypes.LITERAL_BOOLEAN)
             && (exprStart.getType() == TokenTypes.LITERAL_FALSE))
         {
-            log(ident, "explicit.init", ident.getText(), "false");
+            log(ident, MSG_KEY, ident.getText(), "false");
         }
         if (isNumericType(primitiveType) && isZero(exprStart)) {
-            log(ident, "explicit.init", ident.getText(), "0");
+            log(ident, MSG_KEY, ident.getText(), "0");
         }
         if ((primitiveType == TokenTypes.LITERAL_CHAR)
             && (isZero(exprStart)
                 || ((exprStart.getType() == TokenTypes.CHAR_LITERAL)
                 && "'\\0'".equals(exprStart.getText()))))
         {
-            log(ident, "explicit.init", ident.getText(), "\\0");
+            log(ident, MSG_KEY, ident.getText(), "\\0");
         }
     }
 

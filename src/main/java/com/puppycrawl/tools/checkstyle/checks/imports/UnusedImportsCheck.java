@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -52,6 +52,13 @@ import java.util.regex.Pattern;
  */
 public class UnusedImportsCheck extends Check
 {
+
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String MSG_KEY = "import.unused";
+
     /** regex to match class names. */
     private static final Pattern CLASS_NAME = Pattern.compile(
            "((:?[\\p{L}_$][\\p{L}\\p{N}_$]*\\.)*[\\p{L}_$][\\p{L}\\p{N}_$]*)");
@@ -99,7 +106,7 @@ public class UnusedImportsCheck extends Check
             if (!referenced.contains(Utils.baseClassname(imp.getText()))) {
                 log(imp.getLineNo(),
                     imp.getColumnNo(),
-                    "import.unused", imp.getText());
+                    MSG_KEY, imp.getText());
             }
         }
     }

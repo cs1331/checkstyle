@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -61,11 +61,38 @@ import com.puppycrawl.tools.checkstyle.api.Utils;
  * OrderedPair&lt;String, Box&lt;Integer&gt;&gt; p;              // Generic type reference
  * boolean same = Util.&lt;Integer, String&gt;compare(p1, p2);   // Generic preceded method name
  * Pair&lt;Integer, String&gt; p1 = new Pair&lt;&gt;(1, "apple");// Diamond operator
+ * List&lt;T&gt; list = ImmutableList.Builder&lt;T&gt;::new;     // Method reference
+ * sort(list, Comparable::&lt;String&gt;compareTo);              // Method reference
  * </pre>
  * @author Oliver Burn
  */
 public class GenericWhitespaceCheck extends Check
 {
+
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String WS_PRECEDED = "ws.preceded";
+
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String WS_FOLLOWED = "ws.followed";
+
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String WS_NOT_PRECEDED = "ws.notPreceded";
+
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String WS_ILLEGAL_FOLLOW = "ws.illegalFollow";
+
     /** Used to count the depth of a Generic expression. */
     private int depth;
 
@@ -115,7 +142,7 @@ public class GenericWhitespaceCheck extends Check
         if ((0 <= before) && Character.isWhitespace(line.charAt(before))
                 && !Utils.whitespaceBefore(before, line))
         {
-            log(ast.getLineNo(), before, "ws.preceded", ">");
+            log(ast.getLineNo(), before, WS_PRECEDED, ">");
         }
 
         if (after < line.length()) {
@@ -130,21 +157,23 @@ public class GenericWhitespaceCheck extends Check
                 //                        ^
                 //                        +--- whitespace not allowed
                 if ((ast.getParent().getType() == TokenTypes.TYPE_ARGUMENTS)
-                    && (ast.getParent().getParent().getType()
-                        == TokenTypes.DOT)
-                    && (ast.getParent().getParent().getParent().getType()
-                        == TokenTypes.METHOD_CALL))
+                        && ((ast.getParent().getParent().getType()
+                            == TokenTypes.DOT)
+                        && (ast.getParent().getParent().getParent().getType()
+                            == TokenTypes.METHOD_CALL))
+                    || isAfterMethodReference(ast))
                 {
                     if (Character.isWhitespace(charAfter)) {
-                        log(ast.getLineNo(), after, "ws.followed", ">");
+                        log(ast.getLineNo(), after, WS_FOLLOWED, ">");
                     }
                 }
                 else if (!Character.isWhitespace(charAfter)
                     && ('(' != charAfter) && (')' != charAfter)
                     && (',' != charAfter) && ('[' != charAfter)
-                    && ('.' != charAfter) && (':' != charAfter))
+                    && ('.' != charAfter) && (':' != charAfter)
+                    && !isAfterMethodReference(ast))
                 {
-                    log(ast.getLineNo(), after, "ws.illegalFollow", ">");
+                    log(ast.getLineNo(), after, WS_ILLEGAL_FOLLOW, ">");
                 }
             }
             else {
@@ -161,17 +190,28 @@ public class GenericWhitespaceCheck extends Check
                     && whitespaceBetween(after, indexOfAmp, line))
                 {
                     if (indexOfAmp - after == 0) {
-                        log(ast.getLineNo(), after, "ws.notPreceded", "&");
+                        log(ast.getLineNo(), after, WS_NOT_PRECEDED, "&");
                     }
                     else if (indexOfAmp - after != 1) {
-                        log(ast.getLineNo(), after, "ws.followed", ">");
+                        log(ast.getLineNo(), after, WS_FOLLOWED, ">");
                     }
                 }
                 else if (line.charAt(after) == ' ') {
-                    log(ast.getLineNo(), after, "ws.followed", ">");
+                    log(ast.getLineNo(), after, WS_FOLLOWED, ">");
                 }
             }
         }
+    }
+
+    /**
+     * Checks if current generic end ('>') is located after
+     * {@link TokenTypes#METHOD_REF method reference operator}.
+     * @param genericEnd {@link TokenTypes#GENERIC_END}
+     * @return true if '>' follows after method reference.
+     */
+    private static boolean isAfterMethodReference(DetailAST genericEnd)
+    {
+        return genericEnd.getParent().getParent().getType() == TokenTypes.METHOD_REF;
     }
 
     /**
@@ -200,21 +240,21 @@ public class GenericWhitespaceCheck extends Check
             {
                 // Require whitespace
                 if (!Character.isWhitespace(line.charAt(before))) {
-                    log(ast.getLineNo(), before, "ws.notPreceded", "<");
+                    log(ast.getLineNo(), before, WS_NOT_PRECEDED, "<");
                 }
             }
             // Whitespace not required
             else if (Character.isWhitespace(line.charAt(before))
                 && !Utils.whitespaceBefore(before, line))
             {
-                log(ast.getLineNo(), before, "ws.preceded", "<");
+                log(ast.getLineNo(), before, WS_PRECEDED, "<");
             }
         }
 
         if ((after < line.length())
                 && Character.isWhitespace(line.charAt(after)))
         {
-            log(ast.getLineNo(), after, "ws.followed", "<");
+            log(ast.getLineNo(), after, WS_FOLLOWED, "<");
         }
     }
 

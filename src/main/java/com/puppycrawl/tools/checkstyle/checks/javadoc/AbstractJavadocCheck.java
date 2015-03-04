@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -57,12 +57,12 @@ public abstract class AbstractJavadocCheck extends Check
     /**
      * Error message key for common javadoc errors.
      */
-    private static final String PARSE_ERROR_MESSAGE_KEY = "javadoc.parse.error";
+    public static final String PARSE_ERROR_MESSAGE_KEY = "javadoc.parse.error";
 
     /**
-     * Unrecognized error from antlr parser
+     * Unrecognized error from antlr parser.
      */
-    private static final String UNRECOGNIZED_ANTLR_ERROR_MESSAGE_KEY =
+    public static final String UNRECOGNIZED_ANTLR_ERROR_MESSAGE_KEY =
             "javadoc.unrecognized.antlr.error";
 
     /**

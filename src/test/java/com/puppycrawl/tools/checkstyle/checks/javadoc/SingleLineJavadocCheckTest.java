@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -23,6 +23,8 @@ import org.junit.Test;
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 
+import static com.puppycrawl.tools.checkstyle.checks.javadoc.SingleLineJavadocCheck.MSG_KEY;
+
 public class SingleLineJavadocCheckTest extends BaseCheckTestSupport
 {
     @Test
@@ -31,8 +33,8 @@ public class SingleLineJavadocCheckTest extends BaseCheckTestSupport
         final DefaultConfiguration checkConfig =
                 createCheckConfig(SingleLineJavadocCheck.class);
         final String[] expected = {
-            "4: Single-line Javadoc comment should be multi-line.",
-            "12: Single-line Javadoc comment should be multi-line.",
+            "4: " + getCheckMessage(MSG_KEY),
+            "12: " + getCheckMessage(MSG_KEY),
         };
         verify(checkConfig, getPath("javadoc/InputSingleLineJavadocCheck.java"), expected);
     }

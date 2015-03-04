@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -22,6 +22,7 @@ import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import org.junit.Test;
 
+import static com.puppycrawl.tools.checkstyle.checks.coding.EmptyStatementCheck.MSG_KEY;
 
 public class EmptyStatementCheckTest
     extends BaseCheckTestSupport
@@ -33,22 +34,22 @@ public class EmptyStatementCheckTest
         final DefaultConfiguration checkConfig =
             createCheckConfig(EmptyStatementCheck.class);
         final String[] expected = {
-            "12:7: Empty statement.",
-            "17:7: Empty statement.",
-            "22:19: Empty statement.",
-            "26:10: Empty statement.",
-            "29:16: Empty statement.",
-            "33:10: Empty statement.",
-            "43:10: Empty statement.",
-            "49:13: Empty statement.",
-            "51:13: Empty statement.",
-            "54:19: Empty statement.",
-            "58:10: Empty statement.",
-            "61:9: Empty statement.",
-            "66:10: Empty statement.",
-            "72:10: Empty statement.",
-            "76:10: Empty statement.",
-            "80:10: Empty statement.",
+            "12:7: " + getCheckMessage(MSG_KEY),
+            "17:7: " + getCheckMessage(MSG_KEY),
+            "22:19: " + getCheckMessage(MSG_KEY),
+            "26:10: " + getCheckMessage(MSG_KEY),
+            "29:16: " + getCheckMessage(MSG_KEY),
+            "33:10: " + getCheckMessage(MSG_KEY),
+            "43:10: " + getCheckMessage(MSG_KEY),
+            "49:13: " + getCheckMessage(MSG_KEY),
+            "51:13: " + getCheckMessage(MSG_KEY),
+            "54:19: " + getCheckMessage(MSG_KEY),
+            "58:10: " + getCheckMessage(MSG_KEY),
+            "61:9: " + getCheckMessage(MSG_KEY),
+            "66:10: " + getCheckMessage(MSG_KEY),
+            "72:10: " + getCheckMessage(MSG_KEY),
+            "76:10: " + getCheckMessage(MSG_KEY),
+            "80:10: " + getCheckMessage(MSG_KEY),
         };
 
         verify(checkConfig, getPath("InputEmptyStatement.java"), expected);

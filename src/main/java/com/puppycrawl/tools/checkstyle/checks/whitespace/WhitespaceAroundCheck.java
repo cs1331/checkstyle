@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -157,6 +157,19 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  */
 public class WhitespaceAroundCheck extends Check
 {
+
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String WS_NOT_PRECEDED = "ws.notPreceded";
+
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String WS_NOT_FOLLOWED = "ws.notFollowed";
+
     /** Whether or not empty constructor bodies are allowed. */
     private boolean allowEmptyCtors;
     /** Whether or not empty method bodies are allowed. */
@@ -390,7 +403,7 @@ public class WhitespaceAroundCheck extends Check
 
         if ((before >= 0) && !Character.isWhitespace(line.charAt(before))) {
             log(ast.getLineNo(), ast.getColumnNo(),
-                    "ws.notPreceded", ast.getText());
+                    WS_NOT_PRECEDED, ast.getText());
         }
 
         if (after >= line.length()) {
@@ -410,7 +423,7 @@ public class WhitespaceAroundCheck extends Check
                     || (nextChar == '.'))))
         {
             log(ast.getLineNo(), ast.getColumnNo() + ast.getText().length(),
-                    "ws.notFollowed", ast.getText());
+                    WS_NOT_FOLLOWED, ast.getText());
         }
     }
 

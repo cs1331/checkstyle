@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -22,6 +22,8 @@ import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import org.junit.Test;
 
+import static com.puppycrawl.tools.checkstyle.checks.sizes.AnonInnerLengthCheck.MSG_KEY;
+
 /**
  * @author Rob Worth
  * @author Lars Kühne
@@ -35,7 +37,7 @@ public class AnonInnerLengthCheckTest extends BaseCheckTestSupport
         final DefaultConfiguration checkConfig =
             createCheckConfig(AnonInnerLengthCheck.class);
         final String[] expected = {
-            "50:35: Anonymous inner class length is 21 lines (max allowed is 20).",
+            "50:35: " + getCheckMessage(MSG_KEY, 21, 20),
         };
         verify(checkConfig, getPath("InputAnonInnerLength.java"), expected);
     }
@@ -47,8 +49,8 @@ public class AnonInnerLengthCheckTest extends BaseCheckTestSupport
             createCheckConfig(AnonInnerLengthCheck.class);
         checkConfig.addAttribute("max", "6");
         final String[] expected = {
-            "50:35: Anonymous inner class length is 21 lines (max allowed is 6).",
-            "75:35: Anonymous inner class length is 20 lines (max allowed is 6).",
+            "50:35: " + getCheckMessage(MSG_KEY, 21, 6),
+            "75:35: " + getCheckMessage(MSG_KEY, 20, 6),
         };
         verify(checkConfig, getPath("InputAnonInnerLength.java"), expected);
     }

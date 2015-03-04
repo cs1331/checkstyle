@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -22,6 +22,8 @@ import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import org.junit.Test;
 
+import static com.puppycrawl.tools.checkstyle.checks.coding.OneStatementPerLineCheck.MSG_KEY;
+
 public class OneStatementPerLineCheckTest extends BaseCheckTestSupport
 {
     @Test
@@ -29,8 +31,8 @@ public class OneStatementPerLineCheckTest extends BaseCheckTestSupport
     {
         DefaultConfiguration checkConfig = createCheckConfig(OneStatementPerLineCheck.class);
         final String[] expected = {
-            "99:18: Only one statement per line allowed.",
-            "127:11: Only one statement per line allowed.",
+            "99:18: " + getCheckMessage(MSG_KEY),
+            "127:11: " + getCheckMessage(MSG_KEY),
         };
 
         verify(checkConfig,

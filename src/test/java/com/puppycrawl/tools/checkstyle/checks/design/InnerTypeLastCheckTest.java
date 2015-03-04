@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -24,6 +24,8 @@ import org.junit.Test;
 
 import java.io.File;
 
+import static com.puppycrawl.tools.checkstyle.checks.design.InnerTypeLastCheck.MSG_KEY;
+
 public class InnerTypeLastCheckTest extends BaseCheckTestSupport
 {
     @Test
@@ -32,11 +34,11 @@ public class InnerTypeLastCheckTest extends BaseCheckTestSupport
         final DefaultConfiguration checkConfig =
             createCheckConfig(InnerTypeLastCheck.class);
         final String[] expected = {
-            "44:9: Fields and methods should be before inner classes.",
-            "65:9: Fields and methods should be before inner classes.",
-            "69:9: Fields and methods should be before inner classes.",
-            "78:5: Fields and methods should be before inner classes.",
-            "95:9: Fields and methods should be before inner classes.",
+            "44:9: " + getCheckMessage(MSG_KEY),
+            "65:9: " + getCheckMessage(MSG_KEY),
+            "69:9: " + getCheckMessage(MSG_KEY),
+            "78:5: " + getCheckMessage(MSG_KEY),
+            "95:9: " + getCheckMessage(MSG_KEY),
         };
         verify(checkConfig, getPath("design" + File.separator
                                     + "InputInnerClassCheck.java"), expected);

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -70,6 +70,13 @@ import java.util.Map.Entry;
 public class TranslationCheck
     extends AbstractFileSetCheck
 {
+
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String MSG_KEY = "translation.missingKey";
+
     /** The property files to process. */
     private final List<File> propertyFiles = Lists.newArrayList();
 
@@ -251,7 +258,7 @@ public class TranslationCheck
             // Remaining elements in the key set are missing in the current file
             if (!keysClone.isEmpty()) {
                 for (Object key : keysClone) {
-                    log(0, "translation.missingKey", key);
+                    log(0, MSG_KEY, key);
                 }
             }
             fireErrors(path);

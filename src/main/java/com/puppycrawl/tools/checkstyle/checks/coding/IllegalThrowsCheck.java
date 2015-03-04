@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -50,6 +50,12 @@ import java.util.Set;
  */
 public final class IllegalThrowsCheck extends AbstractIllegalCheck
 {
+
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String MSG_KEY = "illegal.throw";
 
     /** Default ignored method names. */
     private static final String[] DEFAULT_IGNORED_METHOD_NAMES = {
@@ -103,7 +109,7 @@ public final class IllegalThrowsCheck extends AbstractIllegalCheck
                 if (token.getType() != TokenTypes.COMMA) {
                     final FullIdent ident = FullIdent.createFullIdent(token);
                     if (isIllegalClassName(ident.getText())) {
-                        log(token, "illegal.throw", ident.getText());
+                        log(token, MSG_KEY, ident.getText());
                     }
                 }
                 token = token.getNextSibling();

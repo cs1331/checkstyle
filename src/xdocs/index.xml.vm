@@ -62,15 +62,10 @@
       </p>
 
       <p>
-        These changes are being made to breathe new life into the
-        development of Checkstyle. The following developers have been added
-        as committers of the Checkstyle project:
+        <b>Releases will happen at the end of each month</b> if functional changes exists in <a href="https://github.com/checkstyle/checkstyle/commits/master">master branch of our repo</a>.
       </p>
-      <ul>
-        <li><a href="https://github.com/romani">Roman Ivanov</a></li>
-        <li><a href="https://github.com/isopov">Ivan Sopov</a></li>
-      </ul>
-    </section>
+
+      </section>
 
     <section name="Features">
       <p>

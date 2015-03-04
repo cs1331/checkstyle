@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -23,6 +23,9 @@ import org.junit.Test;
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 
+import static com.puppycrawl.tools.checkstyle.checks.javadoc.NonEmptyAtclauseDescriptionCheck
+.MSG_KEY;
+
 public class NonEmptyAtclauseDescriptionCheckTest
         extends BaseCheckTestSupport
 {
@@ -34,28 +37,28 @@ public class NonEmptyAtclauseDescriptionCheckTest
                 createCheckConfig(NonEmptyAtclauseDescriptionCheck.class);
         final String[] expected = {
             //this is a case with description that is sequences of spaces
-            "26: At-clause should have a non-empty description.",
+            "26: " + getCheckMessage(MSG_KEY),
             //this is a case with description that is sequences of spaces
-            "27: At-clause should have a non-empty description.",
+            "27: " + getCheckMessage(MSG_KEY),
             //this is a case with description that is sequences of spaces
-            "28: At-clause should have a non-empty description.",
+            "28: " + getCheckMessage(MSG_KEY),
             //this is a case with description that is sequences of spaces
-            "37: At-clause should have a non-empty description.",
+            "37: " + getCheckMessage(MSG_KEY),
             //this is a case with description that is sequences of spaces
-            "38: At-clause should have a non-empty description.",
+            "38: " + getCheckMessage(MSG_KEY),
             //this is a case with description that is sequences of spaces
-            "39: At-clause should have a non-empty description.",
-            "75: At-clause should have a non-empty description.",
-            "76: At-clause should have a non-empty description.",
-            "77: At-clause should have a non-empty description.",
-            "78: At-clause should have a non-empty description.",
-            "79: At-clause should have a non-empty description.",
-            "80: At-clause should have a non-empty description.",
-            "89: At-clause should have a non-empty description.",
-            "90: At-clause should have a non-empty description.",
-            "91: At-clause should have a non-empty description.",
-            "92: At-clause should have a non-empty description.",
-            "93: At-clause should have a non-empty description.",
+            "39: " + getCheckMessage(MSG_KEY),
+            "75: " + getCheckMessage(MSG_KEY),
+            "76: " + getCheckMessage(MSG_KEY),
+            "77: " + getCheckMessage(MSG_KEY),
+            "78: " + getCheckMessage(MSG_KEY),
+            "79: " + getCheckMessage(MSG_KEY),
+            "80: " + getCheckMessage(MSG_KEY),
+            "89: " + getCheckMessage(MSG_KEY),
+            "90: " + getCheckMessage(MSG_KEY),
+            "91: " + getCheckMessage(MSG_KEY),
+            "92: " + getCheckMessage(MSG_KEY),
+            "93: " + getCheckMessage(MSG_KEY),
         };
         verify(checkConfig, getPath("javadoc/InputNonEmptyAtclauseDescriptionCheck.java"), expected);
     }

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -23,6 +23,8 @@ import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import java.io.File;
 import org.junit.Test;
 
+import static com.puppycrawl.tools.checkstyle.checks.coding.ParameterAssignmentCheck.MSG_KEY;
+
 public class ParameterAssignmentCheckTest extends BaseCheckTestSupport
 {
     @Test
@@ -32,10 +34,10 @@ public class ParameterAssignmentCheckTest extends BaseCheckTestSupport
         final DefaultConfiguration checkConfig =
             createCheckConfig(ParameterAssignmentCheck.class);
         final String[] expected = {
-            "9:15: Assignment of parameter 'field' is not allowed.",
-            "10:15: Assignment of parameter 'field' is not allowed.",
-            "12:14: Assignment of parameter 'field' is not allowed.",
-            "20:30: Assignment of parameter 'field1' is not allowed.",
+            "9:15: " + getCheckMessage(MSG_KEY, "field"),
+            "10:15: " + getCheckMessage(MSG_KEY, "field"),
+            "12:14: " + getCheckMessage(MSG_KEY, "field"),
+            "20:30: " + getCheckMessage(MSG_KEY, "field1"),
         };
         verify(checkConfig, getPath("coding" + File.separator + "InputParameterAssignment.java"),
                expected);

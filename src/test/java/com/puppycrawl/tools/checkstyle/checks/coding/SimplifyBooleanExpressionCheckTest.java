@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -22,6 +22,8 @@ import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import org.junit.Test;
 
+import static com.puppycrawl.tools.checkstyle.checks.coding.SimplifyBooleanExpressionCheck.MSG_KEY;
+
 public class SimplifyBooleanExpressionCheckTest
     extends BaseCheckTestSupport
 {
@@ -31,11 +33,11 @@ public class SimplifyBooleanExpressionCheckTest
         final DefaultConfiguration checkConfig =
             createCheckConfig(SimplifyBooleanExpressionCheck.class);
         final String[] expected = {
-            "20:18: Expression can be simplified.",
-            "41:36: Expression can be simplified.",
-            "42:36: Expression can be simplified.",
-            "43:16: Expression can be simplified.",
-            "43:32: Expression can be simplified.",
+            "20:18: " + getCheckMessage(MSG_KEY),
+            "41:36: " + getCheckMessage(MSG_KEY),
+            "42:36: " + getCheckMessage(MSG_KEY),
+            "43:16: " + getCheckMessage(MSG_KEY),
+            "43:32: " + getCheckMessage(MSG_KEY),
         };
         verify(checkConfig, getPath("InputSimplifyBoolean.java"), expected);
     }

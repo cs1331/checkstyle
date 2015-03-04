@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -21,6 +21,12 @@ package com.puppycrawl.tools.checkstyle.checks.sizes;
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import org.junit.Test;
+
+import static com.puppycrawl.tools.checkstyle.checks.sizes.MethodCountCheck.MSG_PACKAGE_METHODS;
+import static com.puppycrawl.tools.checkstyle.checks.sizes.MethodCountCheck.MSG_PRIVATE_METHODS;
+import static com.puppycrawl.tools.checkstyle.checks.sizes.MethodCountCheck.MSG_PROTECTED_METHODS;
+import static com.puppycrawl.tools.checkstyle.checks.sizes.MethodCountCheck.MSG_PUBLIC_METHODS;
+import static com.puppycrawl.tools.checkstyle.checks.sizes.MethodCountCheck.MSG_MANY_METHODS;
 
 public class MethodCountCheckTest extends BaseCheckTestSupport
 {
@@ -50,15 +56,15 @@ public class MethodCountCheckTest extends BaseCheckTestSupport
         checkConfig.addAttribute("maxTotal", "3");
 
         final String[] expected = {
-            "3: Number of package methods is 5 (max allowed is 3).",
-            "3: Number of private methods is 5 (max allowed is 3).",
-            "3: Number of protected methods is 5 (max allowed is 3).",
-            "3: Number of public methods is 5 (max allowed is 3).",
-            "3: Total number of methods is 20 (max allowed is 3).",
-            "9: Number of public methods is 5 (max allowed is 3).",
-            "9: Total number of methods is 5 (max allowed is 3).",
-            "45: Number of public methods is 5 (max allowed is 3).",
-            "45: Total number of methods is 5 (max allowed is 3).",
+            "3: " + getCheckMessage(MSG_PACKAGE_METHODS, 5, 3),
+            "3: " + getCheckMessage(MSG_PRIVATE_METHODS, 5, 3),
+            "3: " + getCheckMessage(MSG_PROTECTED_METHODS, 5, 3),
+            "3: " + getCheckMessage(MSG_PUBLIC_METHODS, 5, 3),
+            "3: " + getCheckMessage(MSG_MANY_METHODS, 20, 3),
+            "9: " + getCheckMessage(MSG_PUBLIC_METHODS, 5, 3),
+            "9: " + getCheckMessage(MSG_MANY_METHODS, 5, 3),
+            "45: " + getCheckMessage(MSG_PUBLIC_METHODS, 5, 3),
+            "45: " + getCheckMessage(MSG_MANY_METHODS, 5, 3),
         };
 
         verify(checkConfig,
@@ -74,8 +80,8 @@ public class MethodCountCheckTest extends BaseCheckTestSupport
         checkConfig.addAttribute("maxTotal", "2");
 
         final String[] expected = {
-            "9: Number of private methods is 1 (max allowed is 0).",
-            "9: Total number of methods is 3 (max allowed is 2).",
+            "9: " + getCheckMessage(MSG_PRIVATE_METHODS, 1, 0),
+            "9: " + getCheckMessage(MSG_MANY_METHODS, 3, 2),
         };
 
         verify(checkConfig,

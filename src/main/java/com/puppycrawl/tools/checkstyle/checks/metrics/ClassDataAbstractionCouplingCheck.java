@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -30,6 +30,13 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 public final class ClassDataAbstractionCouplingCheck
     extends AbstractClassCouplingCheck
 {
+
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String MSG_KEY = "classDataAbstractionCoupling";
+
     /** Default allowed complexity. */
     private static final int DEFAULT_MAX = 7;
 
@@ -67,6 +74,6 @@ public final class ClassDataAbstractionCouplingCheck
     @Override
     protected String getLogMessageId()
     {
-        return "classDataAbstractionCoupling";
+        return MSG_KEY;
     }
 }

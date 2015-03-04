@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -65,6 +65,13 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 public class AvoidStaticImportCheck
     extends Check
 {
+
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String MSG_KEY = "import.avoidStatic";
+
     /** the classes/static members to exempt from this check. */
     private String[] excludes = new String[0];
 
@@ -98,7 +105,7 @@ public class AvoidStaticImportCheck
         final FullIdent name = FullIdent.createFullIdent(startingDot);
 
         if ((null != name) && !isExempt(name.getText())) {
-            log(startingDot.getLineNo(), "import.avoidStatic", name.getText());
+            log(startingDot.getLineNo(), MSG_KEY, name.getText());
         }
     }
 

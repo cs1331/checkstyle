@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -23,6 +23,10 @@ import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import java.io.File;
 import org.junit.Test;
 
+import static com.puppycrawl.tools.checkstyle.checks.metrics.JavaNCSSCheck.MSG_CLASS;
+import static com.puppycrawl.tools.checkstyle.checks.metrics.JavaNCSSCheck.MSG_FILE;
+import static com.puppycrawl.tools.checkstyle.checks.metrics.JavaNCSSCheck.MSG_METHOD;
+
 /**
  * Testcase for the JavaNCSS-Check.
  *
@@ -41,15 +45,15 @@ public class JavaNCSSCheckTest extends BaseCheckTestSupport
         checkConfig.addAttribute("fileMaximum", "2");
 
         String[] expected = {
-            "2:1: NCSS for this file is 35 (max allowed is 2).",
-            "9:1: NCSS for this class is 22 (max allowed is 1).",
-            "14:5: NCSS for this method is 2 (max allowed is 0).",
-            "21:5: NCSS for this method is 4 (max allowed is 0).",
-            "30:5: NCSS for this method is 12 (max allowed is 0).",
-            "42:13: NCSS for this method is 2 (max allowed is 0).",
-            "49:5: NCSS for this class is 2 (max allowed is 1).",
-            "56:1: NCSS for this class is 10 (max allowed is 1).",
-            "61:5: NCSS for this method is 8 (max allowed is 0).",
+            "2:1: " + getCheckMessage(MSG_FILE, 35, 2),
+            "9:1: " + getCheckMessage(MSG_CLASS, 22, 1),
+            "14:5: " + getCheckMessage(MSG_METHOD, 2, 0),
+            "21:5: " + getCheckMessage(MSG_METHOD, 4, 0),
+            "30:5: " + getCheckMessage(MSG_METHOD, 12, 0),
+            "42:13: " + getCheckMessage(MSG_METHOD, 2, 0),
+            "49:5: " + getCheckMessage(MSG_CLASS, 2, 1),
+            "56:1: " + getCheckMessage(MSG_CLASS, 10, 1),
+            "61:5: " + getCheckMessage(MSG_METHOD, 8, 0),
         };
 
         verify(checkConfig, getPath("metrics" + File.separator

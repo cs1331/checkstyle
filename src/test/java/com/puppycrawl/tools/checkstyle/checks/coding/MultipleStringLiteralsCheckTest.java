@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -23,6 +23,8 @@ import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import java.io.File;
 import org.junit.Test;
 
+import static com.puppycrawl.tools.checkstyle.checks.coding.MultipleStringLiteralsCheck.MSG_KEY;
+
 public class MultipleStringLiteralsCheckTest extends BaseCheckTestSupport
 {
     @Test
@@ -34,9 +36,9 @@ public class MultipleStringLiteralsCheckTest extends BaseCheckTestSupport
         checkConfig.addAttribute("ignoreStringsRegexp", "");
 
         final String[] expected = {
-            "5:16: The String \"StringContents\" appears 3 times in the file.",
-            "8:17: The String \"\" appears 4 times in the file.",
-            "10:23: The String \", \" appears 3 times in the file.",
+            "5:16: " + getCheckMessage(MSG_KEY, "\"StringContents\"", 3),
+            "8:17: " + getCheckMessage(MSG_KEY, "\"\"", 4),
+            "10:23: " + getCheckMessage(MSG_KEY, "\", \"", 3),
         };
 
         verify(checkConfig,
@@ -52,8 +54,8 @@ public class MultipleStringLiteralsCheckTest extends BaseCheckTestSupport
         checkConfig.addAttribute("allowedDuplicates", "2");
 
         final String[] expected = {
-            "5:16: The String \"StringContents\" appears 3 times in the file.",
-            "10:23: The String \", \" appears 3 times in the file.",
+            "5:16: " + getCheckMessage(MSG_KEY, "\"StringContents\"", 3),
+            "10:23: " + getCheckMessage(MSG_KEY, "\", \"", 3),
         };
 
         verify(checkConfig,
@@ -70,7 +72,7 @@ public class MultipleStringLiteralsCheckTest extends BaseCheckTestSupport
         checkConfig.addAttribute("ignoreStringsRegexp", "^((\"\")|(\", \"))$");
 
         final String[] expected = {
-            "5:16: The String \"StringContents\" appears 3 times in the file.",
+            "5:16: " + getCheckMessage(MSG_KEY, "\"StringContents\"", 3),
         };
 
         verify(checkConfig,
@@ -87,7 +89,7 @@ public class MultipleStringLiteralsCheckTest extends BaseCheckTestSupport
         checkConfig.addAttribute("ignoreOccurrenceContext", "");
 
         final String[] expected = {
-            "19:23: The String \"unchecked\" appears 4 times in the file.",
+            "19:23: " + getCheckMessage(MSG_KEY, "\"unchecked\"", 4),
         };
 
         verify(checkConfig,

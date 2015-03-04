@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -80,6 +80,19 @@ import com.puppycrawl.tools.checkstyle.checks.AbstractOptionCheck;
 public class SeparatorWrapCheck
     extends AbstractOptionCheck<WrapOption>
 {
+
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String LINE_PREVIOUS = "line.previous";
+
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String LINE_NEW = "line.new";
+
     /**
      * Sets the comma wrap option to end of the line.
      */
@@ -131,12 +144,12 @@ public class SeparatorWrapCheck
         if (wSp == WrapOption.EOL
                 && (substringBeforeToken.length() == 0))
         {
-            log(lineNo, colNo, "line.previous", text);
+            log(lineNo, colNo, LINE_PREVIOUS, text);
         }
         else if (wSp == WrapOption.NL
                  && substringAfterToken.length() == 0)
         {
-            log(lineNo, colNo, "line.new", text);
+            log(lineNo, colNo, LINE_NEW, text);
         }
     }
 }

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -22,6 +22,8 @@ import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import org.junit.Test;
 
+import static com.puppycrawl.tools.checkstyle.checks.TodoCommentCheck.MSG_KEY;
+
 public class TodoCommentCheckTest
     extends BaseCheckTestSupport
 {
@@ -32,10 +34,10 @@ public class TodoCommentCheckTest
             createCheckConfig(TodoCommentCheck.class);
         checkConfig.addAttribute("format", "FIXME:");
         final String[] expected = {
-            "161: Comment matches to-do format 'FIXME:'.",
-            "162: Comment matches to-do format 'FIXME:'.",
-            "163: Comment matches to-do format 'FIXME:'.",
-            "167: Comment matches to-do format 'FIXME:'.",
+            "161: " + getCheckMessage(MSG_KEY, "FIXME:"),
+            "162: " + getCheckMessage(MSG_KEY, "FIXME:"),
+            "163: " + getCheckMessage(MSG_KEY, "FIXME:"),
+            "167: " + getCheckMessage(MSG_KEY, "FIXME:"),
         };
         verify(checkConfig, getPath("InputSimple.java"), expected);
     }

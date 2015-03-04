@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -23,6 +23,9 @@ import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import java.io.File;
 import org.junit.Test;
 
+import static com.puppycrawl.tools.checkstyle.checks.metrics.BooleanExpressionComplexityCheck
+.MSG_KEY;
+
 public class BooleanExpressionComplexityCheckTest extends BaseCheckTestSupport
 {
     @Test
@@ -32,8 +35,10 @@ public class BooleanExpressionComplexityCheckTest extends BaseCheckTestSupport
             createCheckConfig(BooleanExpressionComplexityCheck.class);
 
         String[] expected = {
-            "13:9: Boolean expression complexity is 4 (max allowed is 3).",
-            "32:9: Boolean expression complexity is 6 (max allowed is 3).",
+            "13:9: " + getCheckMessage(MSG_KEY, 4, 3),
+            "32:9: " + getCheckMessage(MSG_KEY, 6, 3),
+            "38:34: " + getCheckMessage(MSG_KEY, 4, 3),
+            "40:34: " + getCheckMessage(MSG_KEY, 4, 3),
         };
 
         verify(checkConfig, getPath("metrics" + File.separator + "BooleanExpressionComplexityCheckTestInput.java"), expected);
@@ -51,5 +56,17 @@ public class BooleanExpressionComplexityCheckTest extends BaseCheckTestSupport
         };
 
         verify(checkConfig, getPath("metrics" + File.separator + "BooleanExpressionComplexityCheckTestInput.java"), expected);
+    }
+
+    @Test
+    public void testNPE() throws Exception
+    {
+        DefaultConfiguration checkConfig =
+            createCheckConfig(BooleanExpressionComplexityCheck.class);
+
+        String[] expected = {
+        };
+
+        verify(checkConfig, getPath("metrics" + File.separator + "InputBooleanExpressionComplexityNPE.java"), expected);
     }
 }

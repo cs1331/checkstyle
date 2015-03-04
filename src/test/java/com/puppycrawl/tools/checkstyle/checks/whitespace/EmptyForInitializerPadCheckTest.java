@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -23,6 +23,11 @@ import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import org.junit.Before;
 import org.junit.Test;
 
+import static com.puppycrawl.tools.checkstyle.checks.whitespace.EmptyForInitializerPadCheck
+.MSG_NOT_PRECEDED;
+import static com.puppycrawl.tools.checkstyle.checks.whitespace.EmptyForInitializerPadCheck
+.MSG_PRECEDED;
+
 public class EmptyForInitializerPadCheckTest
     extends BaseCheckTestSupport
 {
@@ -38,7 +43,7 @@ public class EmptyForInitializerPadCheckTest
     public void testDefault() throws Exception
     {
         final String[] expected = {
-            "48:14: ';' is preceded with whitespace.",
+            "48:14: " + getCheckMessage(MSG_PRECEDED, ";"),
         };
         verify(checkConfig, getPath("InputForWhitespace.java"), expected);
     }
@@ -48,7 +53,7 @@ public class EmptyForInitializerPadCheckTest
     {
         checkConfig.addAttribute("option", PadOption.SPACE.toString());
         final String[] expected = {
-            "51:13: ';' is not preceded with whitespace.",
+            "51:13: " + getCheckMessage(MSG_NOT_PRECEDED, ";"),
         };
         verify(checkConfig, getPath("InputForWhitespace.java"), expected);
     }

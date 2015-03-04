@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -99,6 +99,13 @@ import org.apache.commons.beanutils.ConversionException;
  */
 public class TrailingCommentCheck extends AbstractFormatCheck
 {
+
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String MSG_KEY = "trailing.comments";
+
     /** default format for allowed blank line. */
     private static final String DEFAULT_FORMAT = "^[\\s\\}\\);]*$";
 
@@ -178,7 +185,7 @@ public class TrailingCommentCheck extends AbstractFormatCheck
                 && !blankLinePattern.matcher(lineBefore).find()
                 && !isLegalComment(comment))
             {
-                log(lineNo.intValue(), "trailing.comments");
+                log(lineNo.intValue(), MSG_KEY);
             }
         }
     }

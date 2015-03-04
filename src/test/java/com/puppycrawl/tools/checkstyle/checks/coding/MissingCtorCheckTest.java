@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -23,6 +23,8 @@ import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import java.io.File;
 import org.junit.Test;
 
+import static com.puppycrawl.tools.checkstyle.checks.coding.MissingCtorCheck.MSG_KEY;
+
 public class MissingCtorCheckTest extends BaseCheckTestSupport
 {
     @Test
@@ -32,7 +34,7 @@ public class MissingCtorCheckTest extends BaseCheckTestSupport
             createCheckConfig(MissingCtorCheck.class);
 
         final String[] expected = {
-            "3:1: Class should define a constructor.",
+            "3:1: " + getCheckMessage(MSG_KEY),
         };
 
         verify(checkConfig,

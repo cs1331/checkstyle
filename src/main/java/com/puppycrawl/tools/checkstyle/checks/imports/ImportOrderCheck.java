@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -92,6 +92,18 @@ import java.util.regex.Pattern;
 public class ImportOrderCheck
     extends AbstractOptionCheck<ImportOrderOption>
 {
+
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String MSG_SEPARATION = "import.separation";
+
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String MSG_ORDERING = "import.ordering";
 
     /** the special wildcard that catches all remaining groups. */
     private static final String WILDCARD_GROUP_NAME = "*";
@@ -295,7 +307,7 @@ public class ImportOrderCheck
                     // This check should be made more robust to handle
                     // comments and imports that span more than one line.
                     if ((line - lastImportLine) < 2) {
-                        log(line, "import.separation", name);
+                        log(line, MSG_SEPARATION, name);
                     }
                 }
             }
@@ -303,7 +315,7 @@ public class ImportOrderCheck
                 doVisitTokenInSameGroup(isStatic, previous, name, line);
             }
             else {
-                log(line, "import.ordering", name);
+                log(line, MSG_ORDERING, name);
             }
 
             lastGroup = groupIdx;
@@ -330,7 +342,7 @@ public class ImportOrderCheck
         if (getAbstractOption().equals(ImportOrderOption.INFLOW)) {
             // out of lexicographic order
             if (compare(lastImport, name, caseSensitive) > 0) {
-                log(line, "import.ordering", name);
+                log(line, MSG_ORDERING, name);
             }
         }
         else {
@@ -348,7 +360,7 @@ public class ImportOrderCheck
                 previous;
 
             if (shouldFireError) {
-                log(line, "import.ordering", name);
+                log(line, MSG_ORDERING, name);
             }
         }
     }

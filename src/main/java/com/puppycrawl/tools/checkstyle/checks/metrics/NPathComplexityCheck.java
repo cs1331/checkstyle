@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -37,6 +37,13 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  */
 public final class NPathComplexityCheck extends AbstractComplexityCheck
 {
+
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String MSG_KEY = "npathComplexity";
+
     /** Default allowed complexity. */
     private static final int DEFAULT_MAX = 200;
 
@@ -137,7 +144,7 @@ public final class NPathComplexityCheck extends AbstractComplexityCheck
     @Override
     protected String getMessageID()
     {
-        return "npathComplexity";
+        return MSG_KEY;
     }
 
     /** Visits else, catch or case. */

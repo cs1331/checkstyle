@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -43,6 +43,13 @@ import com.puppycrawl.tools.checkstyle.api.DetailAST;
 public final class InterfaceIsTypeCheck
         extends Check
 {
+
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String MSG_KEY = "interface.type";
+
     /** flag to control whether marker interfaces are allowed. */
     private boolean allowMarkerInterfaces = true;
 
@@ -77,7 +84,7 @@ public final class InterfaceIsTypeCheck
                 !allowMarkerInterfaces || (variableDef != null);
 
         if ((methodDef == null) && methodRequired) {
-            log(ast.getLineNo(), "interface.type");
+            log(ast.getLineNo(), MSG_KEY);
         }
 
     }

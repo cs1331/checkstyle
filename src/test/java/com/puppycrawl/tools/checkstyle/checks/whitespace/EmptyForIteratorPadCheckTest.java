@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -23,6 +23,11 @@ import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import org.junit.Before;
 import org.junit.Test;
 
+import static com.puppycrawl.tools.checkstyle.checks.whitespace.EmptyForIteratorPadCheck
+.WS_FOLLOWED;
+import static com.puppycrawl.tools.checkstyle.checks.whitespace.EmptyForIteratorPadCheck
+.WS_NOT_FOLLOWED;
+
 public class EmptyForIteratorPadCheckTest
     extends BaseCheckTestSupport
 {
@@ -38,8 +43,8 @@ public class EmptyForIteratorPadCheckTest
     public void testDefault() throws Exception
     {
         final String[] expected = {
-            "27:31: ';' is followed by whitespace.",
-            "43:32: ';' is followed by whitespace.",
+            "27:31: " + getCheckMessage(WS_FOLLOWED, ";"),
+            "43:32: " + getCheckMessage(WS_FOLLOWED, ";"),
         };
         verify(checkConfig, getPath("InputForWhitespace.java"), expected);
     }
@@ -49,7 +54,7 @@ public class EmptyForIteratorPadCheckTest
     {
         checkConfig.addAttribute("option", PadOption.SPACE.toString());
         final String[] expected = {
-            "23:31: ';' is not followed by whitespace.",
+            "23:31: " + getCheckMessage(WS_NOT_FOLLOWED, ";"),
         };
         verify(checkConfig, getPath("InputForWhitespace.java"), expected);
     }

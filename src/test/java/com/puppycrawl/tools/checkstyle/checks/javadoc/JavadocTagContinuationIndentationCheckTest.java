@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -23,6 +23,9 @@ import org.junit.Test;
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 
+import static com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocTagContinuationIndentationCheck
+.MSG_KEY;
+
 public class JavadocTagContinuationIndentationCheckTest
         extends BaseCheckTestSupport
 {
@@ -42,18 +45,18 @@ public class JavadocTagContinuationIndentationCheckTest
         final DefaultConfiguration checkConfig =
                 createCheckConfig(JavadocTagContinuationIndentationCheck.class);
         final String[] expected = {
-            "47: Line continuation have incorrect indentation level, expected level should be 4.",
-            "109: Line continuation have incorrect indentation level, expected level should be 4.",
-            "112: Line continuation have incorrect indentation level, expected level should be 4.",
-            "203: Line continuation have incorrect indentation level, expected level should be 4.",
-            "206: Line continuation have incorrect indentation level, expected level should be 4.",
-            "221: Line continuation have incorrect indentation level, expected level should be 4.",
-            "223: Line continuation have incorrect indentation level, expected level should be 4.",
-            "285: Line continuation have incorrect indentation level, expected level should be 4.",
-            "288: Line continuation have incorrect indentation level, expected level should be 4.",
-            "290: Line continuation have incorrect indentation level, expected level should be 4.",
-            "310: Line continuation have incorrect indentation level, expected level should be 4.",
-            "322: Line continuation have incorrect indentation level, expected level should be 4.",
+            "47: " + getCheckMessage(MSG_KEY, 4),
+            "109: " + getCheckMessage(MSG_KEY, 4),
+            "112: " + getCheckMessage(MSG_KEY, 4),
+            "203: " + getCheckMessage(MSG_KEY, 4),
+            "206: " + getCheckMessage(MSG_KEY, 4),
+            "221: " + getCheckMessage(MSG_KEY, 4),
+            "223: " + getCheckMessage(MSG_KEY, 4),
+            "285: " + getCheckMessage(MSG_KEY, 4),
+            "288: " + getCheckMessage(MSG_KEY, 4),
+            "290: " + getCheckMessage(MSG_KEY, 4),
+            "310: " + getCheckMessage(MSG_KEY, 4),
+            "322: " + getCheckMessage(MSG_KEY, 4),
         };
         verify(checkConfig, getPath("javadoc/InputJavaDocTagContinuationIndentation.java"), expected);
     }

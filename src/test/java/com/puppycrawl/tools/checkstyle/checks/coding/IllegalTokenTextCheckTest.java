@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -22,6 +22,8 @@ import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import org.junit.Test;
 
+import static com.puppycrawl.tools.checkstyle.checks.coding.IllegalTokenTextCheck.MSG_KEY;
+
 public class IllegalTokenTextCheckTest
     extends BaseCheckTestSupport
 {
@@ -34,7 +36,7 @@ public class IllegalTokenTextCheckTest
         checkConfig.addAttribute("tokens", "STRING_LITERAL");
         checkConfig.addAttribute("format", "a href");
         final String[] expected = {
-            "24:28: Token text matches the illegal pattern 'a href'.",
+            "24:28: " + getCheckMessage(MSG_KEY, "a href"),
         };
         verify(checkConfig, getPath("InputIllegalTokens.java"), expected);
     }
@@ -49,8 +51,8 @@ public class IllegalTokenTextCheckTest
         checkConfig.addAttribute("format", "a href");
         checkConfig.addAttribute("ignoreCase", "true");
         final String[] expected = {
-            "24:28: Token text matches the illegal pattern 'a href'.",
-            "25:32: Token text matches the illegal pattern 'a href'.",
+            "24:28: " + getCheckMessage(MSG_KEY, "a href"),
+            "25:32: " + getCheckMessage(MSG_KEY, "a href"),
         };
         verify(checkConfig, getPath("InputIllegalTokens.java"), expected);
     }

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -23,6 +23,8 @@ import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import java.io.File;
 import org.junit.Test;
 
+import static com.puppycrawl.tools.checkstyle.checks.imports.IllegalImportCheck.MSG_KEY;
+
 public class IllegalImportCheckTest extends BaseCheckTestSupport
 {
     @Test
@@ -33,9 +35,9 @@ public class IllegalImportCheckTest extends BaseCheckTestSupport
             createCheckConfig(IllegalImportCheck.class);
         checkConfig.addAttribute("illegalPkgs", "java.io");
         final String[] expected = {
-            "9:1: Import from illegal package - java.io.*.",
-            "23:1: Import from illegal package - java.io.File.listRoots.",
-            "27:1: Import from illegal package - java.io.File.createTempFile.",
+            "9:1: " + getCheckMessage(MSG_KEY, "java.io.*"),
+            "23:1: " + getCheckMessage(MSG_KEY, "java.io.File.listRoots"),
+            "27:1: " + getCheckMessage(MSG_KEY, "java.io.File.createTempFile"),
         };
         verify(checkConfig, getPath("imports" + File.separator + "InputIllegalImportCheck.java"),
                 expected);
@@ -48,8 +50,8 @@ public class IllegalImportCheckTest extends BaseCheckTestSupport
         final DefaultConfiguration checkConfig =
             createCheckConfig(IllegalImportCheck.class);
         final String[] expected = {
-            "15:1: Import from illegal package - sun.applet.*.",
-            "28:1: Import from illegal package - sun.*.",
+            "15:1: " + getCheckMessage(MSG_KEY, "sun.applet.*"),
+            "28:1: " + getCheckMessage(MSG_KEY, "sun.*"),
         };
         verify(checkConfig, getPath("imports" + File.separator + "InputIllegalImportCheck.java"),
                 expected);

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -43,6 +43,25 @@ import org.apache.commons.beanutils.ConversionException;
  */
 public class ImportControlCheck extends Check
 {
+
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String MSG_MISSING_FILE = "import.control.missing.file";
+
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String MSG_UNKNOWN_PKG = "import.control.unknown.pkg";
+
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String MSG_DISALLOWED = "import.control.disallowed";
+
     /** The root package controller. */
     private PkgControl root;
     /** The package doing the import. */
@@ -81,13 +100,13 @@ public class ImportControlCheck extends Check
             final DetailAST nameAST = ast.getLastChild().getPreviousSibling();
             final FullIdent full = FullIdent.createFullIdent(nameAST);
             if (root == null) {
-                log(nameAST, "import.control.missing.file");
+                log(nameAST, MSG_MISSING_FILE);
             }
             else {
                 inPkg = full.getText();
                 currentLeaf = root.locateFinest(inPkg);
                 if (currentLeaf == null) {
-                    log(nameAST, "import.control.unknown.pkg");
+                    log(nameAST, MSG_UNKNOWN_PKG);
                 }
             }
         }
@@ -104,7 +123,7 @@ public class ImportControlCheck extends Check
             final AccessResult access = currentLeaf.checkAccess(imp.getText(),
                     inPkg);
             if (!AccessResult.ALLOWED.equals(access)) {
-                log(ast, "import.control.disallowed", imp.getText());
+                log(ast, MSG_DISALLOWED, imp.getText());
             }
         }
     }

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -22,6 +22,8 @@ import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import org.junit.Test;
 
+import static com.puppycrawl.tools.checkstyle.checks.design.FinalClassCheck.MSG_KEY;
+
 public class FinalClassCheckTest
     extends BaseCheckTestSupport
 {
@@ -31,9 +33,9 @@ public class FinalClassCheckTest
         final DefaultConfiguration checkConfig =
             createCheckConfig(FinalClassCheck.class);
         final String[] expected = {
-            "7: Class InputFinalClass should be declared as final.",
-            "15: Class test4 should be declared as final.",
-            "109: Class someinnerClass should be declared as final.",
+            "7: " + getCheckMessage(MSG_KEY, "InputFinalClass"),
+            "15: " + getCheckMessage(MSG_KEY, "test4"),
+            "109: " + getCheckMessage(MSG_KEY, "someinnerClass"),
         };
         verify(checkConfig, getPath("InputFinalClass.java"), expected);
     }

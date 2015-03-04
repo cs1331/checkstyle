@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -165,6 +165,30 @@ import com.puppycrawl.tools.checkstyle.api.Utils;
  */
 public class CustomImportOrderCheck extends Check
 {
+
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String MSG_LINE_SEPARATOR = "custom.import.order.line.separator";
+
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String MSG_LEX = "custom.import.order.lex";
+
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String MSG_NONGROUP_IMPORT = "custom.import.order.nongroup.import";
+
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String MSG_ORDER = "custom.import.order";
 
     /** STATIC group name */
     private static final String STATIC_RULE_GROUP = "STATIC";
@@ -356,7 +380,7 @@ public class CustomImportOrderCheck extends Check
                         if (separateLineBetweenGroups && previousImport != null
                                 && !hasEmptyLineBefore(importObject.getLineNumber()))
                         {
-                            log(importObject.getLineNumber(), "custom.import.order.line.separator",
+                            log(importObject.getLineNumber(), MSG_LINE_SEPARATOR,
                                     fullImportIdent);
                         }
                         currentGroup = nextGroup;
@@ -378,7 +402,7 @@ public class CustomImportOrderCheck extends Check
                             fullImportIdent, currentGroup)
                     && !(compareImports(fullImportIdent, previousImport) >= 0))
             {
-                log(importObject.getLineNumber(), "custom.import.order.lex", fullImportIdent);
+                log(importObject.getLineNumber(), MSG_LEX, fullImportIdent);
             }
             previousImport = fullImportIdent;
         }
@@ -394,10 +418,10 @@ public class CustomImportOrderCheck extends Check
     private void logWrongImportGroupOrder(int currentImportLine, String importGroup)
     {
         if (NON_GROUP_RULE_GROUP.equals(importGroup)) {
-            log(currentImportLine, "custom.import.order.nongroup.import");
+            log(currentImportLine, MSG_NONGROUP_IMPORT);
         }
         else {
-            log(currentImportLine, "custom.import.order", importGroup);
+            log(currentImportLine, MSG_ORDER, importGroup);
         }
     }
 

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -22,6 +22,8 @@ import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import org.junit.Test;
 
+import static com.puppycrawl.tools.checkstyle.checks.coding.AbstractSuperCheck.MSG_KEY;
+
 public class SuperFinalizeCheckTest
     extends BaseCheckTestSupport
 {
@@ -31,8 +33,8 @@ public class SuperFinalizeCheckTest
         final DefaultConfiguration checkConfig =
             createCheckConfig(SuperFinalizeCheck.class);
         final String[] expected = {
-            "27:17: Method 'finalize' should call 'super.finalize'.",
-            "34:17: Method 'finalize' should call 'super.finalize'.",
+            "27:17: " + getCheckMessage(MSG_KEY, "finalize", "super.finalize"),
+            "34:17: " + getCheckMessage(MSG_KEY, "finalize", "super.finalize"),
         };
         verify(checkConfig, getPath("coding/InputFinalize.java"), expected);
     }

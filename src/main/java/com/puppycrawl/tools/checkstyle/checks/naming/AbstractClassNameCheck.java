@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -40,6 +40,19 @@ import com.puppycrawl.tools.checkstyle.checks.AbstractFormatCheck;
  */
 public final class AbstractClassNameCheck extends AbstractFormatCheck
 {
+
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String ILLEGAL_ABSTRACT_CLASS_NAME = "illegal.abstract.class.name";
+
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String NO_ABSTRACT_CLASS_MODIFIER = "no.abstract.class.modifier";
+
     /** Default format for abstract class names */
     private static final String DEFAULT_FORMAT = "^Abstract.+$|^.*Factory$";
 
@@ -109,12 +122,12 @@ public final class AbstractClassNameCheck extends AbstractFormatCheck
             // if class has abstract modifier
             if (!ignoreName && !isMatchingClassName(className)) {
                 log(ast.getLineNo(), ast.getColumnNo(),
-                    "illegal.abstract.class.name", className, getFormat());
+                    ILLEGAL_ABSTRACT_CLASS_NAME, className, getFormat());
             }
         }
         else if (!ignoreModifier && isMatchingClassName(className)) {
             log(ast.getLineNo(), ast.getColumnNo(),
-                "no.abstract.class.modifier", className);
+                NO_ABSTRACT_CLASS_MODIFIER, className);
         }
     }
 

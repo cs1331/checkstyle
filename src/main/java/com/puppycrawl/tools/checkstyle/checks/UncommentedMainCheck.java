@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -44,6 +44,13 @@ import org.apache.commons.beanutils.ConversionException;
 public class UncommentedMainCheck
     extends Check
 {
+
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String MSG_KEY = "uncommented.main";
+
     /** the pattern to exclude classes from the check */
     private String excludedClasses = "^$";
     /** compiled regexp to exclude classes from check */
@@ -181,7 +188,7 @@ public class UncommentedMainCheck
             && checkType(method)
             && checkParams(method))
         {
-            log(method.getLineNo(), "uncommented.main");
+            log(method.getLineNo(), MSG_KEY);
         }
     }
 

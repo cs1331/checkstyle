@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -23,6 +23,8 @@ import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import java.io.File;
 import org.junit.Test;
 
+import static com.puppycrawl.tools.checkstyle.checks.coding.PackageDeclarationCheck.MSG_KEY;
+
 public class PackageDeclarationCheckTest extends BaseCheckTestSupport
 {
     @Test
@@ -31,7 +33,7 @@ public class PackageDeclarationCheckTest extends BaseCheckTestSupport
         DefaultConfiguration checkConfig = createCheckConfig(PackageDeclarationCheck.class);
 
         String[] expected = {
-            "4: Missing package declaration.",
+            "4: " + getCheckMessage(MSG_KEY),
         };
 
         verify(checkConfig, new File("src/test/resources-noncompilable/com/puppycrawl/tools/"

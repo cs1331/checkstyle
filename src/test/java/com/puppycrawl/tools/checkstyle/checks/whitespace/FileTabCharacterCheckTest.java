@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -24,6 +24,10 @@ import com.puppycrawl.tools.checkstyle.api.Configuration;
 import java.io.File;
 import org.junit.Test;
 
+import static com.puppycrawl.tools.checkstyle.checks.whitespace.FileTabCharacterCheck.CONTAINS_TAB;
+import static com.puppycrawl.tools.checkstyle.checks.whitespace.FileTabCharacterCheck
+.FILE_CONTAINS_TAB;
+
 public class FileTabCharacterCheckTest
     extends BaseCheckTestSupport
 {
@@ -41,7 +45,7 @@ public class FileTabCharacterCheckTest
     {
         final DefaultConfiguration checkConfig = createConfig(false);
         final String[] expected = {
-            "19:25: File contains tab characters (this is the first instance).",
+            "19:25: " + getCheckMessage(FILE_CONTAINS_TAB),
         };
         final File[] files = {
             new File(getPath("InputSimple.java")),
@@ -55,14 +59,14 @@ public class FileTabCharacterCheckTest
     {
         final DefaultConfiguration checkConfig = createConfig(true);
         final String[] expected = {
-            "19:25: Line contains a tab character.",
-            "145:35: Line contains a tab character.",
-            "146:64: Line contains a tab character.",
-            "154:9: Line contains a tab character.",
-            "155:10: Line contains a tab character.",
-            "156:1: Line contains a tab character.",
-            "157:3: Line contains a tab character.",
-            "158:3: Line contains a tab character.",
+            "19:25: " + getCheckMessage(CONTAINS_TAB),
+            "145:35: " + getCheckMessage(CONTAINS_TAB),
+            "146:64: " + getCheckMessage(CONTAINS_TAB),
+            "154:9: " + getCheckMessage(CONTAINS_TAB),
+            "155:10: " + getCheckMessage(CONTAINS_TAB),
+            "156:1: " + getCheckMessage(CONTAINS_TAB),
+            "157:3: " + getCheckMessage(CONTAINS_TAB),
+            "158:3: " + getCheckMessage(CONTAINS_TAB),
         };
         final File[] files = {
             new File(getPath("InputSimple.java")),

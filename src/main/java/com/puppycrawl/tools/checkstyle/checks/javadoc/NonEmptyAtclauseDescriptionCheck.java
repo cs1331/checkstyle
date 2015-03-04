@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -45,6 +45,12 @@ import com.puppycrawl.tools.checkstyle.api.JavadocTokenTypes;
 public class NonEmptyAtclauseDescriptionCheck extends AbstractJavadocCheck
 {
 
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String MSG_KEY = "non.empty.atclause";
+
     @Override
     public int[] getDefaultJavadocTokens()
     {
@@ -60,7 +66,7 @@ public class NonEmptyAtclauseDescriptionCheck extends AbstractJavadocCheck
     public void visitJavadocToken(DetailNode ast)
     {
         if (isEmptyTag(ast.getParent())) {
-            log(ast.getLineNumber(), "non.empty.atclause", ast.getText());
+            log(ast.getLineNumber(), MSG_KEY, ast.getText());
         }
     }
 

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -93,6 +93,13 @@ import java.util.Set;
  */
 public final class IllegalTypeCheck extends AbstractFormatCheck
 {
+
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String MSG_KEY = "illegal.type";
+
     /** Default value of pattern for illegal class name. */
     private static final String DEFAULT_FORMAT = "^(.*[\\.])?Abstract.*$";
     /** Abstract classes legal by default. */
@@ -294,7 +301,7 @@ public final class IllegalTypeCheck extends AbstractFormatCheck
 
         if (isMatchingClassName(ident.getText())) {
             log(ident.getLineNo(), ident.getColumnNo(),
-                "illegal.type", ident.getText());
+                MSG_KEY, ident.getText());
         }
     }
 
@@ -457,9 +464,9 @@ public final class IllegalTypeCheck extends AbstractFormatCheck
      */
     public void setMemberModifiers(String modifiers)
     {
-        final List<Integer> modifiersList = new ArrayList<>(modifiers.length());
-        for (String modifier : modifiers.split(", ")) {
-            modifiersList.add(TokenTypes.getTokenId(modifier));
+        final List<Integer> modifiersList = new ArrayList<>();
+        for (String modifier : modifiers.split(",")) {
+            modifiersList.add(TokenTypes.getTokenId(modifier.trim()));
         }
         this.memberModifiers = modifiersList;
     }

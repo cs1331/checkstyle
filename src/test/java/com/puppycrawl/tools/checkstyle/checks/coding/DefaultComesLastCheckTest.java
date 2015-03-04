@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -25,6 +25,8 @@ import org.junit.Test;
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 
+import static com.puppycrawl.tools.checkstyle.checks.coding.DefaultComesLastCheck.MSG_KEY;
+
 public class DefaultComesLastCheckTest extends BaseCheckTestSupport
 {
     @Test
@@ -33,7 +35,7 @@ public class DefaultComesLastCheckTest extends BaseCheckTestSupport
         final DefaultConfiguration checkConfig =
             createCheckConfig(DefaultComesLastCheck.class);
         final String[] expected = {
-            "24:9: Default should be last label in the switch.",
+            "24:9: " + getCheckMessage(MSG_KEY),
         };
         verify(checkConfig,
                getPath("coding" + File.separator + "InputDefaultComesLast.java"),

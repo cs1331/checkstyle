@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -22,6 +22,8 @@ import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import org.junit.Test;
 
+import static com.puppycrawl.tools.checkstyle.checks.sizes.OuterTypeNumberCheck.MSG_KEY;
+
 public class OuterTypeNumberCheckTest extends BaseCheckTestSupport
 {
     @Test
@@ -30,7 +32,7 @@ public class OuterTypeNumberCheckTest extends BaseCheckTestSupport
         final DefaultConfiguration checkConfig =
             createCheckConfig(OuterTypeNumberCheck.class);
         final String[] expected = {
-            "6:1: Outer types defined is 3 (max allowed is 1).",
+            "6:1: " + getCheckMessage(MSG_KEY, 3, 1),
         };
         verify(checkConfig, getPath("InputSimple.java"), expected);
     }

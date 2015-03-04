@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -60,6 +60,18 @@ public class SummaryJavadocCheck extends AbstractJavadocCheck
 {
 
     /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String SUMMARY_FIRST_SENTENCE = "summary.first.sentence";
+
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String SUMMARY_JAVADOC = "summary.javaDoc";
+
+    /**
      * Regular expression for forbidden summary fragments.
      */
     private Pattern forbiddenSummaryFragments = Utils.createPattern("^$");
@@ -101,12 +113,12 @@ public class SummaryJavadocCheck extends AbstractJavadocCheck
         String firstSentence = getFirstSentence(ast);
         final int endOfSentence = firstSentence.lastIndexOf(period);
         if (endOfSentence == -1) {
-            log(ast.getLineNumber(), "summary.first.sentence");
+            log(ast.getLineNumber(), SUMMARY_FIRST_SENTENCE);
         }
         else {
             firstSentence = firstSentence.substring(0, endOfSentence);
             if (containsForbiddenFragment(firstSentence)) {
-                log(ast.getLineNumber(), "summary.javaDoc");
+                log(ast.getLineNumber(), SUMMARY_JAVADOC);
             }
         }
     }

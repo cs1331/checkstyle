@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -27,12 +27,22 @@ import com.puppycrawl.tools.checkstyle.checks.CheckUtils;
 /**
  * Restricts nested boolean operators (&amp;&amp;, ||, &amp;, | and ^) to
  * a specified depth (default = 3).
+ * Note: &amp;, | and ^ are not checked if they are part of constructor or
+ * method call because they can be applied to non boolean variables and
+ * Checkstyle does not know types of methods from different classes.
  *
  * @author <a href="mailto:simon@redhillconsulting.com.au">Simon Harris</a>
  * @author o_sukhodolsky
  */
 public final class BooleanExpressionComplexityCheck extends Check
 {
+
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String MSG_KEY = "booleanExpressionComplexity";
+
     /** Default allowed complexity. */
     private static final int DEFAULT_MAX = 3;
 
@@ -118,16 +128,48 @@ public final class BooleanExpressionComplexityCheck extends Check
             case TokenTypes.EXPR:
                 visitExpr();
                 break;
-            case TokenTypes.LAND:
-            case TokenTypes.BAND:
-            case TokenTypes.LOR:
             case TokenTypes.BOR:
+                if (!isPipeOperator(ast) && !isPassedInParameter(ast)) {
+                    context.visitBooleanOperator();
+                }
+                break;
+            case TokenTypes.BAND:
             case TokenTypes.BXOR:
+                if (!isPassedInParameter(ast)) {
+                    context.visitBooleanOperator();
+                }
+                break;
+            case TokenTypes.LAND:
+            case TokenTypes.LOR:
                 context.visitBooleanOperator();
                 break;
             default:
                 throw new IllegalStateException(ast.toString());
         }
+    }
+
+    /**
+     * Checks if logical operator is part of constructor or method call.
+     * @param logicalOperator logical operator
+     * @return true if logical operator is part of constructor or method call
+     */
+    private boolean isPassedInParameter(DetailAST logicalOperator)
+    {
+        return logicalOperator.getParent().getType() == TokenTypes.EXPR
+            && logicalOperator.getParent().getParent().getType() == TokenTypes.ELIST;
+    }
+
+    /**
+     * Checks if {@link TokenTypes#BOR binary OR} is applied to exceptions
+     * in
+     * <a href="http://docs.oracle.com/javase/specs/jls/se8/html/jls-14.html#jls-14.20">
+     * multi-catch</a> (pipe-syntax).
+     * @param binaryOr {@link TokenTypes#BOR binary or}
+     * @return true if binary or is applied to exceptions in multi-catch.
+     */
+    private static boolean isPipeOperator(DetailAST binaryOr)
+    {
+        return binaryOr.getParent().getType() == TokenTypes.TYPE;
     }
 
     @Override
@@ -230,7 +272,7 @@ public final class BooleanExpressionComplexityCheck extends Check
                 final DetailAST parentAST = ast.getParent();
 
                 log(parentAST.getLineNo(), parentAST.getColumnNo(),
-                    "booleanExpressionComplexity", count, getMax());
+                    MSG_KEY, count, getMax());
             }
         }
     }

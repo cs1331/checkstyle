@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -25,6 +25,8 @@ import org.junit.Test;
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 
+import static com.puppycrawl.tools.checkstyle.checks.design.OneTopLevelClassCheck.MSG_KEY;
+
 public class OneTopLevelClassCheckTest extends BaseCheckTestSupport
 {
 
@@ -43,12 +45,12 @@ public class OneTopLevelClassCheckTest extends BaseCheckTestSupport
         final DefaultConfiguration checkConfig =
             createCheckConfig(OneTopLevelClassCheck.class);
         final String[] expected = {
-            "25: Top-level class NoSuperClone has to reside in its own source file.",
-            "33: Top-level class InnerClone has to reside in its own source file.",
-            "50: Top-level class CloneWithTypeArguments has to reside in its own source file.",
-            "58: Top-level class CloneWithTypeArgumentsAndNoSuper has to reside in its own source file.",
-            "67: Top-level class MyClassWithGenericSuperMethod has to reside in its own source file.",
-            "84: Top-level class AnotherClass has to reside in its own source file.",
+            "25: " + getCheckMessage(MSG_KEY, "NoSuperClone"),
+            "33: " + getCheckMessage(MSG_KEY, "InnerClone"),
+            "50: " + getCheckMessage(MSG_KEY, "CloneWithTypeArguments"),
+            "58: " + getCheckMessage(MSG_KEY, "CloneWithTypeArgumentsAndNoSuper"),
+            "67: " + getCheckMessage(MSG_KEY, "MyClassWithGenericSuperMethod"),
+            "84: " + getCheckMessage(MSG_KEY, "AnotherClass"),
         };
         verify(checkConfig, getPath("coding" + File.separator + "InputClone.java"), expected);
     }
@@ -59,7 +61,7 @@ public class OneTopLevelClassCheckTest extends BaseCheckTestSupport
         final DefaultConfiguration checkConfig =
             createCheckConfig(OneTopLevelClassCheck.class);
         final String[] expected = {
-            "83: Top-level class InputDeclarationOrderEnum has to reside in its own source file.",
+            "83: " + getCheckMessage(MSG_KEY, "InputDeclarationOrderEnum"),
         };
         verify(checkConfig, getPath("coding" + File.separator + "InputDeclarationOrder.java"), expected);
     }

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -51,6 +51,12 @@ public class EqualsHashCodeCheck
 {
     // implementation note: we have to use the following members to
     // keep track of definitions in different inner classes
+
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String MSG_KEY = "equals.noHashCode";
 
     /** maps OBJ_BLOCK to the method definition of equals() */
     private final Map<DetailAST, DetailAST> objBlockEquals = Maps.newHashMap();
@@ -135,7 +141,7 @@ public class EqualsHashCodeCheck
             if (!objBlockWithHashCode.contains(objBlock)) {
                 final DetailAST equalsAST = objBlockEquals.get(objBlock);
                 log(equalsAST.getLineNo(), equalsAST.getColumnNo(),
-                        "equals.noHashCode");
+                        MSG_KEY);
             }
         }
 

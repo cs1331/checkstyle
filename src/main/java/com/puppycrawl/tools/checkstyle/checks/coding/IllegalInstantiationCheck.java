@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -62,6 +62,13 @@ import java.util.StringTokenizer;
 public class IllegalInstantiationCheck
     extends Check
 {
+
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String MSG_KEY = "instantiation.avoid";
+
     /** Set of fully qualified classnames. E.g. "java.lang.Boolean" */
     private final Set<String> illegalClasses = Sets.newHashSet();
 
@@ -218,7 +225,7 @@ public class IllegalInstantiationCheck
         final int colNo = ast.getColumnNo();
         final String fqClassName = getIllegalInstantiation(typeName);
         if (fqClassName != null) {
-            log(lineNo, colNo, "instantiation.avoid", fqClassName);
+            log(lineNo, colNo, MSG_KEY, fqClassName);
         }
     }
 

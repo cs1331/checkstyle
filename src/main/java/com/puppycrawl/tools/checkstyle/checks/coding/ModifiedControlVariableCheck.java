@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -30,6 +30,13 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  */
 public final class ModifiedControlVariableCheck extends Check
 {
+
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String MSG_KEY = "modified.control.variable";
+
     /** Current set of parameters. */
     private FastStack<String> currentVariables = FastStack.newInstance();
     /** Stack of block parameters. */
@@ -209,7 +216,7 @@ public final class ModifiedControlVariableCheck extends Check
                 && currentVariables.contains(identAST.getText()))
             {
                 log(ast.getLineNo(), ast.getColumnNo(),
-                    "modified.control.variable", identAST.getText());
+                    MSG_KEY, identAST.getText());
             }
         }
     }

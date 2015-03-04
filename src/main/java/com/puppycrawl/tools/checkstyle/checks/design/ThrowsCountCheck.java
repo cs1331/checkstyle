@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -42,6 +42,13 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  */
 public final class ThrowsCountCheck extends Check
 {
+
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String MSG_KEY = "throws.count";
+
     /** default value of max property */
     private static final int DEFAULT_MAX = 1;
 
@@ -115,7 +122,7 @@ public final class ThrowsCountCheck extends Check
         // Account for all the commas!
         final int count = (ast.getChildCount() + 1) / 2;
         if (count > getMax()) {
-            log(ast.getLineNo(),  ast.getColumnNo(), "throws.count",
+            log(ast.getLineNo(),  ast.getColumnNo(), MSG_KEY,
                 count, getMax());
         }
     }

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -61,6 +61,13 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 public class NoWhitespaceBeforeCheck
     extends Check
 {
+
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String MSG_KEY = "ws.preceded";
+
     /** Whether whitespace is allowed if the AST is at a linebreak */
     private boolean allowLineBreaks;
 
@@ -112,7 +119,7 @@ public class NoWhitespaceBeforeCheck
                 }
             }
             if (flag) {
-                log(ast.getLineNo(), before, "ws.preceded", ast.getText());
+                log(ast.getLineNo(), before, MSG_KEY, ast.getText());
             }
         }
     }

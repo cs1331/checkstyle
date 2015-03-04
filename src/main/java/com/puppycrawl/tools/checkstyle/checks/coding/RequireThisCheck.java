@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -55,6 +55,19 @@ import com.puppycrawl.tools.checkstyle.checks.DeclarationCollector;
  */
 public class RequireThisCheck extends DeclarationCollector
 {
+
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String MSG_METHOD = "require.this.method";
+
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String MSG_VARIABLE = "require.this.variable";
+
     /** whether we should check fields usage. */
     private boolean checkFields = true;
     /** whether we should check methods usage. */

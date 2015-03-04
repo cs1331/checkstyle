@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -24,6 +24,8 @@ import com.puppycrawl.tools.checkstyle.api.Configuration;
 import java.io.File;
 import org.junit.Test;
 
+import static com.puppycrawl.tools.checkstyle.checks.TranslationCheck.MSG_KEY;
+
 public class TranslationCheckTest
     extends BaseCheckTestSupport
 {
@@ -41,7 +43,7 @@ public class TranslationCheckTest
     {
         final Configuration checkConfig = createCheckConfig(TranslationCheck.class);
         final String[] expected = {
-            "0: Key 'only.english' missing.",
+            "0: " + getCheckMessage(MSG_KEY, "only.english"),
         };
         final File[] propertyFiles = new File[] {
             new File(getPath("messages_test_de.properties")),
@@ -67,7 +69,7 @@ public class TranslationCheckTest
         final DefaultConfiguration checkConfig = createCheckConfig(TranslationCheck.class);
         checkConfig.addAttribute("basenameSeparator", "-");
         final String[] expected = {
-            "0: Key 'only.english' missing.",
+            "0: " + getCheckMessage(MSG_KEY, "only.english"),
         };
         final File[] propertyFiles = new File[] {
             new File(getPath("app-dev.properties")),

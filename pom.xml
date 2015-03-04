@@ -16,13 +16,13 @@
   <parent>
     <artifactId>oss-parent</artifactId>
     <groupId>org.sonatype.oss</groupId>
-    <version>7</version>
+    <version>9</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.puppycrawl.tools</groupId>
   <artifactId>checkstyle</artifactId>
-  <version>6.4-SNAPSHOT</version>
+  <version>6.5-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>checkstyle</name>
   <url>http://checkstyle.sourceforge.net/</url>
@@ -57,9 +57,9 @@
 
   <distributionManagement>
     <site>
-      <id>sourceforge-snapshot-site</id>
-      <name>Snapshot Site</name>
-      <url>scp://shell.sourceforge.net/home/project-web/checkstyle/htdocs/snapshot</url>
+      <id>sourceforge-new-site</id>
+      <name>New Site</name>
+      <url>scp://shell.sourceforge.net/home/project-web/checkstyle/htdocs/new-site</url>
     </site>
   </distributionManagement>
 
@@ -285,7 +285,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.3.2</version>
+        <version>3.2</version>
         <configuration>
           <source>${java.version}</source>
           <target>${java.version}</target>
@@ -313,7 +313,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
-        <version>1.3.1</version>
+        <version>1.4</version>
         <executions>
           <execution>
             <id>enforce-versions</id>
@@ -423,7 +423,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-antrun-plugin</artifactId>
-        <version>1.7</version>
+        <version>1.8</version>
         <executions>
           <execution>
             <id>ant-phase-compile</id>
@@ -469,7 +469,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.17</version>
+        <version>2.18.1</version>
         <configuration>
           <argLine>-Duser.language=en -Duser.country=US -XX:-UseSplitVerifier</argLine>
           <additionalClasspathElements>
@@ -482,7 +482,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>2.3.1</version>
+        <version>2.5</version>
         <configuration>
           <archive>
             <manifest>
@@ -510,6 +510,7 @@
               <exclude>com/puppycrawl/tools/checkstyle/CheckStyleTask*.class</exclude>
               <exclude>com/puppycrawl/tools/checkstyle/doclets/*.class</exclude>
               <exclude>com/puppycrawl/tools/checkstyle/grammars/*.class</exclude>
+              <exclude>com/puppycrawl/tools/checkstyle/grammars/javadoc/*.class</exclude>
               <exclude>com/puppycrawl/tools/checkstyle/gui/*.class</exclude>
             </excludes>
           </instrumentation>
@@ -519,29 +520,13 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-eclipse-plugin</artifactId>
-        <version>2.8</version>
+        <version>2.9</version>
         <configuration>
           <downloadSources>true</downloadSources>
           <downloadJavadocs>true</downloadJavadocs>
         </configuration>
       </plugin>
 	  
-          <!-- Generates the site, which is required for assembly -->
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-site-plugin</artifactId>
-            <version>${maven.site.plugin.version}</version>
-            <executions>
-              <execution>
-                <id>gen-site</id>
-                <phase>prepare-package</phase>
-                <goals>
-                  <goal>site</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-      
       </plugins>
   </build>
 
@@ -596,7 +581,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-jxr-plugin</artifactId>
-            <version>2.4</version>
+            <version>2.5</version>
           </plugin>
 
           <plugin>
@@ -713,7 +698,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-gpg-plugin</artifactId>
-            <version>1.4</version>
+            <version>1.6</version>
             <executions>
               <execution>
                 <id>sign-artifacts</id>
@@ -730,24 +715,6 @@
 
     <!-- Bring in tools.jar for platforms which provide it
     that is required for javadoc docklets that are in use -->
-    <profile>
-      <id>tools.jar-sun</id>
-      <activation>
-        <property>
-          <name>java.vendor</name>
-          <value>Sun Microsystems Inc.</value>
-        </property>
-      </activation>
-      <dependencies>
-        <dependency>
-          <groupId>com.sun</groupId>
-          <artifactId>tools</artifactId>
-          <version>${tools.jar.version}</version>
-          <scope>system</scope>
-          <systemPath>${tools.jar.path}</systemPath>
-        </dependency>
-      </dependencies>
-    </profile>
     <profile>
       <id>default-tools.jar-oracle</id>
       <activation>
@@ -786,7 +753,7 @@
           <plugin>
             <groupId>org.jacoco</groupId>
             <artifactId>jacoco-maven-plugin</artifactId>
-            <version>0.7.1.201405082137</version>
+            <version>0.7.2.201409121644</version>
             <configuration>
               <excludes>
                 <exclude>com/puppycrawl/tools/checkstyle/CheckStyleTask*.class</exclude>
@@ -816,7 +783,7 @@
           <plugin>
             <groupId>org.eluder.coveralls</groupId>
             <artifactId>coveralls-maven-plugin</artifactId>
-            <version>2.2.0</version>
+            <version>3.0.1</version>
           </plugin>
         </plugins>
       </build>
@@ -838,12 +805,27 @@
 
       <build>
         <plugins>
+          <!-- Generates the site, which is required for assembly -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-site-plugin</artifactId>
+            <version>${maven.site.plugin.version}</version>
+            <executions>
+              <execution>
+                <id>gen-site</id>
+                <phase>prepare-package</phase>
+                <goals>
+                  <goal>site</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
 
           <!-- Creates the all inclusive uber jar -->
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-shade-plugin</artifactId>
-            <version>1.4</version>
+            <version>2.3</version>
             <executions>
               <execution>
                 <phase>package</phase>
@@ -866,7 +848,7 @@
           <!-- Creates the binary and source distributions -->
           <plugin>
             <artifactId>maven-assembly-plugin</artifactId>
-            <version>2.2.1</version>
+            <version>2.5.3</version>
             <configuration>
               <descriptors>
                 <descriptor>config/assembly-bin.xml</descriptor>

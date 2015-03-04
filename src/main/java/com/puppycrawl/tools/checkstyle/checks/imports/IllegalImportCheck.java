@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -61,6 +61,13 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 public class IllegalImportCheck
     extends Check
 {
+
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String MSG_KEY = "import.illegal";
+
     /** list of illegal packages */
     private String[] illegalPkgs;
 
@@ -107,7 +114,7 @@ public class IllegalImportCheck
         if (isIllegalImport(imp.getText())) {
             log(ast.getLineNo(),
                 ast.getColumnNo(),
-                "import.illegal",
+                MSG_KEY,
                 imp.getText());
         }
     }

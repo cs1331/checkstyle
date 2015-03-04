@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -22,6 +22,8 @@ import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import org.junit.Test;
 
+import static com.puppycrawl.tools.checkstyle.checks.naming.AbstractNameCheck.MSG_INVALID_PATTERN;
+
 public class LocalFinalVariableNameCheckTest
     extends BaseCheckTestSupport
 {
@@ -31,8 +33,11 @@ public class LocalFinalVariableNameCheckTest
     {
         final DefaultConfiguration checkConfig =
             createCheckConfig(LocalFinalVariableNameCheck.class);
+
+        final String pattern = "^[a-z][a-zA-Z0-9]*$";
+
         final String[] expected = {
-            "123:19: Name 'CDE' must match pattern '^[a-z][a-zA-Z0-9]*$'.",
+            "123:19: " + getCheckMessage(MSG_INVALID_PATTERN, "CDE", pattern),
         };
         verify(checkConfig, getPath("InputSimple.java"), expected);
     }
@@ -44,8 +49,11 @@ public class LocalFinalVariableNameCheckTest
         final DefaultConfiguration checkConfig =
             createCheckConfig(LocalFinalVariableNameCheck.class);
         checkConfig.addAttribute("format", "[A-Z]+");
+
+        final String pattern = "[A-Z]+";
+
         final String[] expected = {
-            "122:19: Name 'cde' must match pattern '[A-Z]+'.",
+            "122:19: " + getCheckMessage(MSG_INVALID_PATTERN, "cde", pattern),
         };
         verify(checkConfig, getPath("InputSimple.java"), expected);
     }

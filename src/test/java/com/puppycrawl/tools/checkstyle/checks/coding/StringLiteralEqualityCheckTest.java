@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -23,6 +23,8 @@ import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import java.io.File;
 import org.junit.Test;
 
+import static com.puppycrawl.tools.checkstyle.checks.coding.StringLiteralEqualityCheck.MSG_KEY;
+
 public class StringLiteralEqualityCheckTest
         extends BaseCheckTestSupport
 {
@@ -32,9 +34,9 @@ public class StringLiteralEqualityCheckTest
         final DefaultConfiguration checkConfig =
             createCheckConfig(StringLiteralEqualityCheck.class);
         final String[] expected = {
-            "11:18: Literal Strings should be compared using equals(), not '=='.",
-            "16:20: Literal Strings should be compared using equals(), not '=='.",
-            "21:22: Literal Strings should be compared using equals(), not '=='.",
+            "11:18: " + getCheckMessage(MSG_KEY, "=="),
+            "16:20: " + getCheckMessage(MSG_KEY, "=="),
+            "21:22: " + getCheckMessage(MSG_KEY, "=="),
         };
         verify(checkConfig, getPath("coding" + File.separator + "InputStringLiteralEquality.java"), expected);
     }

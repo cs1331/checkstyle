@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -96,20 +96,56 @@ import org.apache.commons.beanutils.ConversionException;
  *    &lt;property name="ignoreConstructorParameter" value="true"/&gt;
  * &lt;/module&gt;
  * </pre>
+ * <p>
+ * An example of how to configure the check so that it ignores variables and parameters
+ * named 'test':
+ * <pre>
+ * &lt;module name="HiddenField"&gt;
+ *    &lt;property name="ignoreFormat" value="^test$"/&gt;
+ * &lt;/module&gt;
+ * </pre>
+ * <p>
+ * <code>
+ * <pre>
+ * class SomeClass
+ * {
+ *     private List&lt;String&gt; test;
+ *
+ *     private void addTest(List&lt;String&gt; test) // no violation
+ *     {
+ *         this.test.addAll(test);
+ *     }
+ *
+ *     private void foo()
+ *     {
+ *         final List&lt;String&gt; test = new ArrayList&lt;&gt;(); // no violation
+ *         ...
+ *     }
+ * }
+ * </pre>
+ * </code>
+ * </p>
  * @author Dmitri Priimak
  */
 public class HiddenFieldCheck
     extends Check
 {
+
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String MSG_KEY = "hidden.field";
+
     /** stack of sets of field names,
      * one for each class of a set of nested classes.
      */
     private FieldFrame currentFrame;
 
-    /** the regexp to match against */
+    /** pattern for names of variables and parameters to ignore. */
     private Pattern regexp;
 
-    /** controls whether to check the pnameter of a property setter method */
+    /** controls whether to check the parameter of a property setter method */
     private boolean ignoreSetter;
 
     /**
@@ -264,7 +300,7 @@ public class HiddenFieldCheck
                 && !isIgnoredConstructorParam(ast)
                 && !isIgnoredParamOfAbstractMethod(ast))
             {
-                log(nameAST, "hidden.field", name);
+                log(nameAST, MSG_KEY, name);
             }
         }
     }

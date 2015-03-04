@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -164,6 +164,31 @@ import java.util.Set;
  */
 public class DescendantTokenCheck extends Check
 {
+
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String MSG_KEY_MIN = "descendant.token.min";
+
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String MSG_KEY_MAX = "descendant.token.max";
+
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String MSG_KEY_SUM_MIN = "descendant.token.sum.min";
+
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String MSG_KEY_SUM_MAX = "descendant.token.sum.max";
+
      /** minimum  depth */
     private int minimumDepth;
     /** maximum depth */
@@ -210,14 +235,14 @@ public class DescendantTokenCheck extends Check
             }
             if (total < minimumNumber) {
                 log(ast.getLineNo(), ast.getColumnNo(),
-                        (null == minimumMessage) ? "descendant.token.sum.min"
+                        (null == minimumMessage) ? MSG_KEY_SUM_MIN
                                 : minimumMessage,
                         String.valueOf(total),
                         String.valueOf(minimumNumber), name);
             }
             if (total > maximumNumber) {
                 log(ast.getLineNo(), ast.getColumnNo(),
-                        (null == maximumMessage) ? "descendant.token.sum.max"
+                        (null == maximumMessage) ? MSG_KEY_SUM_MAX
                                 : maximumMessage,
                         String.valueOf(total),
                         String.valueOf(maximumNumber),
@@ -231,7 +256,7 @@ public class DescendantTokenCheck extends Check
                     final String descendantName = TokenTypes
                             .getTokenName(element);
                     log(ast.getLineNo(), ast.getColumnNo(),
-                            (null == minimumMessage) ? "descendant.token.min"
+                            (null == minimumMessage) ? MSG_KEY_MIN
                                     : minimumMessage,
                             String.valueOf(tokenCount),
                             String.valueOf(minimumNumber),
@@ -242,7 +267,7 @@ public class DescendantTokenCheck extends Check
                     final String descendantName = TokenTypes
                             .getTokenName(element);
                     log(ast.getLineNo(), ast.getColumnNo(),
-                            (null == maximumMessage) ? "descendant.token.max"
+                            (null == maximumMessage) ? MSG_KEY_MAX
                                     : maximumMessage,
                             String.valueOf(tokenCount),
                             String.valueOf(maximumNumber),

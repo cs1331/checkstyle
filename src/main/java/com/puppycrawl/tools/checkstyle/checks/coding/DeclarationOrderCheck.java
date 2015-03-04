@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -30,7 +30,7 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  * Checks that the parts of a class or interface declaration
  * appear in the order suggested by the
  * <a
- * href="http://java.sun.com/docs/codeconv/html/CodeConventions.doc2.html#1852"
+ * href="http://www.oracle.com/technetwork/java/javase/documentation/codeconventions-141855.html#1852"
  * >Code Conventions for the Java Programming Language</a>.
  *
  *
@@ -56,6 +56,37 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  */
 public class DeclarationOrderCheck extends Check
 {
+
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String MSG_CONSTRUCTOR = "declaration.order.constructor";
+
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String MSG_METHOD = "declaration.order.method";
+
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String MSG_STATIC = "declaration.order.static";
+
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String MSG_INSTANCE = "declaration.order.instance";
+
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String MSG_ACCESS = "declaration.order.access";
+
     /** State for the VARIABLE_DEF */
     private static final int STATE_STATIC_VARIABLE_DEF = 1;
 
@@ -134,7 +165,7 @@ public class DeclarationOrderCheck extends Check
                 state = scopeStates.peek();
                 if (state.scopeState > STATE_CTOR_DEF) {
                     if (!ignoreConstructors) {
-                        log(ast, "declaration.order.constructor");
+                        log(ast, MSG_CONSTRUCTOR);
                     }
                 }
                 else {
@@ -150,7 +181,7 @@ public class DeclarationOrderCheck extends Check
 
                 if (state.scopeState > STATE_METHOD_DEF) {
                     if (!ignoreMethods) {
-                        log(ast, "declaration.order.method");
+                        log(ast, MSG_METHOD);
                     }
                 }
                 else {
@@ -172,7 +203,7 @@ public class DeclarationOrderCheck extends Check
                         if (!ignoreModifiers
                             || state.scopeState > STATE_INSTANCE_VARIABLE_DEF)
                         {
-                            log(ast, "declaration.order.static");
+                            log(ast, MSG_STATIC);
                         }
                     }
                     else {
@@ -181,7 +212,7 @@ public class DeclarationOrderCheck extends Check
                 }
                 else {
                     if (state.scopeState > STATE_INSTANCE_VARIABLE_DEF) {
-                        log(ast, "declaration.order.instance");
+                        log(ast, MSG_INSTANCE);
                     }
                     else if (state.scopeState == STATE_STATIC_VARIABLE_DEF) {
                         state.declarationAccess = Scope.PUBLIC;
@@ -192,7 +223,7 @@ public class DeclarationOrderCheck extends Check
                 final Scope access = ScopeUtils.getScopeFromMods(ast);
                 if (state.declarationAccess.compareTo(access) > 0) {
                     if (!ignoreModifiers) {
-                        log(ast, "declaration.order.access");
+                        log(ast, MSG_ACCESS);
                     }
                 }
                 else {

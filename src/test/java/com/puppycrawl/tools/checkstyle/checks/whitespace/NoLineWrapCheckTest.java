@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -22,6 +22,8 @@ import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import org.junit.Test;
 
+import static com.puppycrawl.tools.checkstyle.checks.whitespace.NoLineWrapCheck.MSG_KEY;
+
 public class NoLineWrapCheckTest
     extends BaseCheckTestSupport
 {
@@ -38,8 +40,8 @@ public class NoLineWrapCheckTest
     {
         final DefaultConfiguration checkConfig = createCheckConfig(NoLineWrapCheck.class);
         final String[] expected = {
-            "1: package statement should not be line-wrapped.",
-            "6: import statement should not be line-wrapped.",
+            "1: " + getCheckMessage(MSG_KEY, "package"),
+            "6: " + getCheckMessage(MSG_KEY, "import"),
         };
         verify(checkConfig, getPath("whitespace/NoLineWrapBadInput.java"), expected);
     }
@@ -51,10 +53,10 @@ public class NoLineWrapCheckTest
         final DefaultConfiguration checkConfig = createCheckConfig(NoLineWrapCheck.class);
         checkConfig.addAttribute("tokens", "IMPORT, CLASS_DEF, METHOD_DEF, ENUM_DEF");
         final String[] expected = {
-            "6: import statement should not be line-wrapped.",
-            "10: CLASS_DEF statement should not be line-wrapped.",
-            "13: METHOD_DEF statement should not be line-wrapped.",
-            "20: ENUM_DEF statement should not be line-wrapped.",
+            "6: " + getCheckMessage(MSG_KEY, "import"),
+            "10: " + getCheckMessage(MSG_KEY, "CLASS_DEF"),
+            "13: " + getCheckMessage(MSG_KEY, "METHOD_DEF"),
+            "20: " + getCheckMessage(MSG_KEY, "ENUM_DEF"),
         };
         verify(checkConfig, getPath("whitespace/NoLineWrapBadInput.java"), expected);
     }

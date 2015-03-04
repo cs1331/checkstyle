@@ -10,6 +10,150 @@
   </properties>
 
   <body>
+
+    <section name="Release 6.4.1">
+      <p>Bug fixes:</p>
+      <ul>
+        <li>
+          Visibility Modifier Check, updated option setter. Author: Alex Kravin <a href="https://github.com/checkstyle/checkstyle/issues/710">#710</a>
+        </li>
+        <li>
+          Generic Whitespace Check, updated method references processing. Author: Alex Kravin <a href="https://github.com/checkstyle/checkstyle/issues/677">#677</a>
+        </li>
+      </ul>
+
+      <p>Notes:</p>
+      <ul>
+        <li>
+          Hidden Field Check, updated docs for 'ignoreFormat' option. Author: Alex Kravin <a href="https://github.com/checkstyle/checkstyle/issues/607">#607</a>
+        </li>
+        <li>
+          Clarified all Indentation Input files for certain expected values. Author: Alexey Zuy <a href="https://github.com/checkstyle/checkstyle/issues/675">#675</a>
+        </li>
+        <li>
+          Update of maven plugins. Author: Michal Kordas <a href="https://github.com/checkstyle/checkstyle/issues/644">#644</a>
+        </li>
+        <li>
+          Fix incorrect author anf typos in release notes for issue. Author: Michal Kordas <a href="https://github.com/checkstyle/checkstyle/issues/606">#606</a>
+        </li>
+      </ul>
+    </section>
+
+    <section name="Release 6.4">
+      <p>New:</p>
+      <ul>
+        <li>
+          New Check: Empty Catch Block Check for Google Style Guide. Author: Alex Kravin<a href="https://github.com/checkstyle/checkstyle/issues/571">#571</a>
+        </li>
+        <li>
+          New option for Visibility Modifier Check, to allow public immutable fields. Author: Alex Kravin<a href="https://github.com/checkstyle/checkstyle/issues/61">#61</a>
+        </li>
+      </ul>
+
+      <p>Bug fixes:</p>
+      <ul>
+        <li>
+          Added support of Windows line separator to Javadoc parser. Fixed UTs. Author: Baratali Izmailov <a href="https://github.com/checkstyle/checkstyle/issues/612">#612</a>
+        </li>
+        <li>
+          Fix NPE when setting classpath field. Author: Aaron Sheldon
+        </li>
+        <li>
+          Illegal Type Check, updated memberModifiers option setting. Author: Alex Kravin <a href="https://github.com/checkstyle/checkstyle/issues/663">#663</a>
+        </li>
+        <li>
+          Boolean Expression Complexity Check, fixed NPE. Author: Alex Kravin <a href="https://github.com/checkstyle/checkstyle/issues/654">#654</a>
+        </li>
+        <li>
+          Final Local Variable Check, fixed false-positive. Author: Alex Kravin <a href="https://github.com/checkstyle/checkstyle/issues/258">#258</a>
+        </li>
+        <li>
+          Abstract Class Name Check, updated default regex. Author: Alex Kravin <a href="https://github.com/checkstyle/checkstyle/issues/595">#595</a>
+        </li>
+        <li>
+          Empty Line Separator Check, fixed Exception if file doesn't have header. Author: Alex Kravin <a href="https://github.com/checkstyle/checkstyle/issues/621">#621</a>
+        </li>
+        <li>
+          BooleanExpressionComplexity misidentifies integer expression as boolean expression. Author: ychulovskyy <a href="https://github.com/checkstyle/checkstyle/issues/572">#572</a>
+        </li>
+      </ul>
+
+      <p>Breaking backward compatibility:</p>
+      <ul>
+        <li>
+          Fixed typo in 'ignoreOverriden' property of IllegalThrowsCheck. Author: Alex Kravin <a href="https://github.com/checkstyle/checkstyle/issues/623">#623</a>
+        </li>
+        <li>
+          Annotation Location Check, extended typo fixing. Author: Alex Kravin <a href="https://github.com/checkstyle/checkstyle/issues/585">#585</a>
+        </li>
+      </ul>
+
+      <p>Notes:</p>
+      <ul>
+        <li>
+          Javadoc comments for JAVADOC_TAG and JAVADOC_INLINE_TAG related nodes. Author: Baratali Izmailov <a href="https://github.com/checkstyle/checkstyle/issues/409">#409</a>
+        </li>
+        <li>
+          Linkcheck report, fixed errors. Author: Alex Kravin <a href="https://github.com/checkstyle/checkstyle/issues/549">#549</a>
+        </li>
+        <li>
+          Refactored UTs. Author: Alex Kravin <a href="https://github.com/checkstyle/checkstyle/issues/537">#537</a>
+        </li>
+        <li>
+          Site: feeds icons were added. Author: Alex Kravin <a href="https://github.com/checkstyle/checkstyle/issues/617">#617</a>
+        </li>
+        <li>
+          TreeWalker update, added logging warning if AcceptableTokens are broken. Acceptable tokens are specified for all checks. Author: Alex Kravin <a href="https://github.com/checkstyle/checkstyle/issues/342">#342</a>
+        </li>
+        <li>
+          Suppression Comment Filter, extended docs for messageFormat option. Author: Alex Kravin <a href="https://github.com/checkstyle/checkstyle/issues/132">#123</a>
+        </li>
+        <li>
+          Site: moved 'Extending Checkstyle' to Developers groups. Author: Alex Kravin <a href="https://github.com/checkstyle/checkstyle/issues/606">#606</a>
+        </li>
+
+        <li>
+          Update some maven plugin in pom.xml. Author: Michal Kordas <a href="https://github.com/checkstyle/checkstyle/issues/644">#644</a>
+        </li>
+        <li>
+          Reformat and fix example for AnnotationUseStyle. Author: Michal Kordas <a href="https://github.com/checkstyle/checkstyle/issues/672">#672</a>
+        </li>
+        <li>
+          Require at least Maven 3.0.1 to build Checkstyle. Author: Michal Kordas <a href="https://github.com/checkstyle/checkstyle/issues/620">#620</a>
+        </li>
+        <li>
+          Site: moved 'Extending Checkstyle' to Developers groups. Author: Alex Kravin <a href="https://github.com/checkstyle/checkstyle/issues/606">#606</a>
+        </li>
+        <li>
+          Replace `StringBuffer` with `StringBuilder` to improve performance. Author: Michal Kordas
+        </li>
+        <li>
+          Repair typos in UniqueProperties description. Author: Michal Kordas
+        </li>
+        <li>
+          Replace verbose type arguments with diamond type. Author: Michal Kordas
+        </li>
+        <li>
+          Fix for typos in documentation. Author: Michal Kordas
+        </li>
+        <li>
+          Use Collections.addAll() instead of adding elements individually. Author: Michal Kordas
+        </li>
+        <li>
+          Added missed @Test annotation on test-case 'IndentationCheckTest.testMethodCallLineWrap'. Author: Alexey Zuy
+        </li>
+        <li>
+          IndentationCheck. Refactoring: got rid of anonymous classes. Author: Alexey Zuy
+        </li>
+        <li>
+          Fix table display. In config_whitespace, a comma was incorrectly replaced with a period. Author: Glenn Hollingsworth
+        </li>
+        <li>
+          Update config links in Google Style html page. Author: Glenn Hollingsworth <a href="https://github.com/checkstyle/checkstyle/issues/686">#686</a>
+        </li>
+      </ul>
+    </section>
+
     <section name="Release 6.3">
       <p>New:</p>
       <ul>
@@ -32,14 +176,15 @@
           New option to Javadoc Method Name Check - ignore method name regex. Author: Alex Kravin <a href="https://github.com/checkstyle/checkstyle/issues/430">#430</a>
         </li>
         <li>
-          New option to Illegal Type Check to control valiadtion baseon modifiers - memberModifiers, updated default illegal types. Author: Alex Kravin <a href="https://github.com/checkstyle/checkstyle/issues/567">#567</a>
+          New option to Illegal Type Check to control validation based on modifiers - memberModifiers, updated default illegal types. Author: Alex Kravin <a
+                href="https://github.com/checkstyle/checkstyle/issues/567">#567</a>
         </li>
       </ul>
 
       <p>Bug fixes:</p>
       <ul>
         <li>
-          Extended Method Name Check to ignore overriden methods. Author: Alex Kravin <a href="https://github.com/checkstyle/checkstyle/issues/430">#430</a>
+          Extended Method Name Check to ignore overridden methods. Author: Alex Kravin <a href="https://github.com/checkstyle/checkstyle/issues/430">#430</a>
         </li>
         <li>
           Allow basedir property of Checker module to be set to NULL. Author: Lars Ködderitzsch <a href="https://github.com/checkstyle/checkstyle/issues/570">#570</a>
@@ -256,7 +401,7 @@
           Fix for MultiMap empty collections garbage. Author: Vladimir Sitnikov, Ivan Sopov. <a href="https://github.com/checkstyle/checkstyle/pull/348">#348</a>
         </li>
         <li>
-          Preformance fix for RegexpCheck. Author: Vladimir Sitnikov, Ivan Sopov. <a href="https://github.com/checkstyle/checkstyle/pull/348">#348</a>
+          Performance fix for RegexpCheck. Author: Vladimir Sitnikov, Ivan Sopov. <a href="https://github.com/checkstyle/checkstyle/pull/348">#348</a>
         </li>
         <li>
           Removing unnecessary char[] copying to reduce GC-pressure. Author: Vladimir Sitnikov, Ivan Sopov. <a href="https://github.com/checkstyle/checkstyle/pull/347">#347</a>
@@ -274,7 +419,7 @@
       <p>Breaking backward compatibility:</p>
       <ul>
         <li>
-          AnnotationLocationCheck, package location was chaged, one option was renamed. Author: Roman Ivanov. <a href="https://github.com/checkstyle/checkstyle/pull/356">#356</a>
+          AnnotationLocationCheck, package location was changed, one option was renamed. Author: Roman Ivanov. <a href="https://github.com/checkstyle/checkstyle/pull/356">#356</a>
         </li>
       </ul>
     </section>
@@ -525,7 +670,7 @@
       <p>Notes:</p>
       <ul>
         <li>
-          dsm-maven-plugin is used to show <a href="dsm/index.html">dependency stucture of project</a> on site. Author: Ilja Dubinin.
+          dsm-maven-plugin is used to show <a href="dsm/index.html">dependency structure of project</a> on site. Author: Ilja Dubinin.
         </li>
         <li>
           Added and updated documentation/messages for number of Checks. Authors: Max Vetrenko, Thomas Jensen, ychulovskyy, Jarmo Isotalo

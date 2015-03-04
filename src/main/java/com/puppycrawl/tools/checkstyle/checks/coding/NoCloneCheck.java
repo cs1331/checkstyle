@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -128,11 +128,18 @@ package com.puppycrawl.tools.checkstyle.checks.coding;
  */
 public class NoCloneCheck extends  AbstractIllegalMethodCheck
 {
+
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String MSG_KEY = "avoid.clone.method";
+
     /**
      * Creates an instance.
      */
     public NoCloneCheck()
     {
-        super("clone", "avoid.clone.method");
+        super("clone", MSG_KEY);
     }
 }

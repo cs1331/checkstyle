@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -88,6 +88,19 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  */
 public class EqualsAvoidNullCheck extends Check
 {
+
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String MSG_EQUALS_AVOID_NULL = "equals.avoid.null";
+
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String MSG_EQUALS_IGNORE_CASE_AVOID_NULL = "equalsIgnoreCase.avoid.null";
+
     /** Whether to process equalsIgnoreCase() invocations. */
     private boolean ignoreEqualsIgnoreCase;
 
@@ -132,7 +145,7 @@ public class EqualsAvoidNullCheck extends Check
             && containsOneArg(expr) && containsAllSafeTokens(expr))
         {
             log(methodCall.getLineNo(), methodCall.getColumnNo(),
-                "equals.avoid.null");
+                MSG_EQUALS_AVOID_NULL);
         }
 
         if (!ignoreEqualsIgnoreCase
@@ -140,7 +153,7 @@ public class EqualsAvoidNullCheck extends Check
             && containsOneArg(expr) && containsAllSafeTokens(expr))
         {
             log(methodCall.getLineNo(), methodCall.getColumnNo(),
-                "equalsIgnoreCase.avoid.null");
+                MSG_EQUALS_IGNORE_CASE_AVOID_NULL);
         }
     }
 

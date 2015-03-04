@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -22,6 +22,8 @@ import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import org.junit.Test;
 
+import static com.puppycrawl.tools.checkstyle.checks.naming.AbstractNameCheck.MSG_INVALID_PATTERN;
+
 public class StaticVariableNameCheckTest
     extends BaseCheckTestSupport
 {
@@ -32,8 +34,11 @@ public class StaticVariableNameCheckTest
         final DefaultConfiguration checkConfig =
             createCheckConfig(StaticVariableNameCheck.class);
         checkConfig.addAttribute("format", "^s[A-Z][a-zA-Z0-9]*$");
+
+        final String pattern = "^s[A-Z][a-zA-Z0-9]*$";
+
         final String[] expected = {
-            "30:24: Name 'badStatic' must match pattern '^s[A-Z][a-zA-Z0-9]*$'.",
+            "30:24: " + getCheckMessage(MSG_INVALID_PATTERN, "badStatic", pattern),
         };
         verify(checkConfig, getPath("InputSimple.java"), expected);
     }

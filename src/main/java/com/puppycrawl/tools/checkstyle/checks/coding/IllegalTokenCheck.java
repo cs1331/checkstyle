@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -53,6 +53,13 @@ import java.util.Set;
 public class IllegalTokenCheck
     extends Check
 {
+
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String MSG_KEY = "illegal.token";
+
     @Override
     public int[] getDefaultTokens()
     {
@@ -88,7 +95,7 @@ public class IllegalTokenCheck
         log(
             ast.getLineNo(),
             ast.getColumnNo(),
-            "illegal.token",
+            MSG_KEY,
             ast.getText());
     }
 

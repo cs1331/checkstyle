@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2014  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -23,6 +23,10 @@ import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import java.io.File;
 import org.junit.Test;
 
+import static com.puppycrawl.tools.checkstyle.checks.imports.RedundantImportCheck.MSG_DUPLICATE;
+import static com.puppycrawl.tools.checkstyle.checks.imports.RedundantImportCheck.MSG_LANG;
+import static com.puppycrawl.tools.checkstyle.checks.imports.RedundantImportCheck.MSG_SAME;
+
 public class RedundantImportCheckTest
     extends BaseCheckTestSupport
 {
@@ -33,12 +37,12 @@ public class RedundantImportCheckTest
         final DefaultConfiguration checkConfig =
             createCheckConfig(RedundantImportCheck.class);
         final String[] expected = {
-            "7:1: Redundant import from the same package - com.puppycrawl.tools.checkstyle.imports.*.",
-            "8:1: Redundant import from the same package - com.puppycrawl.tools.checkstyle.imports.InputImportBug.",
-            "10:1: Redundant import from the java.lang package - java.lang.*.",
-            "11:1: Redundant import from the java.lang package - java.lang.String.",
-            "14:1: Duplicate import to line 13 - java.util.List.",
-            "26:1: Duplicate import to line 25 - javax.swing.WindowConstants.*.",
+            "7:1: " + getCheckMessage(MSG_SAME, "com.puppycrawl.tools.checkstyle.imports.*"),
+            "8:1: " + getCheckMessage(MSG_SAME, "com.puppycrawl.tools.checkstyle.imports.InputImportBug"),
+            "10:1: " + getCheckMessage(MSG_LANG, "java.lang.*"),
+            "11:1: " + getCheckMessage(MSG_LANG, "java.lang.String"),
+            "14:1: " + getCheckMessage(MSG_DUPLICATE, 13, "java.util.List"),
+            "26:1: " + getCheckMessage(MSG_DUPLICATE, 25, "javax.swing.WindowConstants.*"),
         };
         verify(checkConfig, getPath("imports" + File.separator + "InputRedundantImportCheck.java"), expected);
     }
