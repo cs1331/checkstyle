@@ -5,7 +5,9 @@
     xsi:schemaLocation="http://maven.apache.org/DECORATION/1.0.0 http://maven.apache.org/xsd/decoration-1.0.0.xsd">
   
   <bannerLeft>
-    <name>Checkstyle ${projectVersion}</name>
+    <alt>Checkstyle</alt>
+    <href>http://checkstyle.sourceforge.net</href>
+    <src>images/checkstyle_logo_small_64.png</src>
   </bannerLeft>
   <bannerRight>
     <alt>Checkstyle</alt>
@@ -13,6 +15,9 @@
     <src>images/logo.png</src>
   </bannerRight>
   
+  <publishDate position="right" />
+  <version position="right" />
+
   <poweredBy>
     <logo name="GitHub" href="https://github.com/checkstyle/checkstyle" 
     	img="images/github_logo_social_coding_outlined.png" 
@@ -37,6 +42,10 @@
           img="images/rss-long.png"
           href="http://sourceforge.net/p/checkstyle/news/feed"
           />
+    <logo name="Google+"
+          img="images/Google-Plus-Logo-120x38.png"
+          href="https://plus.google.com/u/0/108692338295483568100/posts"
+          />
   </poweredBy>
   
   <body>
@@ -56,8 +65,7 @@
         <item name="Command Line" href="cmdline.html"/>
       </item>
 
-      <item name="Available Checks" href="availablechecks.html"/>
-      <item name="Standard Checks" href="checks.html">
+      <item name="Checks" href="checks.html">
         <item name="Annotations"        href="config_annotation.html"/>
         <item name="Block Checks"       href="config_blocks.html"/>
         <item name="Class Design"       href="config_design.html"/>
@@ -82,11 +90,16 @@
 
     <menu name="Developers">
       <item name="Extending Checkstyle" href="extending.html">
-        <item name="Writing checks" href="writingchecks.html"/>
-        <item name="Writing filters" href="writingfilters.html"/>
-        <item name="Writing listeners" href="writinglisteners.html"/>
+        <item name="Writing Checks" href="writingchecks.html"/>
+        <item name="Writing Filters" href="writingfilters.html"/>
+        <item name="Writing Listeners" href="writinglisteners.html"/>
       </item>
       <item name="Contributing" href="contributing.html"/>
+      <item name="Beginning Development" href="beginning_development.html">
+        <item name="Eclipse IDE" href="eclipse.html"/>
+        <item name="Netbeans IDE" href="netbeans.html"/>
+        <item name="IntelliJ IDE" href="idea.html"/>
+      </item>
       <item name="Javadoc" href="apidocs/index.html"/>
     </menu>
 

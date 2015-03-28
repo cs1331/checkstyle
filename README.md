@@ -1,6 +1,7 @@
 [![][travis img]][travis]
 [![][coverage img]][coverage]
 [![][mavenbadge img]][mavenbadge]
+[![][versioneye img]][versioneye]
 [![][sonar img]][sonar]
 
 ![](https://raw.githubusercontent.com/checkstyle/checkstyle/master/src/site/resources/images/logo.png)
@@ -10,7 +11,7 @@ checking Java source code for adherence to a Code Standard or set of validation 
 
 The latest version can be found at [SourceForge downloads](https://sourceforge.net/projects/checkstyle/files/checkstyle/) or at [Maven repo](http://repo1.maven.org/maven2/com/puppycrawl/tools/checkstyle/).
 
-Documentation is available in HTML format, see http://checkstyle.sourceforge.net/availablechecks.html.
+Documentation is available in HTML format, see http://checkstyle.sourceforge.net/checks.html.
 
 Continuous integration and Quality reports
 ======================
@@ -29,6 +30,8 @@ Bugs and Feature requests: https://github.com/checkstyle/checkstyle/issues
 
 Licensing
 =========
+
+[![][license img]][license]
 
 This software is licensed under the terms in the file named "LICENSE" in this
 directory.
@@ -59,5 +62,11 @@ directory.
 [coverage]:https://coveralls.io/r/checkstyle/checkstyle
 [coverage img]:https://coveralls.io/repos/checkstyle/checkstyle/badge.png
 
+[license]:LICENSE
+[license img]:https://img.shields.io/badge/license-GNU%20LGPL%20v2.1-blue.svg
+
 [mavenbadge]:http://search.maven.org/#search|gav|1|g%3A%22com.puppycrawl.tools%22%20AND%20a%3A%22checkstyle%22
 [mavenbadge img]:https://maven-badges.herokuapp.com/maven-central/com.puppycrawl.tools/checkstyle/badge.svg
+
+[versioneye]:https://www.versioneye.com/user/projects/5504ca834a1064774400049a
+[versioneye img]:https://www.versioneye.com/user/projects/5504ca834a1064774400049a/badge.svg

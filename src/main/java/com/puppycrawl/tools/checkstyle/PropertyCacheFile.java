@@ -30,8 +30,9 @@ import java.util.Properties;
 import java.security.MessageDigest;
 
 
+import com.google.common.io.Closeables;
+import com.google.common.io.Flushables;
 import com.puppycrawl.tools.checkstyle.api.Configuration;
-import com.puppycrawl.tools.checkstyle.api.Utils;
 
 /**
  * This class maintains a persistent(on file-system) store of the files
@@ -80,7 +81,7 @@ final class PropertyCacheFile
                 final String cachedConfigHash =
                     details.getProperty(CONFIG_HASH_KEY);
                 setInActive = false;
-                if ((cachedConfigHash == null)
+                if (cachedConfigHash == null
                     || !cachedConfigHash.equals(currentConfigHash))
                 {
                     // Detected configuration change - clear cache
@@ -99,10 +100,10 @@ final class PropertyCacheFile
                     .debug("Unable to open cache file, ignoring.", e);
             }
             finally {
-                Utils.closeQuietly(inStream);
+                Closeables.closeQuietly(inStream);
             }
         }
-        detailsFile = (setInActive) ? null : fileName;
+        detailsFile = setInActive ? null : fileName;
     }
 
     /** Cleans up the object and updates the cache file. **/
@@ -130,17 +131,13 @@ final class PropertyCacheFile
      */
     private void flushAndCloseOutStream(OutputStream stream)
     {
-        if (stream != null) {
-            try {
-                stream.flush();
-            }
-            catch (final IOException ex) {
-                Utils.getExceptionLogger()
-                    .debug("Unable to flush output stream.", ex);
-            }
-            finally {
-                Utils.closeQuietly(stream);
-            }
+        try {
+            Flushables.flush(stream, false);
+            Closeables.close(stream, false);
+        }
+        catch (final IOException ex) {
+            Utils.getExceptionLogger()
+                    .debug("Unable to flush and close output stream.", ex);
         }
     }
 
@@ -152,8 +149,8 @@ final class PropertyCacheFile
     boolean alreadyChecked(String fileName, long timestamp)
     {
         final String lastChecked = details.getProperty(fileName);
-        return (lastChecked != null)
-            && (lastChecked.equals(Long.toString(timestamp)));
+        return lastChecked != null
+            && lastChecked.equals(Long.toString(timestamp));
     }
 
     /**
@@ -225,7 +222,7 @@ final class PropertyCacheFile
         final StringBuilder buf = new StringBuilder(2 * byteArray.length);
         for (final byte b : byteArray) {
             final int low = b & MASK_0X0F;
-            final int high = (b >> SHIFT_4) & MASK_0X0F;
+            final int high = b >> SHIFT_4 & MASK_0X0F;
             buf.append(HEX_CHARS[high]);
             buf.append(HEX_CHARS[low]);
         }

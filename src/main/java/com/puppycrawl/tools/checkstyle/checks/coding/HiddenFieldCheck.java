@@ -24,11 +24,10 @@ import com.puppycrawl.tools.checkstyle.api.Check;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.ScopeUtils;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.api.Utils;
+import com.puppycrawl.tools.checkstyle.Utils;
 
 import java.util.Set;
 import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 import org.apache.commons.beanutils.ConversionException;
 
 /**
@@ -196,7 +195,7 @@ public class HiddenFieldCheck
     @Override
     public void beginTree(DetailAST rootAST)
     {
-        currentFrame = new FieldFrame(null, true, null, null);
+        currentFrame = new FieldFrame(null, true, null);
     }
 
     @Override
@@ -230,12 +229,12 @@ public class HiddenFieldCheck
         //check.
         final DetailAST typeMods = ast.findFirstToken(TokenTypes.MODIFIERS);
         final boolean isStaticInnerType =
-                (typeMods != null)
+                typeMods != null
                         && typeMods.branchContains(TokenTypes.LITERAL_STATIC);
 
         final FieldFrame frame =
-            new FieldFrame(currentFrame, isStaticInnerType, type,
-                (type == TokenTypes.CLASS_DEF || type == TokenTypes.ENUM_DEF)
+            new FieldFrame(currentFrame, isStaticInnerType,
+                    type == TokenTypes.CLASS_DEF || type == TokenTypes.ENUM_DEF
                     ? ast.findFirstToken(TokenTypes.IDENT).getText()
                     : null
             );
@@ -268,9 +267,9 @@ public class HiddenFieldCheck
     @Override
     public void leaveToken(DetailAST ast)
     {
-        if ((ast.getType() == TokenTypes.CLASS_DEF)
-            || (ast.getType() == TokenTypes.ENUM_DEF)
-            || (ast.getType() == TokenTypes.ENUM_CONSTANT_DEF))
+        if (ast.getType() == TokenTypes.CLASS_DEF
+            || ast.getType() == TokenTypes.ENUM_DEF
+            || ast.getType() == TokenTypes.ENUM_CONSTANT_DEF)
         {
             //pop
             currentFrame = currentFrame.getParent();
@@ -287,15 +286,15 @@ public class HiddenFieldCheck
     {
         if (!ScopeUtils.inInterfaceOrAnnotationBlock(ast)
             && (ScopeUtils.isLocalVariableDef(ast)
-                || (ast.getType() == TokenTypes.PARAMETER_DEF)))
+                || ast.getType() == TokenTypes.PARAMETER_DEF))
         {
             // local variable or parameter. Does it shadow a field?
             final DetailAST nameAST = ast.findFirstToken(TokenTypes.IDENT);
             final String name = nameAST.getText();
 
             if ((currentFrame.containsStaticField(name)
-                || (!inStatic(ast) && currentFrame.containsInstanceField(name)))
-                && ((regexp == null) || (!getRegexp().matcher(name).find()))
+                || !inStatic(ast) && currentFrame.containsInstanceField(name))
+                && (regexp == null || !getRegexp().matcher(name).find())
                 && !isIgnoredSetterParam(ast, name)
                 && !isIgnoredConstructorParam(ast)
                 && !isIgnoredParamOfAbstractMethod(ast))
@@ -380,7 +379,7 @@ public class HiddenFieldCheck
             final DetailAST typeAST = aMethodAST.findFirstToken(TokenTypes.TYPE);
             final String returnType = typeAST.getFirstChild().getText();
             if (typeAST.branchContains(TokenTypes.LITERAL_VOID)
-                || (setterCanReturnItsClass && currentFrame.embeddedIn(returnType)))
+                || setterCanReturnItsClass && currentFrame.embeddedIn(returnType))
             {
                 // this method has signature
                 //
@@ -412,8 +411,8 @@ public class HiddenFieldCheck
         // we should not capitalize the first character if the second
         // one is a capital one, since according to JavBeans spec
         // setXYzz() is a setter for XYzz property, not for xYzz one.
-        if (name != null && name.length() > 0
-            && (name.length() > 1 && !Character.isUpperCase(name.charAt(1))))
+        if (name != null && (name.length() == 1
+                || name.length() > 1 && !Character.isUpperCase(name.charAt(1))))
         {
             setterName = name.substring(0, 1).toUpperCase() + name.substring(1);
         }
@@ -430,12 +429,12 @@ public class HiddenFieldCheck
     private boolean isIgnoredConstructorParam(DetailAST ast)
     {
         boolean result = false;
-        if ((ast.getType() == TokenTypes.PARAMETER_DEF)
+        if (ast.getType() == TokenTypes.PARAMETER_DEF
             && ignoreConstructorParameter)
         {
             final DetailAST parametersAST = ast.getParent();
             final DetailAST constructorAST = parametersAST.getParent();
-            result = (constructorAST.getType() == TokenTypes.CTOR_DEF);
+            result = constructorAST.getType() == TokenTypes.CTOR_DEF;
         }
         return result;
     }
@@ -451,13 +450,13 @@ public class HiddenFieldCheck
     private boolean isIgnoredParamOfAbstractMethod(DetailAST ast)
     {
         boolean result = false;
-        if ((ast.getType() == TokenTypes.PARAMETER_DEF)
+        if (ast.getType() == TokenTypes.PARAMETER_DEF
             && ignoreAbstractMethods)
         {
             final DetailAST method = ast.getParent().getParent();
             if (method.getType() == TokenTypes.METHOD_DEF) {
                 final DetailAST mods = method.findFirstToken(TokenTypes.MODIFIERS);
-                result = ((mods != null) && mods.branchContains(TokenTypes.ABSTRACT));
+                result = mods != null && mods.branchContains(TokenTypes.ABSTRACT);
             }
         }
         return result;
@@ -466,17 +465,12 @@ public class HiddenFieldCheck
     /**
      * Set the ignore format to the specified regular expression.
      * @param format a <code>String</code> value
-     * @throws ConversionException unable to parse format
+     * @throws ConversionException if unable to create Pattern object
      */
     public void setIgnoreFormat(String format)
         throws ConversionException
     {
-        try {
-            regexp = Utils.getPattern(format);
-        }
-        catch (final PatternSyntaxException e) {
-            throw new ConversionException("unable to parse " + format, e);
-        }
+        regexp = Utils.createPattern(format);
     }
 
     /**
@@ -541,9 +535,6 @@ public class HiddenFieldCheck
      */
     private static class FieldFrame
     {
-        /** type of the frame, such as TokenTypes.CLASS_DEF or TokenTypes.ENUM_DEF */
-        private final Integer frameType;
-
         /** name of the frame, such name of the class or enum declaration */
         private final String frameName;
 
@@ -561,18 +552,14 @@ public class HiddenFieldCheck
 
         /**
          * Creates new frame.
-         * @param staticType is this a static inner type (class or enum).
          * @param parent parent frame.
-         * @param frameType frameType derived from {@link TokenTypes}
+         * @param staticType is this a static inner type (class or enum).
          * @param frameName name associated with the frame, which can be a
-         * class or enum name or null if no relevan information is available.
          */
-        public FieldFrame(FieldFrame parent, boolean staticType,
-            Integer frameType, String frameName)
+        public FieldFrame(FieldFrame parent, boolean staticType, String frameName)
         {
             this.parent = parent;
             this.staticType = staticType;
-            this.frameType = frameType;
             this.frameName = frameName;
         }
 
@@ -612,7 +599,7 @@ public class HiddenFieldCheck
         {
             return instanceFields.contains(field)
                     || !isStaticType()
-                    && (parent != null)
+                    && parent != null
                     && parent.containsInstanceField(field);
 
         }
@@ -625,7 +612,7 @@ public class HiddenFieldCheck
         public boolean containsStaticField(String field)
         {
             return staticFields.contains(field)
-                    || (parent != null)
+                    || parent != null
                     && parent.containsStaticField(field);
 
         }

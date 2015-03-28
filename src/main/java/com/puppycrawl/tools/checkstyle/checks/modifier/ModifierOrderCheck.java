@@ -29,7 +29,7 @@ import java.util.List;
  * <p>
  * Checks that the order of modifiers conforms to the suggestions in the
  * <a
- * href="http://java.sun.com/docs/books/jls/second_edition/html/classes.doc.html">
+ * href="http://docs.oracle.com/javase/specs/jls/se8/html/jls-8.html">
  * Java Language specification, sections 8.1.1, 8.3.1 and 8.4.3</a>.
  * The correct order is:</p>
 
@@ -151,7 +151,7 @@ public class ModifierOrderCheck
         do {
             modifier = it.next();
         }
-        while (it.hasNext() && (modifier.getType() == TokenTypes.ANNOTATION));
+        while (it.hasNext() && modifier.getType() == TokenTypes.ANNOTATION);
 
         //All modifiers are annotations, no problem
         if (modifier.getType() == TokenTypes.ANNOTATION) {
@@ -164,7 +164,7 @@ public class ModifierOrderCheck
                 return modifier;
             }
 
-            while ((i < JLS_ORDER.length)
+            while (i < JLS_ORDER.length
                    && !JLS_ORDER[i].equals(modifier.getText()))
             {
                 i++;

@@ -18,6 +18,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 package com.puppycrawl.tools.checkstyle.api;
 
+import static com.puppycrawl.tools.checkstyle.TestUtils.assertUtilsClassHasPrivateConstructor;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
@@ -30,5 +31,11 @@ public class TokenTypesTest
         assertEquals("short description for EQUAL",
                 "The <code>==</code> (equal) operator.", TokenTypes
                         .getShortDescription("EQUAL"));
+    }
+
+    @Test
+    public void testIsProperUtilsClass() throws ReflectiveOperationException
+    {
+        assertUtilsClassHasPrivateConstructor(TokenTypes.class);
     }
 }

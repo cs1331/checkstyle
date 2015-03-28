@@ -34,13 +34,13 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.List;
 
+import com.google.common.io.Closeables;
 import org.apache.commons.beanutils.ConversionException;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.puppycrawl.tools.checkstyle.api.AbstractFileSetCheck;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
-import com.puppycrawl.tools.checkstyle.api.Utils;
 
 /**
  * Abstract super class for header checks.
@@ -89,7 +89,7 @@ public abstract class AbstractHeaderCheck extends AbstractFileSetCheck
     public void setHeaderFile(String fileName)
     {
         // Handle empty param
-        if ((fileName == null) || (fileName.trim().length() == 0)) {
+        if (fileName == null || fileName.trim().length() == 0) {
             return;
         }
 
@@ -115,7 +115,7 @@ public abstract class AbstractHeaderCheck extends AbstractFileSetCheck
                     "unable to load header file " + filename, ex);
         }
         finally {
-            Utils.closeQuietly(headerReader);
+            Closeables.closeQuietly(headerReader);
         }
     }
 
@@ -183,7 +183,7 @@ public abstract class AbstractHeaderCheck extends AbstractFileSetCheck
      */
     public void setHeader(String header)
     {
-        if ((header == null) || (header.trim().length() == 0)) {
+        if (header == null || header.trim().length() == 0) {
             return;
         }
 
@@ -199,7 +199,7 @@ public abstract class AbstractHeaderCheck extends AbstractFileSetCheck
             throw new ConversionException("unable to load header", ex);
         }
         finally {
-            Utils.closeQuietly(headerReader);
+            Closeables.closeQuietly(headerReader);
         }
     }
 

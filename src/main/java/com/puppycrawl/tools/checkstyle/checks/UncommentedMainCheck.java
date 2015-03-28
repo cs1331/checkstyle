@@ -22,10 +22,9 @@ import com.puppycrawl.tools.checkstyle.api.Check;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.FullIdent;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.api.Utils;
+import com.puppycrawl.tools.checkstyle.Utils;
 
 import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 import org.apache.commons.beanutils.ConversionException;
 
@@ -66,20 +65,13 @@ public class UncommentedMainCheck
     /**
      * Set the excluded classes pattern.
      * @param excludedClasses a <code>String</code> value
-     * @throws ConversionException unable to parse excludedClasses
+     * @throws ConversionException if unable to create Pattern object
      */
     public void setExcludedClasses(String excludedClasses)
         throws ConversionException
     {
-        try {
-            this.excludedClasses = excludedClasses;
-            excludedClassesPattern = Utils.getPattern(excludedClasses);
-        }
-        catch (final PatternSyntaxException e) {
-            throw new ConversionException("unable to parse "
-                                          + excludedClasses,
-                                          e);
-        }
+        this.excludedClasses = excludedClasses;
+        excludedClassesPattern = Utils.createPattern(excludedClasses);
     }
 
     @Override
@@ -249,7 +241,7 @@ public class UncommentedMainCheck
         if (params.getChildCount() != 1) {
             return false;
         }
-        final DetailAST paratype = (params.getFirstChild())
+        final DetailAST paratype = params.getFirstChild()
             .findFirstToken(TokenTypes.TYPE);
         final DetailAST arrayDecl =
             paratype.findFirstToken(TokenTypes.ARRAY_DECLARATOR);
@@ -259,12 +251,12 @@ public class UncommentedMainCheck
 
         final DetailAST arrayType = arrayDecl.getFirstChild();
 
-        if ((arrayType.getType() == TokenTypes.IDENT)
-            || (arrayType.getType() == TokenTypes.DOT))
+        if (arrayType.getType() == TokenTypes.IDENT
+            || arrayType.getType() == TokenTypes.DOT)
         {
             final FullIdent type = FullIdent.createFullIdent(arrayType);
-            return ("String".equals(type.getText())
-                    || "java.lang.String".equals(type.getText()));
+            return "String".equals(type.getText())
+                    || "java.lang.String".equals(type.getText());
         }
 
         return false;

@@ -29,7 +29,6 @@ import java.util.regex.PatternSyntaxException;
 import org.apache.commons.beanutils.ConversionException;
 
 import com.google.common.collect.Lists;
-import com.puppycrawl.tools.checkstyle.api.Utils;
 
 /**
  * Checks the header of the source against a header file that contains a
@@ -56,7 +55,7 @@ public class RegexpHeaderCheck extends AbstractHeaderCheck
      */
     public void setMultiLines(int[] list)
     {
-        if ((list == null) || (list.length == 0)) {
+        if (list == null || list.length == 0) {
             multiLines = EMPTY_INT_ARRAY;
             return;
         }
@@ -78,12 +77,12 @@ public class RegexpHeaderCheck extends AbstractHeaderCheck
         else {
             int headerLineNo = 0;
             int i;
-            for (i = 0; (headerLineNo < headerSize) && (i < fileSize); i++) {
+            for (i = 0; headerLineNo < headerSize && i < fileSize; i++) {
                 final String line = lines.get(i);
                 boolean isMatch = isMatch(line, headerLineNo);
                 while (!isMatch && isMultiLine(headerLineNo)) {
                     headerLineNo++;
-                    isMatch = (headerLineNo == headerSize)
+                    isMatch = headerLineNo == headerSize
                             || isMatch(line, headerLineNo);
                 }
                 if (!isMatch) {
@@ -125,7 +124,7 @@ public class RegexpHeaderCheck extends AbstractHeaderCheck
      */
     private boolean isMultiLine(int lineNo)
     {
-        return (Arrays.binarySearch(multiLines, lineNo + 1) >= 0);
+        return Arrays.binarySearch(multiLines, lineNo + 1) >= 0;
     }
 
     @Override
@@ -135,8 +134,7 @@ public class RegexpHeaderCheck extends AbstractHeaderCheck
         headerRegexps.clear();
         for (String line : headerLines) {
             try {
-                // TODO: Not sure if cache in Utils is still necessary
-                headerRegexps.add(Utils.getPattern(line));
+                headerRegexps.add(Pattern.compile(line));
             }
             catch (final PatternSyntaxException ex) {
                 throw new ConversionException("line "

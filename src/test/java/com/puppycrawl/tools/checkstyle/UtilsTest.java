@@ -18,19 +18,17 @@
 ////////////////////////////////////////////////////////////////////////////////
 package com.puppycrawl.tools.checkstyle;
 
+import static com.puppycrawl.tools.checkstyle.TestUtils.assertUtilsClassHasPrivateConstructor;
+import static com.puppycrawl.tools.checkstyle.Utils.baseClassname;
+import static com.puppycrawl.tools.checkstyle.Utils.fileExtensionMatches;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import com.puppycrawl.tools.checkstyle.api.Utils;
-
 import java.io.File;
-import java.util.regex.Pattern;
 
 import org.apache.commons.beanutils.ConversionException;
 import org.junit.Test;
-
-import static com.puppycrawl.tools.checkstyle.Utils.fileExtensionMatches;
 
 public class UtilsTest
 {
@@ -57,10 +55,6 @@ public class UtilsTest
         assertEquals(0, Utils.lengthMinusTrailingWhitespace(" \t "));
         assertEquals(3, Utils.lengthMinusTrailingWhitespace(" 23"));
         assertEquals(3, Utils.lengthMinusTrailingWhitespace(" 23 \t "));
-
-        final Pattern r1 = Utils.getPattern("a");
-        final Pattern r2 = Utils.getPattern("a");
-        assertEquals(r1, r2);
     }
 
     @Test(expected = ConversionException.class)
@@ -78,5 +72,30 @@ public class UtilsTest
         assertTrue(fileExtensionMatches(file, null));
         file = new File("file.java");
         assertTrue(fileExtensionMatches(file, fileExtensions));
+    }
+
+    @Test
+    public void testBaseClassnameForCanonicalName()
+    {
+        assertEquals("List", baseClassname("java.util.List"));
+    }
+
+    @Test
+    public void testBaseClassnameForSimpleName()
+    {
+        assertEquals("Set", baseClassname("Set"));
+    }
+
+    @Test
+    public void testIsProperUtilsClass() throws ReflectiveOperationException
+    {
+        assertUtilsClassHasPrivateConstructor(Utils.class);
+    }
+
+    @Test
+    public void testInvalidPattern()
+    {
+        boolean result = Utils.isPatternValid("some[invalidPattern");
+        assertFalse(result);
     }
 }

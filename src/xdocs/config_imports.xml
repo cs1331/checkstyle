@@ -9,6 +9,12 @@
     <author>Checkstyle Development Team</author>
   </properties>
 
+  <head>
+    <title>Imports</title>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script type="text/javascript" src="js/anchors.js"></script>
+  </head>
+
   <body>
     <section name="AvoidStarImport">
       <subsection name="Description">
@@ -423,6 +429,13 @@ class FooBar {
             <td><a href="property_types.html#boolean">Boolean</a></td>
             <td>true</td>
           </tr>
+          <tr>
+            <td>sortStaticImportsAlphabetically</td>
+            <td>whether static imports grouped by <b>top</b> or <b>bottom</b> option
+            are sorted alphabetically or not</td>
+            <td><a href="property_types.html#boolean">Boolean</a></td>
+            <td>false</td>
+          </tr>
         </table>
       </subsection>
 
@@ -443,6 +456,30 @@ class FooBar {
     &lt;property name=&quot;option&quot; value=&quot;above&quot;/>
 &lt;/module>
         </source>
+
+        <p>
+          To configure the Check allows static imports grouped to the <b>top</b>
+          being sorted alphabetically:
+        </p>
+
+        <source>
+&lt;module name=&quot;ImportOrder&quot;>
+    &lt;property name=&quot;sortStaticImportsAlphabetically&quot; value=&quot;true&quot;/>
+    &lt;property name=&quot;option&quot; value=&quot;top&quot;/>
+&lt;/module>
+        </source>
+
+        <source>
+import static java.lang.Math.abs;
+import static org.abego.treelayout.Configuration.AlignmentInLevel; // OK, alphabetical order
+
+import org.abego.*;
+
+import java.util.Set;
+
+public class SomeClass { ... }
+        </source>
+
       </subsection>
 
       <subsection name="Package">
@@ -661,7 +698,7 @@ class FooBar {
           </tr>
           <tr>
             <td>sortImportsInGroupAlphabetically</td>
-            <td>Force grouping alphabetically.</td>
+            <td>Force grouping alphabetically, in <a href="http://en.wikipedia.org/wiki/ASCII#Order">ASCII sort order</a>.</td>
             <td><a href="property_types.html#boolean">boolean</a></td>
             <td><code>false</code></td>
           </tr>
@@ -691,12 +728,23 @@ class FooBar {
 &lt;/module&gt;
         </source>
         <p>
-          By the option it is possible to force alphabetically sorting.
+          It is possible to enforce <a href="http://en.wikipedia.org/wiki/ASCII#Order">ASCII sort order</a>
+          of imports in groups using the following configuration:
         </p>
        <source>
 &lt;module name=&quot;CustomImportOrder&quot;&gt;
     &lt;property name=&quot;sortImportsInGroupAlphabetically&quot; value=&quot;true&quot;/&gt;
 &lt;/module&gt;
+       </source>
+       <p>
+         Example of ASCII order:
+       </p>
+       <source>
+import java.awt.Dialog;
+import java.awt.Window;
+import java.awt.color.ColorSpace;
+import java.awt.Frame; // violation here - in ASCII order 'F' should go before 'c',
+                       // as all uppercase come before lowercase letters
        </source>
        <p>
          To force checking imports sequence such as:

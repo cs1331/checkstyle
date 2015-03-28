@@ -163,7 +163,7 @@ public class ParseTreeInfoPanel extends JPanel
         @Override
         public void filesDropped(File[] files)
         {
-            if ((files != null) && (files.length > 0))
+            if (files != null && files.length > 0)
             {
                 final File file = files[0];
                 openFile(file, mSp);
@@ -217,15 +217,10 @@ public class ParseTreeInfoPanel extends JPanel
                 // move back to the top of the file
                 jTextArea.moveCaretPosition(0);
             }
-            catch (final IOException ex) {
+            catch (final IOException | ANTLRException ex) {
                 showErrorDialog(
                         parent,
-                        "Could not open " + file + ": " + ex.getMessage());
-            }
-            catch (final ANTLRException ex) {
-                showErrorDialog(
-                        parent,
-                        "Could not parse " + file + ": " + ex.getMessage());
+                        "Could not parse" + file + ": " + ex.getMessage());
             }
         }
     }

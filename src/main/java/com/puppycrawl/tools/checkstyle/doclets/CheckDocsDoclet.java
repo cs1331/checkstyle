@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Comparator;
 import com.sun.javadoc.ClassDoc;
@@ -52,8 +53,11 @@ public final class CheckDocsDoclet
      * by their check name.
      */
     private static class ClassDocByCheckNameComparator implements
-        Comparator<ClassDoc>
+        Comparator<ClassDoc>, Serializable
     {
+        /** Serialization version. */
+        private static final long serialVersionUID = 1731995210294871881L;
+
         /** {@inheritDoc} */
         public int compare(ClassDoc object1, ClassDoc object2)
         {
@@ -88,7 +92,7 @@ public final class CheckDocsDoclet
     {
         final String openTag = "<p>";
         final int tagLen = openTag.length();
-        if ((text.length() > tagLen)
+        if (text.length() > tagLen
                 && text.substring(0, tagLen).equals(openTag))
         {
             text.delete(0, tagLen);
@@ -160,7 +164,7 @@ public final class CheckDocsDoclet
 
         final File destDir = new File(getDestDir(root.options()));
 
-        final File checksIndexFile = new File(destDir, "availablechecks.xml");
+        final File checksIndexFile = new File(destDir, "checks.xml");
         final PrintWriter fileWriter = new PrintWriter(
                 new FileWriter(checksIndexFile));
         writeXdocsHeader(fileWriter, "Available Checks");
@@ -185,7 +189,7 @@ public final class CheckDocsDoclet
                 // allow checks to override pageName when
                 // java package hierarchy is not reflected in doc structure
                 final Tag[] docPageTags = classDoc.tags("checkstyle-docpage");
-                if ((docPageTags != null) && (docPageTags.length > 0)) {
+                if (docPageTags != null && docPageTags.length > 0) {
                     pageName = docPageTags[0].text();
                 }
 

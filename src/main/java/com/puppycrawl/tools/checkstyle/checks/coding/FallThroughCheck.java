@@ -24,7 +24,6 @@ import java.util.regex.Pattern;
 import com.puppycrawl.tools.checkstyle.api.Check;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.api.Utils;
 
 /**
  * Checks for fall through in switch statements
@@ -135,7 +134,7 @@ public class FallThroughCheck extends Check
     public void init()
     {
         super.init();
-        regExp = Utils.getPattern(reliefPattern);
+        regExp = Pattern.compile(reliefPattern);
     }
 
     @Override
@@ -143,8 +142,8 @@ public class FallThroughCheck extends Check
     {
         final DetailAST nextGroup = ast.getNextSibling();
         final boolean isLastGroup =
-            ((nextGroup == null)
-             || (nextGroup.getType() != TokenTypes.CASE_GROUP));
+                nextGroup == null
+                 || nextGroup.getType() != TokenTypes.CASE_GROUP;
         if (isLastGroup && !checkLastGroup) {
             // we do not need to check last group
             return;
@@ -222,7 +221,7 @@ public class FallThroughCheck extends Check
             lastStmt = lastStmt.getPreviousSibling();
         }
 
-        return (lastStmt != null)
+        return lastStmt != null
             && isTerminated(lastStmt, useBreak, useContinue);
     }
 
@@ -242,7 +241,7 @@ public class FallThroughCheck extends Check
         final DetailAST elseStmt = thenStmt.getNextSibling();
         boolean isTerminated = isTerminated(thenStmt, useBreak, useContinue);
 
-        if (isTerminated && (elseStmt != null)) {
+        if (isTerminated && elseStmt != null) {
             isTerminated = isTerminated(elseStmt.getFirstChild(),
                                         useBreak, useContinue);
         }
@@ -290,7 +289,7 @@ public class FallThroughCheck extends Check
                                             useBreak, useContinue);
 
         DetailAST catchStmt = ast.findFirstToken(TokenTypes.LITERAL_CATCH);
-        while ((catchStmt != null) && isTerminated) {
+        while (catchStmt != null && isTerminated) {
             final DetailAST catchBody =
                 catchStmt.findFirstToken(TokenTypes.SLIST);
             isTerminated &= isTerminated(catchBody, useBreak, useContinue);
@@ -309,9 +308,9 @@ public class FallThroughCheck extends Check
     private boolean checkSwitch(final DetailAST ast, boolean useContinue)
     {
         DetailAST caseGroup = ast.findFirstToken(TokenTypes.CASE_GROUP);
-        boolean isTerminated = (caseGroup != null);
-        while (isTerminated && (caseGroup != null)
-               && (caseGroup.getType() != TokenTypes.RCURLY))
+        boolean isTerminated = caseGroup != null;
+        while (isTerminated && caseGroup != null
+               && caseGroup.getType() != TokenTypes.RCURLY)
         {
             final DetailAST caseBody =
                 caseGroup.findFirstToken(TokenTypes.SLIST);

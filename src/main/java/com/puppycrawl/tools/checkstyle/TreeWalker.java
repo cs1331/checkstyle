@@ -51,7 +51,6 @@ import com.puppycrawl.tools.checkstyle.api.FileContents;
 import com.puppycrawl.tools.checkstyle.api.FileText;
 import com.puppycrawl.tools.checkstyle.api.LocalizedMessage;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.api.Utils;
 import com.puppycrawl.tools.checkstyle.grammars.GeneratedJavaLexer;
 import com.puppycrawl.tools.checkstyle.grammars.GeneratedJavaRecognizer;
 
@@ -117,9 +116,6 @@ public final class TreeWalker
     /** logger for debug purpose */
     private static final Log LOG =
         LogFactory.getLog("com.puppycrawl.tools.checkstyle.TreeWalker");
-
-    /** the file extensions that are accepted */
-    private String[] fileExtensions;
 
     /**
      * Creates a new <code>TreeWalker</code> instance.
@@ -198,7 +194,7 @@ public final class TreeWalker
         final String fileName = file.getPath();
         final long timestamp = file.lastModified();
         if (cache.alreadyChecked(fileName, timestamp)
-                 || !fileExtensionMatches(file, fileExtensions))
+                 || !fileExtensionMatches(file, getFileExtensions()))
         {
             return;
         }
@@ -218,77 +214,44 @@ public final class TreeWalker
 
             walk(astWithComments, contents, AstState.WITH_COMMENTS);
         }
-        catch (final RecognitionException re) {
-            final String exceptionMsg = String.format(msg, "RecognitionException", fileName);
-            Utils.getExceptionLogger().error(exceptionMsg);
-            getMessageCollector().add(
-                new LocalizedMessage(
-                    re.getLine(),
-                    re.getColumn(),
-                    Defn.CHECKSTYLE_BUNDLE,
-                    "general.exception",
-                    new String[] {re.getMessage()},
-                    getId(),
-                    this.getClass(), null));
-        }
         catch (final TokenStreamRecognitionException tre) {
             final String exceptionMsg = String.format(msg, "TokenStreamRecognitionException",
                      fileName);
             Utils.getExceptionLogger().error(exceptionMsg);
             final RecognitionException re = tre.recog;
+            String message = "TokenStreamRecognitionException occured";
             if (re != null) {
-                getMessageCollector().add(
-                    new LocalizedMessage(
-                        re.getLine(),
-                        re.getColumn(),
-                        Defn.CHECKSTYLE_BUNDLE,
-                        "general.exception",
-                        new String[] {re.getMessage()},
-                        getId(),
-                        this.getClass(), null));
+                message = re.getMessage();
             }
-            else {
-                getMessageCollector().add(
-                    new LocalizedMessage(
-                        0,
-                        Defn.CHECKSTYLE_BUNDLE,
-                        "general.exception",
-                        new String[]
-                        {"TokenStreamRecognitionException occured."},
-                        getId(),
-                        this.getClass(), null));
-            }
+            getMessageCollector().add(createLocalizedMessage(message));
         }
-        catch (final TokenStreamException te) {
-            final String exceptionMsg = String.format(msg,
-                    "TokenStreamException", fileName);
+        // RecognitionException and any other (need to check if needed)
+        catch (Throwable ex) {
+            final String exceptionMsg = String.format(msg, ex.getClass().getSimpleName(), fileName);
             Utils.getExceptionLogger().error(exceptionMsg);
-            getMessageCollector().add(
-                new LocalizedMessage(
-                    0,
-                    Defn.CHECKSTYLE_BUNDLE,
-                    "general.exception",
-                    new String[] {te.getMessage()},
-                    getId(),
-                    this.getClass(), null));
-        }
-        catch (final Throwable err) {
-            final String exceptionMsg = String.format(msg, "Exception", fileName);
-            Utils.getExceptionLogger().error(exceptionMsg);
-            err.printStackTrace();
-            getMessageCollector().add(
-                new LocalizedMessage(
-                    0,
-                    Defn.CHECKSTYLE_BUNDLE,
-                    "general.exception",
-                    new String[] {"" + err},
-                    getId(),
-                    this.getClass(), null));
+            getMessageCollector().add(createLocalizedMessage(ex.getMessage()));
         }
 
         if (getMessageCollector().size() == 0) {
             cache.checkedOk(fileName, timestamp);
         }
+    }
+
+    /**
+     * Creates {@link LocalizedMessage} object using default attributes.
+     * @param message
+     *        message that will be used for created object
+     * @return instance of created object
+     */
+    private LocalizedMessage createLocalizedMessage(String message)
+    {
+        return new LocalizedMessage(
+                0,
+                Defn.CHECKSTYLE_BUNDLE,
+                "general.exception",
+                new String[] {message },
+                getId(),
+                this.getClass(), null);
     }
 
     /**
@@ -549,7 +512,7 @@ public final class TreeWalker
         while (curNode != null) {
             notifyVisit(curNode, astState);
             DetailAST toVisit = curNode.getFirstChild();
-            while ((curNode != null) && (toVisit == null)) {
+            while (curNode != null && toVisit == null) {
                 notifyLeave(curNode, astState);
                 toVisit = curNode.getNextSibling();
                 if (toVisit == null) {
@@ -596,7 +559,7 @@ public final class TreeWalker
             }
 
             DetailAST toVisit = curNode.getFirstChild();
-            while ((curNode != null) && (toVisit == null)) {
+            while (curNode != null && toVisit == null) {
                 toVisit = curNode.getNextSibling();
                 if (toVisit == null) {
                     curNode = curNode.getParent();

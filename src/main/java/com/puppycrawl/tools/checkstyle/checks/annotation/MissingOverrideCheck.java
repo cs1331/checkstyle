@@ -27,7 +27,7 @@ import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.JavadocTagInfo;
 import com.puppycrawl.tools.checkstyle.api.TextBlock;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.api.Utils;
+import com.puppycrawl.tools.checkstyle.Utils;
 
 /**
  * <p>
@@ -172,8 +172,8 @@ public final class MissingOverrideCheck extends Check
         }
 
         if (containastag
-            && (!AnnotationUtility.containsAnnotation(ast, OVERRIDE)
-            && !AnnotationUtility.containsAnnotation(ast, FQ_OVERRIDE)))
+            && !AnnotationUtility.containsAnnotation(ast, OVERRIDE)
+            && !AnnotationUtility.containsAnnotation(ast, FQ_OVERRIDE))
         {
             this.log(ast.getLineNo(), MSG_KEY_ANNOTATION_MISSING_OVERRIDE);
         }

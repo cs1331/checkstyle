@@ -24,12 +24,11 @@ import java.util.regex.Pattern;
 import com.puppycrawl.tools.checkstyle.api.Check;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.api.Utils;
 
 /**
  * <p>
  * Restrict using <a href =
- * "http://docs.oracle.com/javase/specs/jls/se7/html/jls-3.html#jls-3.3">
+ * "http://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.3">
  * Unicode escapes</a> (e.g. \u221e).
  * It is possible to allow using escapes for
  * <a href="http://en.wiktionary.org/wiki/Appendix:Control_characters">
@@ -107,27 +106,26 @@ import com.puppycrawl.tools.checkstyle.api.Utils;
 public class AvoidEscapedUnicodeCharactersCheck
     extends Check
 {
-     /** Regexp for Unicode chars */
-    private static Pattern sUnicodeRegexp =
-            Utils.getPattern("\\\\u[a-fA-F0-9]{4}");
+    /** Regular expression for Unicode chars */
+    private static Pattern sUnicodeRegexp = Pattern.compile("\\\\u[a-fA-F0-9]{4}");
 
-    /** Regexp Unicode control characters */
-    private static Pattern sUnicodeControl = Utils.getPattern("\\\\(u|U)"
+    /** Regular expression Unicode control characters */
+    private static Pattern sUnicodeControl = Pattern.compile("\\\\(u|U)"
             + "(00[0-1][0-1A-Fa-f]|00[8-9][0-9A-Fa-f]|034(f|F)|070(f|F)"
             + "|180(e|E)|200[b-fB-F]|202[b-eB-E]|206[0-4a-fA-F]"
             + "|[fF]{3}[9a-bA-B]|[fF][eE][fF]{2})");
 
-    /** Regexp for trail comment */
-    private static Pattern sCommentRegexp = Utils.getPattern(";[ ]*//+"
+    /** Regular expression for trail comment */
+    private static Pattern sCommentRegexp = Pattern.compile(";[ ]*//+"
             + "[a-zA-Z0-9 ]*|;[ ]*/[*]{1}+[a-zA-Z0-9 ]*");
 
-    /** Regexp for all escaped chars*/
+    /** Regular expression for all escaped chars */
     private static Pattern sAllEscapedChars =
-            Utils.getPattern("^((\\\\u)[a-fA-F0-9]{4}"
+            Pattern.compile("^((\\\\u)[a-fA-F0-9]{4}"
                     + "||\\\\b|\\\\t|\\\\n|\\\\f|\\\\r|\\\\|\\\"|\\\')+$");
 
-    /** Regexp for non-printable unicode chars*/
-    private static Pattern sNonPrintableChars = Utils.getPattern("\\\\u1680|\\\\u2028"
+    /** Regular expression for non-printable unicode chars */
+    private static Pattern sNonPrintableChars = Pattern.compile("\\\\u1680|\\\\u2028"
             + "|\\\\u2029|\\\\u205(f|F)|\\\\u3000|\\\\u2007|\\\\u2000|\\\\u200(a|A)"
             + "|\\\\u007(F|f)|\\\\u009(f|F)|\\\\u(f|F){4}|\\\\u007(F|f)|\\\\u00(a|A)(d|D)"
             + "|\\\\u0600|\\\\u061(c|C)|\\\\u06(d|D){2}|\\\\u070(f|F)|\\\\u1680|\\\\u180(e|E)"
@@ -214,16 +212,14 @@ public class AvoidEscapedUnicodeCharactersCheck
 
         final String literal = ast.getText();
 
-        if (hasUnicodeChar(literal)) {
-            if (!(allowByTailComment && haastrailComment(ast)
-                    || isAllCharactersEscaped(literal)
-                    || (allowEscapesForControlCharacters
-                            && isOnlyUnicodeValidChars(literal, sUnicodeControl))
-                    || (allowNonPrintableEscapes
-                            && isOnlyUnicodeValidChars(literal, sNonPrintableChars))))
-            {
-                log(ast.getLineNo(), "forbid.escaped.unicode.char");
-            }
+        if (hasUnicodeChar(literal) && !(allowByTailComment && hasTrailComment(ast)
+                || isAllCharactersEscaped(literal)
+                || allowEscapesForControlCharacters
+                        && isOnlyUnicodeValidChars(literal, sUnicodeControl)
+                || allowNonPrintableEscapes
+                        && isOnlyUnicodeValidChars(literal, sNonPrintableChars)))
+        {
+            log(ast.getLineNo(), "forbid.escaped.unicode.char");
         }
     }
 
@@ -257,7 +253,7 @@ public class AvoidEscapedUnicodeCharactersCheck
      * @param ast current token.
      * @return true if trail comment is present after ast token.
      */
-    private boolean haastrailComment(DetailAST ast)
+    private boolean hasTrailComment(DetailAST ast)
     {
         boolean result = false;
         final DetailAST variableDef = getVariableDef(ast);

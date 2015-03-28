@@ -10,6 +10,12 @@
     <author>Checkstyle Development Team</author>
   </properties>
 
+  <head>
+    <title>Checkstyle ${projectVersion}</title>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script type="text/javascript" src="js/anchors.js"></script>
+  </head>
+
   <body>
 
     <section name="Overview">
@@ -43,13 +49,13 @@
       </p>
       <ul>
         <li>
-          <a href="https://github.com/checkstyle/checkstyle">Source
+          <a href="https://github.com/checkstyle/checkstyle">GitHub Source
           code repository</a> - replacing the Mercurial repository on
           SourceForge.
         </li>
         <li>
           <a
-          href="https://github.com/checkstyle/checkstyle/issues">Issue
+          href="https://github.com/checkstyle/checkstyle/issues">GitHub Issue
           management</a> - replacing the Bugs/Feature/Patches on
           SourceForge. All new issues should be raised at GitHub, and
           pull requests are now the preferred way to submit patches.
@@ -76,7 +82,7 @@
 
       <p>
         For a detailed list of available checks please refer to the <a
-        href="availablechecks.html">Available Checks</a> page.
+        href="checks.html">Checks</a> page.
       </p>
     </section>
 
@@ -205,7 +211,7 @@
           <td></td>
         </tr>
         <tr>
-          <td><a href="http://www.netbeans.org">NetBeans</a></td>
+          <td><a href="http://netbeans.org">NetBeans</a></td>
           <td>Petr Hejl</td>
           <td>
             <a href="http://www.sickboy.cz/checkstyle/">Checkstyle Beans</a>
@@ -216,7 +222,7 @@
           </td>
         </tr>
         <tr>
-          <td><a href="http://www.netbeans.org">NetBeans</a></td>
+          <td><a href="http://netbeans.org">NetBeans</a></td>
           <td>Paul Goulbourn</td>
           <td>
             <a href="http://nbcheckstyle.sourceforge.net">nbCheckStyle</a>
@@ -224,7 +230,7 @@
           <td></td>
         </tr>
         <tr>
-          <td><a href="http://www.netbeans.org">NetBeans</a></td>
+          <td><a href="http://netbeans.org">NetBeans</a></td>
           <td></td>
           <td>
             <a href="http://java.net/projects/sqe/">Software Quality Environment (SQE)</a>

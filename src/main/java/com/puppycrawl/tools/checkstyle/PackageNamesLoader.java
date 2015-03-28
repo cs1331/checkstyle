@@ -18,17 +18,18 @@
 ////////////////////////////////////////////////////////////////////////////////
 package com.puppycrawl.tools.checkstyle;
 
-import com.puppycrawl.tools.checkstyle.api.Utils;
-
 import com.google.common.collect.Sets;
+import com.google.common.io.Closeables;
 import com.puppycrawl.tools.checkstyle.api.AbstractLoader;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
-import com.puppycrawl.tools.checkstyle.api.FastStack;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.Set;
 import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.Attributes;
@@ -57,7 +58,7 @@ public final class PackageNamesLoader
         "checkstyle_packages.xml";
 
     /** The temporary stack of package name parts */
-    private final FastStack<String> packageStack = FastStack.newInstance();
+    private final Deque<String> packageStack = new ArrayDeque<>();
 
     /** The fully qualified package names. */
     private final Set<String> packageNames = Sets.newLinkedHashSet();
@@ -107,7 +108,9 @@ public final class PackageNamesLoader
     private String getPackageName()
     {
         final StringBuilder buf = new StringBuilder();
-        for (String subPackage : packageStack) {
+        final Iterator<String> iterator = packageStack.descendingIterator();
+        while (iterator.hasNext()) {
+            final String subPackage = iterator.next();
             buf.append(subPackage);
             if (!subPackage.endsWith(".")) {
                 buf.append(".");
@@ -154,7 +157,7 @@ public final class PackageNamesLoader
         //being created anew for each file
         final PackageNamesLoader namesLoader = newPackageNamesLoader();
 
-        while ((null != packageFiles) && packageFiles.hasMoreElements()) {
+        while (null != packageFiles && packageFiles.hasMoreElements()) {
             final URL packageFile = packageFiles.nextElement();
             InputStream stream = null;
 
@@ -169,7 +172,7 @@ public final class PackageNamesLoader
                         "unable to open " + packageFile, e);
             }
             finally {
-                Utils.closeQuietly(stream);
+                Closeables.closeQuietly(stream);
             }
         }
         return namesLoader.getPackageNames();
@@ -186,11 +189,7 @@ public final class PackageNamesLoader
         try {
             return new PackageNamesLoader();
         }
-        catch (final ParserConfigurationException e) {
-            throw new CheckstyleException(
-                    "unable to create PackageNamesLoader ", e);
-        }
-        catch (final SAXException e) {
+        catch (final ParserConfigurationException | SAXException e) {
             throw new CheckstyleException(
                     "unable to create PackageNamesLoader - "
                     + e.getMessage(), e);
@@ -212,12 +211,9 @@ public final class PackageNamesLoader
         try {
             nameLoader.parseInputSource(source);
         }
-        catch (final SAXException e) {
-            throw new CheckstyleException("unable to parse "
+        catch (final SAXException | IOException e) {
+            throw new CheckstyleException("Unable to parse "
                     + sourceName + " - " + e.getMessage(), e);
-        }
-        catch (final IOException e) {
-            throw new CheckstyleException("unable to read " + sourceName, e);
         }
     }
 }

@@ -27,6 +27,7 @@ import java.util.regex.Pattern;
 
 import antlr.collections.ASTEnumeration;
 
+import com.puppycrawl.tools.checkstyle.Utils;
 import com.puppycrawl.tools.checkstyle.api.Check;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.FullIdent;
@@ -214,14 +215,15 @@ public class VariableDeclarationUsageDistanceCheck extends Check
     }
 
     /**
-     * Sets RegExp pattern to ignore distance calculation for variables listed
-     * in this pattern.
+     * Sets RegExp pattern to ignore distance calculation for variables listed in this pattern.
      * @param ignorePattern
      *        Pattern contains ignored variables.
+     * @throws org.apache.commons.beanutils.ConversionException
+     *         if unable to create Pattern object.
      */
     public void setIgnoreVariablePattern(String ignorePattern)
     {
-        this.ignoreVariablePattern = Pattern.compile(ignorePattern);
+        this.ignoreVariablePattern = Utils.createPattern(ignorePattern);
     }
 
     /**
@@ -264,12 +266,9 @@ public class VariableDeclarationUsageDistanceCheck extends Check
         final int parentType = ast.getParent().getType();
         final DetailAST modifiers = ast.getFirstChild();
 
-        if ((ignoreFinal && modifiers.branchContains(TokenTypes.FINAL))
-                || parentType == TokenTypes.OBJBLOCK)
+        if (!(ignoreFinal && modifiers.branchContains(TokenTypes.FINAL)
+                || parentType == TokenTypes.OBJBLOCK))
         {
-            ;// no code
-        }
-        else {
             final DetailAST variable = ast.findFirstToken(TokenTypes.IDENT);
 
             if (!isVariableMatchesIgnorePattern(variable.getText())) {
@@ -590,12 +589,9 @@ public class VariableDeclarationUsageDistanceCheck extends Check
                 if (currentNodeType == TokenTypes.SLIST) {
                     firstNodeInsideBlock = currentNode.getFirstChild();
                 }
-                else if (currentNodeType == TokenTypes.VARIABLE_DEF
-                        || currentNodeType == TokenTypes.EXPR)
+                else if (currentNodeType != TokenTypes.VARIABLE_DEF
+                        && currentNodeType != TokenTypes.EXPR)
                 {
-                    ; // no code
-                }
-                else {
                     firstNodeInsideBlock = currentNode;
                 }
             }
@@ -856,7 +852,7 @@ public class VariableDeclarationUsageDistanceCheck extends Check
                         break;
 
                     default:
-                        ;// no code
+                        // no code
                 }
             }
         }

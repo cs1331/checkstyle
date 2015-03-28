@@ -20,8 +20,10 @@ package com.puppycrawl.tools.checkstyle.checks.coding;
 
 import com.puppycrawl.tools.checkstyle.api.Check;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import com.puppycrawl.tools.checkstyle.api.FastStack;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
+import java.util.ArrayDeque;
+import java.util.Deque;
+
 /**
  * Check for ensuring that for loop control variables are not modified
  * inside the for block.
@@ -38,10 +40,9 @@ public final class ModifiedControlVariableCheck extends Check
     public static final String MSG_KEY = "modified.control.variable";
 
     /** Current set of parameters. */
-    private FastStack<String> currentVariables = FastStack.newInstance();
+    private Deque<String> currentVariables = new ArrayDeque<>();
     /** Stack of block parameters. */
-    private final FastStack<FastStack<String>> variableStack =
-        FastStack.newInstance();
+    private final Deque<Deque<String>> variableStack = new ArrayDeque<>();
 
     @Override
     public int[] getDefaultTokens()
@@ -191,7 +192,7 @@ public final class ModifiedControlVariableCheck extends Check
     private void enterBlock()
     {
         variableStack.push(currentVariables);
-        currentVariables = FastStack.newInstance();
+        currentVariables = new ArrayDeque<>();
 
     }
     /**
@@ -208,11 +209,11 @@ public final class ModifiedControlVariableCheck extends Check
      */
     private void checkIdent(DetailAST ast)
     {
-        if ((currentVariables != null) && !currentVariables.isEmpty()) {
+        if (currentVariables != null && !currentVariables.isEmpty()) {
             final DetailAST identAST = ast.getFirstChild();
 
-            if ((identAST != null)
-                && (identAST.getType() == TokenTypes.IDENT)
+            if (identAST != null
+                && identAST.getType() == TokenTypes.IDENT
                 && currentVariables.contains(identAST.getText()))
             {
                 log(ast.getLineNo(), ast.getColumnNo(),

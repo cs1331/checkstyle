@@ -82,7 +82,7 @@ public class DefaultLogger
         closeInfo = closeInfoAfterUse;
         closeError = closeErrorAfterUse;
         infoWriter = new PrintWriter(infoStream);
-        errorWriter = (infoStream == errorStream)
+        errorWriter = infoStream == errorStream
             ? infoWriter
             : new PrintWriter(errorStream);
     }
@@ -97,7 +97,7 @@ public class DefaultLogger
     public void addError(AuditEvent evt)
     {
         final SeverityLevel severityLevel = evt.getSeverityLevel();
-        if (!SeverityLevel.IGNORE.equals(severityLevel)) {
+        if (SeverityLevel.IGNORE != severityLevel) {
 
             final String fileName = evt.getFileName();
             final String message = evt.getMessage();
@@ -112,7 +112,7 @@ public class DefaultLogger
             if (evt.getColumn() > 0) {
                 sb.append(':').append(evt.getColumn());
             }
-            if (SeverityLevel.WARNING.equals(severityLevel)) {
+            if (SeverityLevel.WARNING == severityLevel) {
                 sb.append(": warning");
             }
             sb.append(": ").append(message);

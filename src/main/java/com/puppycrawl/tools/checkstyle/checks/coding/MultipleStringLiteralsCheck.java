@@ -23,12 +23,13 @@ import com.google.common.collect.Maps;
 import com.puppycrawl.tools.checkstyle.api.Check;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.api.Utils;
+import com.puppycrawl.tools.checkstyle.Utils;
 import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
+
 
 /**
  * Checks for multiple occurrences of the same string literal within a
@@ -87,15 +88,18 @@ public class MultipleStringLiteralsCheck extends Check
     }
 
     /**
-     * Sets regexp pattern for ignored strings.
-     * @param ignoreStringsRegexp regexp pattern for ignored strings
+     * Sets regular expression pattern for ignored strings.
+     * @param ignoreStringsRegexp
+     *        regular expression pattern for ignored strings
+     * @throws org.apache.commons.beanutils.ConversionException
+     *         if unable to create Pattern object
      */
     public void setIgnoreStringsRegexp(String ignoreStringsRegexp)
     {
-        if ((ignoreStringsRegexp != null)
-            && (ignoreStringsRegexp.length() > 0))
+        if (ignoreStringsRegexp != null
+            && ignoreStringsRegexp.length() > 0)
         {
-            pattern = Utils.getPattern(ignoreStringsRegexp);
+            pattern = Utils.createPattern(ignoreStringsRegexp);
         }
         else {
             pattern = null;
@@ -134,7 +138,7 @@ public class MultipleStringLiteralsCheck extends Check
             return;
         }
         final String currentString = ast.getText();
-        if ((pattern == null) || !pattern.matcher(currentString).find()) {
+        if (pattern == null || !pattern.matcher(currentString).find()) {
             List<StringInfo> hitList = stringMap.get(currentString);
             if (hitList == null) {
                 hitList = Lists.newArrayList();

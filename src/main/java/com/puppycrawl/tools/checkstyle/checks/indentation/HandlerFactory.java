@@ -35,9 +35,8 @@ import org.apache.commons.logging.LogFactory;
  */
 public class HandlerFactory
 {
-    /** Logger for indentation check */
-    private static final Log LOG =
-        LogFactory.getLog("com.puppycrawl.tools.checkstyle.checks.indentation");
+    /** Logger for indentation check. */
+    private static final Log LOG = LogFactory.getLog(HandlerFactory.class);
 
     /**
      * Registered handlers.
@@ -63,7 +62,6 @@ public class HandlerFactory
                     });
             typeHandlers.put(type, ctor);
         }
-        ///CLOVER:OFF
         catch (final NoSuchMethodException e) {
             throw new RuntimeException("couldn't find ctor for "
                                        + handlerClass);
@@ -73,7 +71,6 @@ public class HandlerFactory
             throw new RuntimeException("couldn't find ctor for "
                                        + handlerClass);
         }
-        ///CLOVER:ON
     }
 
     /** Creates a HandlerFactory. */
@@ -169,7 +166,6 @@ public class HandlerFactory
                         indentCheck, ast, parent);
             }
         }
-        ///CLOVER:OFF
         catch (final InstantiationException e) {
             LOG.debug("couldn't instantiate constructor for " + ast, e);
             throw new RuntimeException("couldn't instantiate constructor for "
@@ -188,7 +184,6 @@ public class HandlerFactory
         if (expHandler == null) {
             throw new RuntimeException("no handler for type " + ast.getType());
         }
-        ///CLOVER:ON
         return expHandler;
     }
 
@@ -206,10 +201,10 @@ public class HandlerFactory
     {
         ExpressionHandler theParent = parent;
         DetailAST astNode = ast.getFirstChild();
-        while ((astNode != null) && (astNode.getType() == TokenTypes.DOT)) {
+        while (astNode != null && astNode.getType() == TokenTypes.DOT) {
             astNode = astNode.getFirstChild();
         }
-        if ((astNode != null) && isHandledType(astNode.getType())) {
+        if (astNode != null && isHandledType(astNode.getType())) {
             theParent = getHandler(indentCheck, astNode, theParent);
             createdHandlers.put(astNode, theParent);
         }

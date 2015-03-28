@@ -147,7 +147,7 @@ public class RequireThisCheck extends DeclarationCollector
         if (ast.getType() == TokenTypes.IDENT) {
             processIDENT(ast);
         }
-    } // end visitToken
+    }
 
     /**
      * Checks if a given IDENT is method call or field name which
@@ -188,26 +188,26 @@ public class RequireThisCheck extends DeclarationCollector
             return;
         }
 
-        if ((parentType == TokenTypes.DOT)
-            && (ast.getPreviousSibling() != null))
+        if (parentType == TokenTypes.DOT
+            && ast.getPreviousSibling() != null)
         {
             // it's the method name in a method call; no problem
             return;
         }
-        if ((parentType == TokenTypes.TYPE)
-            || (parentType == TokenTypes.LITERAL_NEW))
+        if (parentType == TokenTypes.TYPE
+            || parentType == TokenTypes.LITERAL_NEW)
         {
             // it's a type name; no problem
             return;
         }
-        if ((parentType == TokenTypes.VARIABLE_DEF)
-            || (parentType == TokenTypes.CTOR_DEF)
-            || (parentType == TokenTypes.METHOD_DEF)
-            || (parentType == TokenTypes.CLASS_DEF)
-            || (parentType == TokenTypes.ENUM_DEF)
-            || (parentType == TokenTypes.INTERFACE_DEF)
-            || (parentType == TokenTypes.PARAMETER_DEF)
-            || (parentType == TokenTypes.TYPE_ARGUMENT))
+        if (parentType == TokenTypes.VARIABLE_DEF
+            || parentType == TokenTypes.CTOR_DEF
+            || parentType == TokenTypes.METHOD_DEF
+            || parentType == TokenTypes.CLASS_DEF
+            || parentType == TokenTypes.ENUM_DEF
+            || parentType == TokenTypes.INTERFACE_DEF
+            || parentType == TokenTypes.PARAMETER_DEF
+            || parentType == TokenTypes.TYPE_ARGUMENT)
         {
             // it's being declared; no problem
             return;
@@ -218,4 +218,4 @@ public class RequireThisCheck extends DeclarationCollector
             log(ast, "require.this.variable", name);
         }
     }
-} // end class RequireThis
+}

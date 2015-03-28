@@ -9,7 +9,156 @@
     <author>Checkstyle Development Team</author>
   </properties>
 
+  <head>
+    <title>Release Notes</title>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script type="text/javascript" src="js/anchors.js"></script>
+  </head>
+
   <body>
+
+    <section name="Release 6.5">
+      <p>Breaking backward compatibility:</p>
+      <ul>
+        <li>
+          Class checkstyle.api.Utils was moved to checkstyle.Utils. Author: Alex Kravin <a href="https://github.com/checkstyle/checkstyle/issues/661">#661</a>
+        </li>
+      </ul>
+
+      <p>New:</p>
+      <ul>
+        <li>
+          New sortStaticImportsAlphabetically property for ImportOrder check that allows alphabetical grouping order in static group. Author: Alex Kravin <a href="https://github.com/checkstyle/checkstyle/issues/12">#12</a>
+        </li>
+        <li>
+          New allowSingleLineStatement property for NeedBraces check to allow one-line statements. Author: Alex Kravin <a href="https://github.com/checkstyle/checkstyle/issues/300">#300</a>
+        </li>
+        <li>
+          New ignoreAnnotationCanonicalNames property for VisibilityModifier check, to ignore fields with particular annotations. Author: Alex Kravin <a href="https://github.com/checkstyle/checkstyle/issues/584">#584</a>
+        </li>
+        <li>
+          New validateEnhancedForLoopVariable property for FinalLocalVariable check to enforce final variables in for each clause. Author: Bhavik Patel <a href="https://github.com/checkstyle/checkstyle/issues/20">#20</a>
+        </li>
+      </ul>
+
+      <p>Bug fixes:</p>
+      <ul>
+        <li>
+          CustomImportOrder checks import sorting according to ASCII order instead of case-insensitive alphabetical order. Author: Michal Kordas <a href="https://github.com/checkstyle/checkstyle/issues/847">#847</a>
+        </li>
+        <li>
+          Fix failing EmptyLineSeparator check on multiple imports or fields. Author: liscju <a href="https://github.com/checkstyle/checkstyle/issues/706">#706</a>
+        </li>
+        <li>
+          Fix ignoreSetter property of HiddenField not working for one letter fields. Author: Michal Kordas <a href="https://github.com/checkstyle/checkstyle/issues/730">#730</a>
+        </li>
+        <li>
+          Token WILDCARD_TYPE was added to WhitespaceAround check. Author: Danil Lopatin <a href="https://github.com/checkstyle/checkstyle/issues/853">#853</a>
+        </li>
+        <li>
+          SuppressionCommentFilter does not suppress StrictDuplicateCode warnings. Author: Yuriy Chulovskyy <a href="https://github.com/checkstyle/checkstyle/issues/26">#26</a>
+        </li>
+        <li>
+          AnnotationsUseStyle yields warning on "({})" of Array types. Author: Alex Kravin <a href="https://github.com/checkstyle/checkstyle/issues/28">#28</a>
+        </li>
+        <li>
+          Fix bug with lambda params in FinalLocalVariable check. Author: Alex Kravin <a href="https://github.com/checkstyle/checkstyle/issues/747">#747</a>
+        </li>
+        <li>
+          Final Local Variable Check, extended acceptable tokens. Author: Alex Kravin <a href="https://github.com/checkstyle/checkstyle/issues/762">#762</a>
+        </li>
+        <li>
+          Add support of logging severity for all audit events. Author: Alex Kravin <a href="https://github.com/checkstyle/checkstyle/issues/67">#67</a>
+        </li>
+        <li>
+          Fix typo in violation message of ModifierOrder check. Author: Michal Kordas <a href="https://github.com/checkstyle/checkstyle/issues/740">#740</a>
+        </li>
+      </ul>
+
+      <p>Notes:</p>
+      <ul>
+        <li>
+          Add anchors to sections. Author: Alex Kravin <a href="https://github.com/checkstyle/checkstyle/issues/586">#586</a>
+        </li>
+        <li>
+          Extended guide for newbies. Author: Alex Kravin <a href="https://github.com/checkstyle/checkstyle/issues/606">#606</a>
+        </li>
+        <li>
+          Remove printStackTrace(...) from whole code. Author: Alex Kravin <a href="https://github.com/checkstyle/checkstyle/issues/660">#660</a>
+        </li>
+        <li>
+          Move content from available_checks.html to checks.html. Author: Alex Kravin <a href="https://github.com/checkstyle/checkstyle/issues/691">#691</a>
+        </li>
+        <li>
+          EmptyCatchBlock check,  updated docs. Author: Alex Kravin <a href="https://github.com/checkstyle/checkstyle/issues/571">#571</a>
+        </li>
+        <li>
+          Add post field for mailing lists. Author: Glenn Hollingsworth <a href="https://github.com/checkstyle/checkstyle/issues/743">#743</a>
+        </li>
+        <li>
+          Automate Code Coverage Validation. Author: Bhavik Patel <a href="https://github.com/checkstyle/checkstyle/issues/722">#722</a>
+        </li>
+        <li>
+          Update all Maven plugins to latest versions. Author: Michal Kordas <a href="https://github.com/checkstyle/checkstyle/issues/644">#644</a>
+        </li>
+        <li>
+          Resolve all violations that were found by default PMD maven plugin rule sets. Author: Michal Kordas <a href="https://github.com/checkstyle/checkstyle/issues/744">#744</a>
+        </li>
+        <li>
+          Add maven-project-info-reports-plugin to POM. Author: Michal Kordas <a href="https://github.com/checkstyle/checkstyle/issues/776">#776</a>
+        </li>
+        <li>
+          Several fixes for problems found by Findbugs. Author: Michal Kordas <a href="https://github.com/checkstyle/checkstyle/issues/778">#778</a>
+        </li>
+        <li>
+          Add OverloadMethodsDeclarationOrder to Available Checks page. Author: Michal Kordas <a href="https://github.com/checkstyle/checkstyle/issues/784">#784</a>
+        </li>
+        <li>
+          Add test to verify that all checks are present on website. Author: Michal Kordas <a href="https://github.com/checkstyle/checkstyle/issues/783">#783</a>
+        </li>
+        <li>
+          Remove deprecated getLines() methods from Utils. Author: Michal Kordas <a href="https://github.com/checkstyle/checkstyle/issues/854">#854</a>
+        </li>
+        <li>
+          Deprecate FastStack and replace it with ArrayDeque. Author: Michal Kordas <a href="https://github.com/checkstyle/checkstyle/issues/86">#86</a>
+        </li>
+        <li>
+          Huge amount of refactoring and improvements, some of them without issue reference. Author: Michal Kordas
+          <a href="https://github.com/checkstyle/checkstyle/issues/674">#674</a>
+          , <a href="https://github.com/checkstyle/checkstyle/issues/729">#729</a>
+          , <a href="https://github.com/checkstyle/checkstyle/issues/730">#730</a>
+          , <a href="https://github.com/checkstyle/checkstyle/issues/736">#736</a>
+          , <a href="https://github.com/checkstyle/checkstyle/issues/742">#742</a>
+          , <a href="https://github.com/checkstyle/checkstyle/issues/751">#751</a>
+          , <a href="https://github.com/checkstyle/checkstyle/issues/787">#787</a>
+          , <a href="https://github.com/checkstyle/checkstyle/issues/790">#790</a>
+          , <a href="https://github.com/checkstyle/checkstyle/issues/805">#805</a>
+          , <a href="https://github.com/checkstyle/checkstyle/issues/806">#806</a>
+          , <a href="https://github.com/checkstyle/checkstyle/issues/809">#809</a>
+          , <a href="https://github.com/checkstyle/checkstyle/issues/816">#816</a>
+          , <a href="https://github.com/checkstyle/checkstyle/issues/821">#821</a>
+          , <a href="https://github.com/checkstyle/checkstyle/issues/821">#821</a>
+        </li>
+        <li>
+          Use Guava Closeables to manage closing exceptions. Author: Michal Kordas  <a href="https://github.com/checkstyle/checkstyle/pull/836">#836</a>
+        </li>
+        <li>
+          Remove duplicate UniqueProperties section. Author: Michele Mauro  <a href="https://github.com/checkstyle/checkstyle/pull/843">#843</a>
+        </li>
+        <li>
+          Add Utils.isPatternValid method to hide try-catch blocks when parsing is used only for validation. Author: Damian Szczepanik  <a href="https://github.com/checkstyle/checkstyle/pull/835">#835</a>
+        </li>
+        <li>
+          Reduce complexity in HandlerFactory class by grouping catch blocks. Author: Damian Szczepanik  <a href="https://github.com/checkstyle/checkstyle/pull/833">#833</a>
+        </li>
+        <li>
+          Delete ///CLOVER comments. Author: Damian Szczepanik  <a href="https://github.com/checkstyle/checkstyle/pull/824">#824</a>
+        </li>
+        <li>
+          Update all links to sun.com reference to oracle site. Author: Damian Szczepanik  <a href="https://github.com/checkstyle/checkstyle/pull/724">#724</a>
+        </li>
+      </ul>
+    </section>
 
     <section name="Release 6.4.1">
       <p>Bug fixes:</p>
@@ -74,7 +223,7 @@
           Empty Line Separator Check, fixed Exception if file doesn't have header. Author: Alex Kravin <a href="https://github.com/checkstyle/checkstyle/issues/621">#621</a>
         </li>
         <li>
-          BooleanExpressionComplexity misidentifies integer expression as boolean expression. Author: ychulovskyy <a href="https://github.com/checkstyle/checkstyle/issues/572">#572</a>
+          BooleanExpressionComplexity misidentifies integer expression as boolean expression. Author: Yuriy Chulovskyy <a href="https://github.com/checkstyle/checkstyle/issues/572">#572</a>
         </li>
       </ul>
 
@@ -158,7 +307,7 @@
       <p>New:</p>
       <ul>
         <li>
-          New option to HiddenField, to skip builder methods - setterCanReturnItsClass. Author: Dmitri Priimak <a href="https://github.com/checkstyle/checkstyle/issues/589">#589</a>
+          New option to HiddenField, to skip builder methods - setterCanReturnItsClass. Author: Dmitri Priimak <a href="https://github.com/checkstyle/checkstyle/pull/598">#598</a>
         </li>
         <li>
           New option to Checker and TreeWalker to specify file extensions. Author: Alex Kravin <a href="https://github.com/checkstyle/checkstyle/issues/25">#25</a>
@@ -236,10 +385,10 @@
           Got rid of javadoc warning. Resolved maven compilation warnings. Author: Alex Kravin <a href="https://github.com/checkstyle/checkstyle/issues/548">#548</a>
         </li>
         <li>
-          Refactored tests from blocks package. Author: ychulovskyy <a href="https://github.com/checkstyle/checkstyle/issues/537">#537</a>
+          Refactored tests from blocks package. Author: Yuriy Chulovskyy <a href="https://github.com/checkstyle/checkstyle/issues/537">#537</a>
         </li>
         <li>
-          Turn on -r recursive by default in CLI. Author: ychulovskyy <a href="https://github.com/checkstyle/checkstyle/issues/3">#3</a>
+          Turn on -r recursive by default in CLI. Author: Yuriy Chulovskyy <a href="https://github.com/checkstyle/checkstyle/issues/3">#3</a>
         </li>
         <li>
           Fixes for suppression examples. Author: Michał Kordas <a href="https://github.com/checkstyle/checkstyle/issues/537">#289</a>
@@ -287,19 +436,19 @@
           Generic Whitespace Check, fixed bug - '>' is followed by an illegal character. Author: Alex Kravin <a href="https://github.com/checkstyle/checkstyle/issues/350">#350</a>
         </li>
         <li>
-          InnerTypeLast within methods. Author: ychulovskyy <a href="https://github.com/checkstyle/checkstyle/issues/6">#6</a>
+          InnerTypeLast within methods. Author: Yuriy Chulovskyy <a href="https://github.com/checkstyle/checkstyle/issues/6">#6</a>
         </li>
         <li>
-          AnnotationUseStyle closingParens check failed. Author: ychulovskyy <a href="https://github.com/checkstyle/checkstyle/issues/131">#131</a>
+          AnnotationUseStyle closingParens check failed. Author: Yuriy Chulovskyy <a href="https://github.com/checkstyle/checkstyle/issues/131">#131</a>
         </li>
         <li>
-          RequireThis triggers when try-with-resources defines resource with same name as method. Author: ychulovskyy <a href="https://github.com/checkstyle/checkstyle/issues/257">#257</a>
+          RequireThis triggers when try-with-resources defines resource with same name as method. Author: Yuriy Chulovskyy <a href="https://github.com/checkstyle/checkstyle/issues/257">#257</a>
         </li>
         <li>
-          NullPointerException with SuppressWarningsHolder and enum fields. Author: ychulovskyy <a href="https://github.com/checkstyle/checkstyle/issues/353">#353</a>
+          NullPointerException with SuppressWarningsHolder and enum fields. Author: Yuriy Chulovskyy <a href="https://github.com/checkstyle/checkstyle/issues/353">#353</a>
         </li>
         <li>
-          ParameterNumber check option to ignore methods with an @Override. Author: ychulovskyy <a href="https://github.com/checkstyle/checkstyle/issues/66">#66</a>
+          ParameterNumber check option to ignore methods with an @Override. Author: Yuriy Chulovskyy <a href="https://github.com/checkstyle/checkstyle/issues/66">#66</a>
         </li>
         <li>
           MutableException check requires class to explicitly extend some other class. Author: Michal Kordas <a href="https://github.com/checkstyle/checkstyle/issues/60">#60</a>
@@ -329,7 +478,7 @@
           Abstract Aware Type Check marked as deprecated, removed Redundant Throws Check. Author: Alex Kravin <a href="https://github.com/checkstyle/checkstyle/issues/473">#473</a>
         </li>
         <li>
-          JUnitTestCaseCheck was removed from Checkstyle. Author: ychulovskyy <a href="https://github.com/checkstyle/checkstyle/issues/457">#457</a>
+          JUnitTestCaseCheck was removed from Checkstyle. Author: Yuriy Chulovskyy <a href="https://github.com/checkstyle/checkstyle/issues/457">#457</a>
         </li>
         <li>
           Remove StrictDuplicateCodeCheck and whole package. Author: Michal Kordas <a href="https://github.com/checkstyle/checkstyle/issues/523">#523</a>
@@ -377,7 +526,7 @@
           Indentation check fails for switch statements. Author: Max Vetrenko. <a href="https://github.com/checkstyle/checkstyle/issues/341">#341</a>
         </li>
         <li>
-          -v CLI flag for querying the installed Checkstyle version. Author: ychulovskyy. <a href="https://github.com/checkstyle/checkstyle/issues/9">#9</a>
+          -v CLI flag for querying the installed Checkstyle version. Author: Yuriy Chulovskyy. <a href="https://github.com/checkstyle/checkstyle/issues/9">#9</a>
         </li>
       </ul>
       <p>Notes:</p>
@@ -532,7 +681,7 @@
         <li> Enable array initialisation indentation settings. Author: Vaclav Chalupa. </li>
         <li> Enhance WhitespaceAroundCheck to ignore Annotation Array Initialization curlies as it does for Array Initialization outside of annotations. . Author: Jacob Tomaw </li>
         <li>
-          ignore option to the JavadocVariable check. Author: ychulovskyy. <a href="https://github.com/checkstyle/checkstyle/issues/98">#98</a>
+          ignore option to the JavadocVariable check. Author: Yuriy Chulovskyy. <a href="https://github.com/checkstyle/checkstyle/issues/98">#98</a>
         </li>
         <li>
           New: InterfaceTypeParameterName check. Author: Max Vetrenko. <a href="https://github.com/checkstyle/checkstyle/issues/202">#202</a>
@@ -603,11 +752,11 @@
           Fixed RightCurlyCheck for empty methods. Author: Max Vetrenko. <a href="https://github.com/checkstyle/checkstyle/issues/213">#213</a>
         </li>
         <li>
-          Fixed WhitespaceAroundCheck. fix for anonymous inner class. Author: ychulovskyy. <a href="https://github.com/checkstyle/checkstyle/issues/213">#105</a>
+          Fixed WhitespaceAroundCheck. fix for anonymous inner class. Author: Yuriy Chulovskyy. <a href="https://github.com/checkstyle/checkstyle/issues/213">#105</a>
         </li>
         <li>
           Fixed RedundantModifier. Abstract Interface Should not be Allowed.
-          Author: ychulovskyy. <a href="https://github.com/checkstyle/checkstyle/issues/209">#209</a>
+          Author: Yuriy Chulovskyy. <a href="https://github.com/checkstyle/checkstyle/issues/209">#209</a>
         </li>
         <li>
           Fixed EmptyBlock. need to handle switch block.
@@ -631,7 +780,7 @@
         </li>
         <li>
           Exception thrown when parsing numeric constant "3.14_15F".
-          Author: ychulovskyy<a href="https://github.com/checkstyle/checkstyle/issues/134">#134</a>
+          Author: Yuriy Chulovskyy<a href="https://github.com/checkstyle/checkstyle/issues/134">#134</a>
         </li>
         <li>
           RequireThis triggers for static interface fields Fixed.
@@ -673,7 +822,7 @@
           dsm-maven-plugin is used to show <a href="dsm/index.html">dependency structure of project</a> on site. Author: Ilja Dubinin.
         </li>
         <li>
-          Added and updated documentation/messages for number of Checks. Authors: Max Vetrenko, Thomas Jensen, ychulovskyy, Jarmo Isotalo
+          Added and updated documentation/messages for number of Checks. Authors: Max Vetrenko, Thomas Jensen, Yuriy Chulovskyy, Jarmo Isotalo
           , Peter O, Ryszard Wisniewski, Ilja Gubins, Baratali Izmailov, Jan Schafer, Niklas Walter, Andrew Gaul.
         </li>
         <li>
@@ -1775,7 +1924,7 @@
         </li>
         <li>
           FallThrough check can be configured to ignore fall-throughs
-          if there is a relief comment, thanks to  Ralf (aka rakus)
+          if there is a relief comment, thanks to Ralf (aka rakus)
           for a great patch (rfe 1345691, patch 1348873)
         </li>
       </ul>
@@ -1866,7 +2015,7 @@
         definition (bug 1284682)</li>
 
         <li>Fixed i18n problems in ArrayTypeStyle,
-        HideUtilityClassConstructor and  AvoidInlineConditionals(bug
+        HideUtilityClassConstructor and AvoidInlineConditionals(bug
         1262825)</li>
 
       </ul>
@@ -2066,7 +2215,7 @@
         <li>JavadocMethod check now can be configured to skip missed javadoc
         (rfe 1060634)</li>
 
-        <li>Some clarifications on  scope property of javadoc checks added
+        <li>Some clarifications on scope property of javadoc checks added
         (rfe 1009201)</li>
 
         <li>UnusedPrivateMethod check now can be configured to ignore

@@ -28,7 +28,7 @@ import com.puppycrawl.tools.checkstyle.api.Check;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.FullIdent;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.api.Utils;
+import com.puppycrawl.tools.checkstyle.Utils;
 
 /**
  * <p>
@@ -119,17 +119,25 @@ import com.puppycrawl.tools.checkstyle.api.Utils;
  * </code>
  * </pre>
  * <p>
- * By the option it is possible to force alphabetically sorting.
+ * It is possible to enforce <a href="http://en.wikipedia.org/wiki/ASCII#Order">ASCII sort order</a>
+ * of imports in groups using the following configuration:
  * </p>
- *
  * <pre>
- * <code>
- * &lt;module name=&quot;CustomImportOrder&quot;&gt;
+ * <code>&lt;module name=&quot;CustomImportOrder&quot;&gt;
  *    &lt;property name=&quot;sortImportsInGroupAlphabetically&quot; value=&quot;true&quot;/&gt;
  * &lt;/module&gt;
  * </code>
  * </pre>
- *
+ * <p>
+ * Example of ASCII order:
+ * </p>
+ * <pre>
+ * <code>import java.awt.Dialog;
+ * import java.awt.Window;
+ * import java.awt.color.ColorSpace;
+ * import java.awt.Frame; // violation here - in ASCII order 'F' should go before 'c',
+ *                        // as all uppercase come before lowercase letters</code>
+ * </pre>
  * <p>
  * To force checking imports sequence such as:
  * </p>
@@ -212,18 +220,18 @@ public class CustomImportOrderCheck extends Check
     private String samePackageDomainsRegExp = "";
 
     /** RegExp for STANDARD_JAVA_PACKAGE group imports */
-    private Pattern standardPackageRegExp = Utils.getPattern("java|javax");
+    private Pattern standardPackageRegExp = Pattern.compile("java|javax");
 
     /** RegExp for THIRDPARTY_PACKAGE group imports */
-    private Pattern thirdPartyPackageRegExp = Utils.getPattern(".*");
+    private Pattern thirdPartyPackageRegExp = Pattern.compile(".*");
 
     /** RegExp for SPECIAL_IMPORTS group imports */
-    private Pattern specialImportsRegExp = Utils.getPattern("^$");
+    private Pattern specialImportsRegExp = Pattern.compile("^$");
 
     /** Force empty line separator between import groups */
     private boolean separateLineBetweenGroups = true;
 
-    /** Force grouping alphabetically */
+    /** Force grouping alphabetically, in ASCII order */
     private boolean sortImportsInGroupAlphabetically;
 
     /** List of order declaration customizing by user */
@@ -239,30 +247,36 @@ public class CustomImportOrderCheck extends Check
      * Sets standardRegExp specified by user.
      * @param regexp
      *        user value.
+     * @throws org.apache.commons.beanutils.ConversionException
+     *         if unable to create Pattern object.
      */
     public final void setStandardPackageRegExp(String regexp)
     {
-        standardPackageRegExp = Utils.getPattern(regexp);
+        standardPackageRegExp = Utils.createPattern(regexp);
     }
 
     /**
      * Sets thirdPartyRegExp specified by user.
      * @param regexp
      *        user value.
+     * @throws org.apache.commons.beanutils.ConversionException
+     *         if unable to create Pattern object.
      */
     public final void setThirdPartyPackageRegExp(String regexp)
     {
-        thirdPartyPackageRegExp = Utils.getPattern(regexp);
+        thirdPartyPackageRegExp = Utils.createPattern(regexp);
     }
 
     /**
      * Sets specialImportsRegExp specified by user.
      * @param regexp
      *        user value.
+     * @throws org.apache.commons.beanutils.ConversionException
+     *         if unable to create Pattern object.
      */
     public final void setSpecialImportsRegExp(String regexp)
     {
-        specialImportsRegExp = Utils.getPattern(regexp);
+        specialImportsRegExp = Utils.createPattern(regexp);
     }
 
     /**
@@ -605,26 +619,12 @@ public class CustomImportOrderCheck extends Check
             }
             final String import1Token = import1Tokens[i];
             final String import2Token = import2Tokens[i];
-            result = import1Token.compareToIgnoreCase(import2Token);
+            result = import1Token.compareTo(import2Token);
             if (result != 0) {
                 break;
             }
         }
         return result;
-    }
-
-    /**
-     * Return class name from import full path.
-     * @param startFrom number of start.
-     * @param importPath import full path.
-     * @return class name.
-     */
-    private String getClassName(int startFrom, String importPath)
-    {
-        String className = importPath;
-        className = className.substring(startFrom, className.length());
-        final StringTokenizer token = new StringTokenizer(className, ".\r");
-        return token.nextToken();
     }
 
     /**
@@ -714,7 +714,7 @@ public class CustomImportOrderCheck extends Check
      * group.
      * @author max
      */
-    class ImportDetails
+    static class ImportDetails
     {
         /** Import full path */
         private String importFullPath;

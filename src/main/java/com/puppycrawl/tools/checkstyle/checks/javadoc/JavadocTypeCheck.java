@@ -26,12 +26,11 @@ import com.puppycrawl.tools.checkstyle.api.Scope;
 import com.puppycrawl.tools.checkstyle.api.ScopeUtils;
 import com.puppycrawl.tools.checkstyle.api.TextBlock;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.api.Utils;
+import com.puppycrawl.tools.checkstyle.Utils;
 import com.puppycrawl.tools.checkstyle.checks.CheckUtils;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 import org.apache.commons.beanutils.ConversionException;
 
 /**
@@ -121,36 +120,25 @@ public class JavadocTypeCheck
     /**
      * Set the author tag pattern.
      * @param format a <code>String</code> value
-     * @throws ConversionException unable to parse aFormat
+     * @throws ConversionException if unable to create Pattern object.
      */
     public void setAuthorFormat(String format)
         throws ConversionException
     {
-        try {
-            authorFormat = format;
-            authorFormatPattern = Utils.getPattern(format);
-        }
-        catch (final PatternSyntaxException e) {
-            throw new ConversionException("unable to parse " + format, e);
-        }
+        authorFormat = format;
+        authorFormatPattern = Utils.createPattern(format);
     }
 
     /**
      * Set the version format pattern.
      * @param format a <code>String</code> value
-     * @throws ConversionException unable to parse aFormat
+     * @throws ConversionException if unable to create Pattern object.
      */
     public void setVersionFormat(String format)
         throws ConversionException
     {
-        try {
-            versionFormat = format;
-            versionFormatPattern = Utils.getPattern(format);
-        }
-        catch (final PatternSyntaxException e) {
-            throw new ConversionException("unable to parse " + format, e);
-        }
-
+        versionFormat = format;
+        versionFormatPattern = Utils.createPattern(format);
     }
 
     /**
@@ -244,11 +232,11 @@ public class JavadocTypeCheck
         final Scope surroundingScope = ScopeUtils.getSurroundingScope(ast);
 
         return scope.isIn(this.scope)
-            && ((surroundingScope == null) || surroundingScope.isIn(this.scope))
-            && ((excludeScope == null)
+            && (surroundingScope == null || surroundingScope.isIn(this.scope))
+            && (excludeScope == null
                 || !scope.isIn(excludeScope)
-                || ((surroundingScope != null)
-                && !surroundingScope.isIn(excludeScope)));
+                || surroundingScope != null
+                && !surroundingScope.isIn(excludeScope));
     }
 
     /**
@@ -313,8 +301,8 @@ public class JavadocTypeCheck
         for (int i = tags.size() - 1; i >= 0; i--) {
             final JavadocTag tag = tags.get(i);
             if (tag.isParamTag()
-                && (tag.getArg1() != null)
-                && (tag.getArg1().indexOf("<" + typeParamName + ">") == 0))
+                && tag.getArg1() != null
+                && tag.getArg1().indexOf("<" + typeParamName + ">") == 0)
             {
                 found = true;
             }
@@ -334,7 +322,7 @@ public class JavadocTypeCheck
         final List<JavadocTag> tags,
         final List<String> typeParamNames)
     {
-        final Pattern pattern = Utils.getPattern("\\s*<([^>]+)>.*");
+        final Pattern pattern = Pattern.compile("\\s*<([^>]+)>.*");
         for (int i = tags.size() - 1; i >= 0; i--) {
             final JavadocTag tag = tags.get(i);
             if (tag.isParamTag()) {

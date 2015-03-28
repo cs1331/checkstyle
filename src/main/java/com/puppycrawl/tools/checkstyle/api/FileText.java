@@ -39,6 +39,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.google.common.io.Closeables;
+
 /**
  * Represents the text contents of a file of arbitrary plain text type.
  * <p>
@@ -62,8 +64,7 @@ public final class FileText extends AbstractList<String>
     /**
      * Regular expression pattern matching all line terminators.
      */
-    private static final Pattern LINE_TERMINATOR =
-        Utils.getPattern("\\n|\\r\\n?");
+    private static final Pattern LINE_TERMINATOR = Pattern.compile("\\n|\\r\\n?");
 
     // For now, we always keep both full text and lines array.
     // In the long run, however, the one passed at initialization might be
@@ -144,7 +145,7 @@ public final class FileText extends AbstractList<String>
             }
         }
         finally {
-            Utils.closeQuietly(reader);
+            Closeables.closeQuietly(reader);
         }
         // buf.trimToSize(); // could be used instead of toString().
         fullText = buf.toString();
@@ -205,7 +206,7 @@ public final class FileText extends AbstractList<String>
      */
     public static FileText fromLines(File file, List<String> lines)
     {
-        return (lines instanceof FileText)
+        return lines instanceof FileText
             ? (FileText) lines
             : new FileText(file, lines);
     }
@@ -265,7 +266,7 @@ public final class FileText extends AbstractList<String>
             return ByteBuffer.wrap(bytes, 0, fill).asReadOnlyBuffer();
         }
         finally {
-            Utils.closeQuietly(stream);
+            Closeables.closeQuietly(stream);
         }
     }
 

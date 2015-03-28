@@ -20,10 +20,11 @@ package com.puppycrawl.tools.checkstyle.checks.sizes;
 
 import com.puppycrawl.tools.checkstyle.api.Check;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import com.puppycrawl.tools.checkstyle.api.FastStack;
 import com.puppycrawl.tools.checkstyle.api.Scope;
 import com.puppycrawl.tools.checkstyle.api.ScopeUtils;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.EnumMap;
 
 /**
@@ -111,7 +112,7 @@ public final class MethodCountCheck extends Check
         int value(Scope scope)
         {
             final Integer value = counts.get(scope);
-            return (null == value) ? 0 : value;
+            return null == value ? 0 : value;
         }
 
         /** @return the total number of methods. */
@@ -119,7 +120,7 @@ public final class MethodCountCheck extends Check
         {
             return total;
         }
-    };
+    }
 
     /** default maximum number of methods */
     private static final int DEFAULT_MAX_METHODS = 100;
@@ -134,8 +135,7 @@ public final class MethodCountCheck extends Check
     /** Maximum total number of methods. */
     private int maxTotal = DEFAULT_MAX_METHODS;
     /** Maintains stack of counters, to support inner types. */
-    private final FastStack<MethodCounter> counters =
-        new FastStack<>();
+    private final Deque<MethodCounter> counters = new ArrayDeque<>();
 
     @Override
     public int[] getDefaultTokens()
@@ -164,10 +164,10 @@ public final class MethodCountCheck extends Check
     @Override
     public void visitToken(DetailAST ast)
     {
-        if ((TokenTypes.CLASS_DEF == ast.getType())
-            || (TokenTypes.INTERFACE_DEF == ast.getType())
-            || (TokenTypes.ENUM_CONSTANT_DEF == ast.getType())
-            || (TokenTypes.ENUM_DEF == ast.getType()))
+        if (TokenTypes.CLASS_DEF == ast.getType()
+            || TokenTypes.INTERFACE_DEF == ast.getType()
+            || TokenTypes.ENUM_CONSTANT_DEF == ast.getType()
+            || TokenTypes.ENUM_DEF == ast.getType())
         {
             counters.push(new MethodCounter(
                 TokenTypes.INTERFACE_DEF == ast.getType()));
@@ -180,10 +180,10 @@ public final class MethodCountCheck extends Check
     @Override
     public void leaveToken(DetailAST ast)
     {
-        if ((TokenTypes.CLASS_DEF == ast.getType())
-            || (TokenTypes.INTERFACE_DEF == ast.getType())
-            || (TokenTypes.ENUM_CONSTANT_DEF == ast.getType())
-            || (TokenTypes.ENUM_DEF == ast.getType()))
+        if (TokenTypes.CLASS_DEF == ast.getType()
+            || TokenTypes.INTERFACE_DEF == ast.getType()
+            || TokenTypes.ENUM_CONSTANT_DEF == ast.getType()
+            || TokenTypes.ENUM_DEF == ast.getType())
         {
             final MethodCounter counter = counters.pop();
             checkCounters(counter, ast);

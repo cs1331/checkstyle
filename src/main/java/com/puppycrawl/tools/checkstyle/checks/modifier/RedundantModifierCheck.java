@@ -99,11 +99,11 @@ public class RedundantModifierCheck
                 // is not a method or annotation field
 
                 final int type = modifier.getType();
-                if ((type == TokenTypes.LITERAL_PUBLIC)
-                    || ((type == TokenTypes.LITERAL_STATIC)
-                            && ast.getType() != TokenTypes.METHOD_DEF)
-                    || (type == TokenTypes.ABSTRACT)
-                    || (type == TokenTypes.FINAL))
+                if (type == TokenTypes.LITERAL_PUBLIC
+                    || type == TokenTypes.LITERAL_STATIC
+                            && ast.getType() != TokenTypes.METHOD_DEF
+                    || type == TokenTypes.ABSTRACT
+                    || type == TokenTypes.FINAL)
                 {
                     log(modifier.getLineNo(), modifier.getColumnNo(),
                             MSG_KEY, modifier.getText());
@@ -160,7 +160,7 @@ public class RedundantModifierCheck
 
     /**
      * Checks if method definition is annotated with
-     * <a href="https://docs.oracle.com/javase/7/docs/api/java/lang/SafeVarargs.html">
+     * <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/SafeVarargs.html">
      * SafeVarargs</a> annotation
      * @param methodDef method definition node
      * @return true or false

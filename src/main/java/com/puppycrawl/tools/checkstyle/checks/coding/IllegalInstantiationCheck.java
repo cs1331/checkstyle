@@ -24,7 +24,7 @@ import com.puppycrawl.tools.checkstyle.api.Check;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.FullIdent;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.api.Utils;
+import com.puppycrawl.tools.checkstyle.Utils;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -212,8 +212,8 @@ public class IllegalInstantiationCheck
     {
         final DetailAST typeNameAST = ast.getFirstChild();
         final AST nameSibling = typeNameAST.getNextSibling();
-        if ((nameSibling != null)
-                && (nameSibling.getType() == TokenTypes.ARRAY_DECLARATOR))
+        if (nameSibling != null
+                && nameSibling.getType() == TokenTypes.ARRAY_DECLARATOR)
         {
             // ast == "new Boolean[]"
             return;
@@ -244,13 +244,13 @@ public class IllegalInstantiationCheck
         }
 
         final int clsNameLen = className.length();
-        final int pkgNameLen = (pkgName == null) ? 0 : pkgName.length();
+        final int pkgNameLen = pkgName == null ? 0 : pkgName.length();
 
         for (String illegal : illegalClasses) {
             final int illegalLen = illegal.length();
 
             // class from java.lang
-            if (((illegalLen - javlang.length()) == clsNameLen)
+            if (illegalLen - javlang.length() == clsNameLen
                 && illegal.endsWith(className)
                 && illegal.startsWith(javlang))
             {
@@ -289,9 +289,9 @@ public class IllegalInstantiationCheck
 
             // the test is the "no garbage" version of
             // illegal.equals(pkgName + "." + className)
-            if ((pkgName != null)
-                && (clsNameLen == illegalLen - pkgNameLen - 1)
-                && (illegal.charAt(pkgNameLen) == '.')
+            if (pkgName != null
+                && clsNameLen == illegalLen - pkgNameLen - 1
+                && illegal.charAt(pkgNameLen) == '.'
                 && illegal.endsWith(className)
                 && illegal.startsWith(pkgName))
             {

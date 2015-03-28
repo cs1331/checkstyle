@@ -93,7 +93,8 @@ import com.puppycrawl.tools.checkstyle.api.DetailAST;
  * by using a JTree as a renderer (and editor) for the cells in a
  * particular column in the JTable.
  *
- * <a href="http://java.sun.com/products/jfc/tsc/articles/treetable1/index.html">Original&nbsp;Source&nbsp;Location</a>
+ * <a href="https://docs.oracle.com/cd/E48246_01/apirefs.1111/e13403/oracle/ide/controls/TreeTableModel.html">
+ * Original&nbsp;Source&nbsp;Location</a>
  *
  * @author Philip Milne
  * @author Scott Violet
@@ -197,7 +198,7 @@ public class JTreeTable extends JTable
     public int getEditingRow()
     {
         final Class<?> editingClass = getColumnClass(editingColumn);
-        return (editingClass == TreeTableModel.class) ? -1 : editingRow;
+        return editingClass == TreeTableModel.class ? -1 : editingRow;
     }
 
     /**
@@ -207,7 +208,7 @@ public class JTreeTable extends JTable
     public void setRowHeight(int newRowHeight)
     {
         super.setRowHeight(newRowHeight);
-        if ((tree != null) && (tree.getRowHeight() != newRowHeight)) {
+        if (tree != null && tree.getRowHeight() != newRowHeight) {
             tree.setRowHeight(getRowHeight());
         }
     }
@@ -251,7 +252,7 @@ public class JTreeTable extends JTable
             // colors.
             final TreeCellRenderer tcr = getCellRenderer();
             if (tcr instanceof DefaultTreeCellRenderer) {
-                final DefaultTreeCellRenderer dtcr = ((DefaultTreeCellRenderer) tcr);
+                final DefaultTreeCellRenderer dtcr = (DefaultTreeCellRenderer) tcr;
                 // For 1.1 uncomment this, 1.2 has a bug that will cause an
                 // exception to be thrown if the border selection color is
                 // null.
@@ -272,8 +273,8 @@ public class JTreeTable extends JTable
         {
             if (newRowHeight > 0) {
                 super.setRowHeight(newRowHeight);
-                if ((JTreeTable.this != null) &&
-                    (JTreeTable.this.getRowHeight() != newRowHeight))
+                if (JTreeTable.this != null &&
+                        JTreeTable.this.getRowHeight() != newRowHeight)
                 {
                     JTreeTable.this.setRowHeight(getRowHeight());
                 }
@@ -464,7 +465,7 @@ public class JTreeTable extends JTable
                     final int max = listSelectionModel.getMaxSelectionIndex();
 
                     clearSelection();
-                    if ((min != -1) && (max != -1)) {
+                    if (min != -1 && max != -1) {
                         for (int counter = min; counter <= max; counter++) {
                             if (listSelectionModel.isSelectedIndex(counter)) {
                                 final TreePath selPath = tree.getPathForRow

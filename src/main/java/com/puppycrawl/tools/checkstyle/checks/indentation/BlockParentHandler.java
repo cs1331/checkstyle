@@ -34,7 +34,7 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  *   <LI>if curlys aren't present, then template method to get expressions
  *       is called</LI>
  *   <LI>now all the repetitous code which checks for BOL, if curlys are on
- *       same line, etc. can be collapsed into  the superclass</LI>
+ *       same line, etc. can be collapsed into the superclass</LI>
  * </UL>
  *
  *
@@ -96,7 +96,7 @@ public class BlockParentHandler extends ExpressionHandler
     {
         final DetailAST toplevel = getToplevelAST();
 
-        if ((toplevel == null)
+        if (toplevel == null
             || getLevel().accept(expandedTabsColumnNo(toplevel)) || hasLabelBefore())
         {
             return;
@@ -135,7 +135,7 @@ public class BlockParentHandler extends ExpressionHandler
      */
     protected boolean hasCurlys()
     {
-        return (getLCurly() != null) && (getRCurly() != null);
+        return getLCurly() != null && getRCurly() != null;
     }
 
     /**
@@ -173,10 +173,7 @@ public class BlockParentHandler extends ExpressionHandler
         final DetailAST lcurly = getLCurly();
         final int lcurlyPos = expandedTabsColumnNo(lcurly);
 
-        if ((lcurly == null)
-            || curlyLevel().accept(lcurlyPos)
-            || !startsLine(lcurly))
-        {
+        if (curlyLevel().accept(lcurlyPos) || !startsLine(lcurly)) {
             return;
         }
 
@@ -224,9 +221,8 @@ public class BlockParentHandler extends ExpressionHandler
         final DetailAST rcurly = getRCurly();
         final int rcurlyPos = expandedTabsColumnNo(rcurly);
 
-        if ((rcurly == null)
-            || curlyLevel().accept(rcurlyPos)
-            || (!rcurlyMustStart() && !startsLine(rcurly))
+        if (curlyLevel().accept(rcurlyPos)
+            || !rcurlyMustStart() && !startsLine(rcurly)
             || areOnSameLine(rcurly, lcurly))
         {
             return;

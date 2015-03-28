@@ -20,14 +20,14 @@ package com.puppycrawl.tools.checkstyle.checks.blocks;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.api.Utils;
+import com.puppycrawl.tools.checkstyle.Utils;
 import com.puppycrawl.tools.checkstyle.checks.AbstractOptionCheck;
 
 /**
  * <p>
  * Checks the placement of left curly braces on types, methods and
  * other blocks:
- *  {@link  TokenTypes#LITERAL_CATCH LITERAL_CATCH},  {@link
+ *  {@link TokenTypes#LITERAL_CATCH LITERAL_CATCH},  {@link
  * TokenTypes#LITERAL_DO LITERAL_DO},  {@link TokenTypes#LITERAL_ELSE
  * LITERAL_ELSE},  {@link TokenTypes#LITERAL_FINALLY LITERAL_FINALLY},  {@link
  * TokenTypes#LITERAL_FOR LITERAL_FOR},  {@link TokenTypes#LITERAL_IF
@@ -190,7 +190,7 @@ public class LeftCurlyCheck
             case TokenTypes.ENUM_CONSTANT_DEF :
                 startToken = skipAnnotationOnlyLines(ast);
                 final DetailAST objBlock = ast.findFirstToken(TokenTypes.OBJBLOCK);
-                brace = (objBlock == null)
+                brace = objBlock == null
                     ? null
                     : objBlock.getFirstChild();
                 break;
@@ -211,7 +211,7 @@ public class LeftCurlyCheck
                 startToken = ast;
                 final DetailAST candidate = ast.getFirstChild();
                 brace =
-                    (candidate.getType() == TokenTypes.SLIST)
+                    candidate.getType() == TokenTypes.SLIST
                     ? candidate
                     : null; // silently ignore
                 break;
@@ -226,7 +226,7 @@ public class LeftCurlyCheck
                 brace = null;
         }
 
-        if ((brace != null) && (startToken != null)) {
+        if (brace != null && startToken != null) {
             verifyBrace(brace, startToken);
         }
     }
@@ -260,8 +260,8 @@ public class LeftCurlyCheck
         }
         final int lastAnnotLineNumber = lastAnnot.getLineNo();
         while (lastAnnot.getPreviousSibling() != null
-               && (lastAnnot.getPreviousSibling().getLineNo()
-                    == lastAnnotLineNumber))
+               && lastAnnot.getPreviousSibling().getLineNo()
+                    == lastAnnotLineNumber)
         {
             lastAnnot = lastAnnot.getPreviousSibling();
         }
@@ -299,50 +299,49 @@ public class LeftCurlyCheck
         // calculate the previous line length without trailing whitespace. Need
         // to handle the case where there is no previous line, cause the line
         // being check is the first line in the file.
-        final int prevLineLen = (brace.getLineNo() == 1)
+        final int prevLineLen = brace.getLineNo() == 1
             ? maxLineLength
             : Utils.lengthMinusTrailingWhitespace(getLine(brace.getLineNo() - 2));
 
         // Check for being told to ignore, or have '{}' which is a special case
-        if ((braceLine.length() > (brace.getColumnNo() + 1))
-            && (braceLine.charAt(brace.getColumnNo() + 1) == '}'))
+        if (braceLine.length() <= brace.getColumnNo() + 1
+                || braceLine.charAt(brace.getColumnNo() + 1) != '}')
         {
-            ; // ignore
-        }
-        else if (getAbstractOption() == LeftCurlyOption.NL) {
-            if (!Utils.whitespaceBefore(brace.getColumnNo(), braceLine)) {
-                log(brace.getLineNo(), brace.getColumnNo(),
-                    MSG_KEY_LINE_NEW, "{");
-            }
-        }
-        else if (getAbstractOption() == LeftCurlyOption.EOL) {
-            if (Utils.whitespaceBefore(brace.getColumnNo(), braceLine)
-                && ((prevLineLen + 2) <= maxLineLength))
-            {
-                log(brace.getLineNo(), brace.getColumnNo(),
-                    MSG_KEY_LINE_PREVIOUS, "{");
-            }
-            if (!hasLineBreakAfter(brace)) {
-                log(brace.getLineNo(), brace.getColumnNo(), MSG_KEY_LINE_BREAK_AFTER);
-            }
-        }
-        else if (getAbstractOption() == LeftCurlyOption.NLOW) {
-            if (startToken.getLineNo() == brace.getLineNo()) {
-                ; // all ok as on the same line
-            }
-            else if ((startToken.getLineNo() + 1) == brace.getLineNo()) {
+            if (getAbstractOption() == LeftCurlyOption.NL) {
                 if (!Utils.whitespaceBefore(brace.getColumnNo(), braceLine)) {
                     log(brace.getLineNo(), brace.getColumnNo(),
                         MSG_KEY_LINE_NEW, "{");
                 }
-                else if ((prevLineLen + 2) <= maxLineLength) {
+            }
+            else if (getAbstractOption() == LeftCurlyOption.EOL) {
+                if (Utils.whitespaceBefore(brace.getColumnNo(), braceLine)
+                    && prevLineLen + 2 <= maxLineLength)
+                {
                     log(brace.getLineNo(), brace.getColumnNo(),
                         MSG_KEY_LINE_PREVIOUS, "{");
                 }
+                if (!hasLineBreakAfter(brace)) {
+                    log(brace.getLineNo(), brace.getColumnNo(), MSG_KEY_LINE_BREAK_AFTER);
+                }
             }
-            else if (!Utils.whitespaceBefore(brace.getColumnNo(), braceLine)) {
-                log(brace.getLineNo(), brace.getColumnNo(),
-                    MSG_KEY_LINE_NEW, "{");
+            else if (getAbstractOption() == LeftCurlyOption.NLOW
+                    && startToken.getLineNo() != brace.getLineNo())
+            {
+                // not on the same line
+                if (startToken.getLineNo() + 1 == brace.getLineNo()) {
+                    if (!Utils.whitespaceBefore(brace.getColumnNo(), braceLine)) {
+                        log(brace.getLineNo(), brace.getColumnNo(),
+                                MSG_KEY_LINE_NEW, "{");
+                    }
+                    else if (prevLineLen + 2 <= maxLineLength) {
+                        log(brace.getLineNo(), brace.getColumnNo(),
+                                MSG_KEY_LINE_PREVIOUS, "{");
+                    }
+                }
+                else if (!Utils.whitespaceBefore(brace.getColumnNo(), braceLine)) {
+                    log(brace.getLineNo(), brace.getColumnNo(),
+                            MSG_KEY_LINE_NEW, "{");
+                }
             }
         }
     }
@@ -361,17 +360,15 @@ public class LeftCurlyCheck
             nextToken = leftCurly.getFirstChild();
         }
         else {
-            if (leftCurly.getParent().getParent().getType() == TokenTypes.ENUM_DEF)
+            if (leftCurly.getParent().getParent().getType() == TokenTypes.ENUM_DEF && !ignoreEnums)
             {
-                if (!ignoreEnums) {
-                    nextToken = leftCurly.getNextSibling();
-                }
+                nextToken = leftCurly.getNextSibling();
             }
         }
-        if (nextToken != null && nextToken.getType() != TokenTypes.RCURLY) {
-            if (leftCurly.getLineNo() == nextToken.getLineNo()) {
-                return false;
-            }
+        if (nextToken != null && nextToken.getType() != TokenTypes.RCURLY
+                && leftCurly.getLineNo() == nextToken.getLineNo())
+        {
+            return false;
         }
         return true;
     }

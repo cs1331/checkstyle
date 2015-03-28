@@ -24,7 +24,7 @@ import com.puppycrawl.tools.checkstyle.api.AutomaticBean;
 import com.puppycrawl.tools.checkstyle.api.FileContents;
 import com.puppycrawl.tools.checkstyle.api.Filter;
 import com.puppycrawl.tools.checkstyle.api.TextBlock;
-import com.puppycrawl.tools.checkstyle.api.Utils;
+import com.puppycrawl.tools.checkstyle.Utils;
 import com.puppycrawl.tools.checkstyle.checks.FileContentsHolder;
 import java.lang.ref.WeakReference;
 import java.util.Collection;
@@ -186,7 +186,7 @@ public class SuppressWithNearbyCommentFilter
                 return lastLine - other.lastLine;
             }
 
-            return (firstLine - other.firstLine);
+            return firstLine - other.firstLine;
         }
 
         /**
@@ -232,9 +232,7 @@ public class SuppressWithNearbyCommentFilter
             final Matcher matcher = regexp.matcher(comment);
             // Match primarily for effect.
             if (!matcher.find()) {
-                ///CLOVER:OFF
                 return string;
-                ///CLOVER:ON
             }
             String result = string;
             for (int i = 0; i <= matcher.groupCount(); i++) {
@@ -325,17 +323,12 @@ public class SuppressWithNearbyCommentFilter
     /**
      * Set the format for a comment that turns off reporting.
      * @param format a <code>String</code> value.
-     * @throws ConversionException unable to parse format.
+     * @throws ConversionException if unable to create Pattern object.
      */
     public void setCommentFormat(String format)
         throws ConversionException
     {
-        try {
-            commentRegexp = Utils.getPattern(format);
-        }
-        catch (final PatternSyntaxException e) {
-            throw new ConversionException("unable to parse " + format, e);
-        }
+        commentRegexp = Utils.createPattern(format);
     }
 
     /** @return the FileContents for this filter. */
@@ -356,35 +349,24 @@ public class SuppressWithNearbyCommentFilter
     /**
      * Set the format for a check.
      * @param format a <code>String</code> value
-     * @throws ConversionException unable to parse format
+     * @throws ConversionException if unable to create Pattern object
      */
     public void setCheckFormat(String format)
         throws ConversionException
     {
-        try {
-            checkRegexp = Utils.getPattern(format);
-            checkFormat = format;
-        }
-        catch (final PatternSyntaxException e) {
-            throw new ConversionException("unable to parse " + format, e);
-        }
+        checkRegexp = Utils.createPattern(format);
+        checkFormat = format;
     }
 
     /**
      * Set the format for a message.
      * @param format a <code>String</code> value
-     * @throws ConversionException unable to parse format
+     * @throws ConversionException if unable to create Pattern object
      */
     public void setMessageFormat(String format)
         throws ConversionException
     {
-        // check that format parses
-        try {
-            Utils.getPattern(format);
-        }
-        catch (final PatternSyntaxException e) {
-            throw new ConversionException("unable to parse " + format, e);
-        }
+        Utils.createPattern(format);
         messageFormat = format;
     }
 
@@ -396,12 +378,8 @@ public class SuppressWithNearbyCommentFilter
     public void setInfluenceFormat(String format)
         throws ConversionException
     {
-        // check that format parses
-        try {
-            Utils.getPattern(format);
-        }
-        catch (final PatternSyntaxException e) {
-            throw new ConversionException("unable to parse " + format, e);
+        if (!Utils.isPatternValid(format)) {
+            throw new ConversionException("Unable to parse format: " + format);
         }
         influenceFormat = format;
     }

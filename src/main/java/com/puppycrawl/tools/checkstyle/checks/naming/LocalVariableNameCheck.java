@@ -23,7 +23,6 @@ import java.util.regex.Pattern;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.ScopeUtils;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.api.Utils;
 
 /**
  * <p>
@@ -80,7 +79,7 @@ public class LocalVariableNameCheck
     private boolean allowOneCharVarInForLoop;
 
     /** Regexp for one-char loop variables. */
-    private static Pattern sSingleChar = Utils.getPattern("^[a-z]$");
+    private static Pattern sSingleChar = Pattern.compile("^[a-z]$");
 
     /** Creates a new <code>LocalVariableNameCheck</code> instance. */
     public LocalVariableNameCheck()
@@ -116,14 +115,14 @@ public class LocalVariableNameCheck
     {
         final DetailAST modifiersAST =
             ast.findFirstToken(TokenTypes.MODIFIERS);
-        final boolean isFinal = (modifiersAST != null)
+        final boolean isFinal = modifiersAST != null
             && modifiersAST.branchContains(TokenTypes.FINAL);
         if (allowOneCharVarInForLoop && isForLoopVariable(ast)) {
             final String variableName =
                     ast.findFirstToken(TokenTypes.IDENT).getText();
             return !sSingleChar.matcher(variableName).find();
         }
-        return (!isFinal && ScopeUtils.isLocalVariableDef(ast));
+        return !isFinal && ScopeUtils.isLocalVariableDef(ast);
     }
 
     /**
@@ -134,7 +133,7 @@ public class LocalVariableNameCheck
     private boolean isForLoopVariable(DetailAST variableDef)
     {
         final int parentType = variableDef.getParent().getType();
-        return  parentType == TokenTypes.FOR_INIT
+        return parentType == TokenTypes.FOR_INIT
                 || parentType == TokenTypes.FOR_EACH_CLAUSE;
     }
 }

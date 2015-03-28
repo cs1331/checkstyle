@@ -24,9 +24,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
-
-import org.apache.commons.beanutils.ConversionException;
 
 import antlr.collections.AST;
 
@@ -37,7 +34,7 @@ import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.FullIdent;
 import com.puppycrawl.tools.checkstyle.api.ScopeUtils;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.api.Utils;
+import com.puppycrawl.tools.checkstyle.Utils;
 
 /**
  * Checks visibility of class members. Only static final, immutable or annotated
@@ -151,6 +148,7 @@ import com.puppycrawl.tools.checkstyle.api.Utils;
  * }
  * </code>
  * </pre>
+ * </p>
  * <p>
  * To configure the Check passing fields of type com.google.common.collect.ImmutableSet and
  * java.util.List:
@@ -349,17 +347,15 @@ public class VisibilityModifierCheck
 
     /**
      * Set the pattern for public members to ignore.
-     * @param pattern pattern for public members to ignore.
+     * @param pattern
+     *        pattern for public members to ignore.
+     * @throws org.apache.commons.beanutils.ConversionException
+     *         if unable to create Pattern object
      */
     public void setPublicMemberPattern(String pattern)
     {
-        try {
-            publicMemberPattern = Utils.getPattern(pattern);
-            publicMemberFormat = pattern;
-        }
-        catch (final PatternSyntaxException e) {
-            throw new ConversionException("unable to parse " + pattern, e);
-        }
+        publicMemberPattern = Utils.createPattern(pattern);
+        publicMemberFormat = pattern;
     }
 
     /**
@@ -552,13 +548,13 @@ public class VisibilityModifierCheck
             final Set<String> classModifiers = getModifiers(classDef);
 
             result =
-                (mods.contains("static") && mods.contains("final"))
-                || (isPackageAllowed() && "package".equals(variableScope))
-                || (isProtectedAllowed() && "protected".equals(variableScope))
-                || ("public".equals(variableScope)
+                mods.contains("static") && mods.contains("final")
+                || isPackageAllowed() && "package".equals(variableScope)
+                || isProtectedAllowed() && "protected".equals(variableScope)
+                || "public".equals(variableScope)
                    && getPublicMemberRegexp().matcher(variableName).find()
-                   || (allowPublicImmutableFields
-                      && classModifiers.contains("final") && isImmutableField(variableDef)));
+                   || allowPublicImmutableFields
+                      && classModifiers.contains("final") && isImmutableField(variableDef);
         }
 
         return result;
@@ -641,9 +637,9 @@ public class VisibilityModifierCheck
             final boolean isCanonicalName = type.getFirstChild().getType() == TokenTypes.DOT;
             final String typeName = getTypeName(type, isCanonicalName);
 
-            result = (!isCanonicalName && isPrimitive(type))
+            result = !isCanonicalName && isPrimitive(type)
                      || immutableClassShortNames.contains(typeName)
-                     || (isCanonicalName && immutableClassCanonicalNames.contains(typeName));
+                     || isCanonicalName && immutableClassCanonicalNames.contains(typeName);
         }
         return result;
     }

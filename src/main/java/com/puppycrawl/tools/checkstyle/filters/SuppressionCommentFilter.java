@@ -24,7 +24,7 @@ import com.puppycrawl.tools.checkstyle.api.AutomaticBean;
 import com.puppycrawl.tools.checkstyle.api.FileContents;
 import com.puppycrawl.tools.checkstyle.api.Filter;
 import com.puppycrawl.tools.checkstyle.api.TextBlock;
-import com.puppycrawl.tools.checkstyle.api.Utils;
+import com.puppycrawl.tools.checkstyle.Utils;
 import com.puppycrawl.tools.checkstyle.checks.FileContentsHolder;
 import java.lang.ref.WeakReference;
 import java.util.Collection;
@@ -190,7 +190,7 @@ public class SuppressionCommentFilter
                 return column - object.column;
             }
 
-            return (line - object.line);
+            return line - object.line;
         }
 
         /**
@@ -229,9 +229,7 @@ public class SuppressionCommentFilter
             final Matcher matcher = regexp.matcher(comment);
             // Match primarily for effect.
             if (!matcher.find()) {
-                ///CLOVER:OFF
                 return string;
-                ///CLOVER:ON
             }
             String result = string;
             for (int i = 0; i <= matcher.groupCount(); i++) {
@@ -307,33 +305,23 @@ public class SuppressionCommentFilter
     /**
      * Set the format for a comment that turns off reporting.
      * @param format a <code>String</code> value.
-     * @throws ConversionException unable to parse format.
+     * @throws ConversionException if unable to create Pattern object.
      */
     public void setOffCommentFormat(String format)
         throws ConversionException
     {
-        try {
-            offRegexp = Utils.getPattern(format);
-        }
-        catch (final PatternSyntaxException e) {
-            throw new ConversionException("unable to parse " + format, e);
-        }
+        offRegexp = Utils.createPattern(format);
     }
 
     /**
      * Set the format for a comment that turns on reporting.
      * @param format a <code>String</code> value
-     * @throws ConversionException unable to parse format
+     * @throws ConversionException if unable to create Pattern object.
      */
     public void setOnCommentFormat(String format)
         throws ConversionException
     {
-        try {
-            onRegexp = Utils.getPattern(format);
-        }
-        catch (final PatternSyntaxException e) {
-            throw new ConversionException("unable to parse " + format, e);
-        }
+        onRegexp = Utils.createPattern(format);
     }
 
     /** @return the FileContents for this filter. */
@@ -354,18 +342,14 @@ public class SuppressionCommentFilter
     /**
      * Set the format for a check.
      * @param format a <code>String</code> value
-     * @throws ConversionException unable to parse format
+     * @throws ConversionException if unable to create Pattern object
      */
     public void setCheckFormat(String format)
         throws ConversionException
     {
-        try {
-            checkRegexp = Utils.getPattern(format);
-            checkFormat = format;
-        }
-        catch (final PatternSyntaxException e) {
-            throw new ConversionException("unable to parse " + format, e);
-        }
+        checkRegexp = Utils.createPattern(format);
+        checkFormat = format;
+
     }
 
     /**
@@ -376,12 +360,8 @@ public class SuppressionCommentFilter
     public void setMessageFormat(String format)
         throws ConversionException
     {
-        // check that format parses
-        try {
-            Utils.getPattern(format);
-        }
-        catch (final PatternSyntaxException e) {
-            throw new ConversionException("unable to parse " + format, e);
+        if (!Utils.isPatternValid(format)) {
+            throw new ConversionException("Unable to parse format: " + format);
         }
         messageFormat = format;
     }
@@ -426,7 +406,7 @@ public class SuppressionCommentFilter
             tagSuppressions();
         }
         final Tag matchTag = findNearestMatch(event);
-        if ((matchTag != null) && !matchTag.isOn()) {
+        if (matchTag != null && !matchTag.isOn()) {
             return false;
         }
         return true;
@@ -444,16 +424,16 @@ public class SuppressionCommentFilter
         // TODO: try binary search if sequential search becomes a performance
         // problem.
         for (Tag tag : tags) {
-            if ((tag.getLine() > event.getLine())
-                || ((tag.getLine() == event.getLine())
-                    && (tag.getColumn() > event.getColumn())))
+            if (tag.getLine() > event.getLine()
+                || tag.getLine() == event.getLine()
+                    && tag.getColumn() > event.getColumn())
             {
                 break;
             }
             if (tag.isMatch(event)) {
                 result = tag;
             }
-        };
+        }
         return result;
     }
 

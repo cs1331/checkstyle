@@ -23,8 +23,9 @@ import com.google.common.collect.Maps;
 import com.puppycrawl.tools.checkstyle.api.AbstractLoader;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 import com.puppycrawl.tools.checkstyle.api.Configuration;
-import com.puppycrawl.tools.checkstyle.api.FastStack;
 import com.puppycrawl.tools.checkstyle.api.SeverityLevel;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -39,6 +40,8 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +53,9 @@ import java.util.Map;
  */
 public final class ConfigurationLoader
 {
+    /** Logger for ConfigurationLoader. */
+    private static final Log LOG = LogFactory.getLog(ConfigurationLoader.class);
+
     /** the public ID for version 1_0 of the configuration dtd */
     private static final String DTD_PUBLIC_ID_1_0 =
         "-//Puppy Crawl//DTD Check Configuration 1.0//EN";
@@ -192,14 +198,13 @@ public final class ConfigurationLoader
                     level = SeverityLevel.getInstance(severity);
                 }
                 catch (final CheckstyleException e) {
-                    //severity not set -> ignore
-                    ;
+                    LOG.debug("Severity not set, ignoring exception", e);
                 }
 
                 // omit this module if these should be omitted and the module
                 // has the severity 'ignore'
                 final boolean omitModule = omitIgnoredModules
-                    && SeverityLevel.IGNORE.equals(level);
+                    && SeverityLevel.IGNORE == level;
 
                 if (omitModule && !configStack.isEmpty()) {
                     final DefaultConfiguration parentModule =
@@ -217,8 +222,7 @@ public final class ConfigurationLoader
     /** property resolver **/
     private final PropertyResolver overridePropsResolver;
     /** the loaded configurations **/
-    private final FastStack<DefaultConfiguration> configStack =
-        FastStack.newInstance();
+    private final Deque<DefaultConfiguration> configStack = new ArrayDeque<>();
     /** the Configuration that is being built */
     private Configuration configuration;
 
@@ -432,7 +436,7 @@ public final class ConfigurationLoader
      * @param value The string to be scanned for property references.
      *              May be <code>null</code>, in which case this
      *              method returns immediately with no effect.
-     * @param props  Mapping (String to String) of property names to their
+     * @param props Mapping (String to String) of property names to their
      *              values. Must not be <code>null</code>.
      * @param defaultValue default to use if one of the properties in value
      *              cannot be resolved from props.
@@ -519,7 +523,7 @@ public final class ConfigurationLoader
             }
             //if we are at the end of the string, we tack on a $
             //then move past it
-            if (pos == (value.length() - 1)) {
+            if (pos == value.length() - 1) {
                 fragments.add("$");
                 prev = pos + 1;
             }

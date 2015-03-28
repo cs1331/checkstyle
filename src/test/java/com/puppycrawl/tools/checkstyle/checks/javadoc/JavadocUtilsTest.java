@@ -18,6 +18,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 package com.puppycrawl.tools.checkstyle.checks.javadoc;
 
+import static com.puppycrawl.tools.checkstyle.TestUtils.assertUtilsClassHasPrivateConstructor;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -40,7 +41,7 @@ public class JavadocUtilsTest
     {
         final String[] text = {
             "/** @see elsewhere ",
-            " * {@link List }, {@link  List link text }",
+            " * {@link List }, {@link List link text }",
             "   {@link List#add(Object) link text}",
             " * {@link Class link text}",
         };
@@ -70,7 +71,7 @@ public class JavadocUtilsTest
     public void testInlineTagLinkText()
     {
         final String[] text = {
-            "/** {@link  List link text }",
+            "/** {@link List link text }",
         };
         final Comment comment = new Comment(text, 1, 1, text[0].length());
         final List<JavadocTag> tags = JavadocUtils.getJavadocTags(
@@ -82,7 +83,7 @@ public class JavadocUtilsTest
     public void testInlineTagMethodRef()
     {
         final String[] text = {
-            "/** {@link  List#add(Object)}",
+            "/** {@link List#add(Object)}",
         };
         final Comment comment = new Comment(text, 1, 1, text[0].length());
         final List<JavadocTag> tags = JavadocUtils.getJavadocTags(
@@ -187,5 +188,11 @@ public class JavadocUtilsTest
         javadocCommentContent.setNextSibling(commentEnd);
 
         assertTrue(JavadocUtils.isJavadocComment(commentBegin));
+    }
+
+    @Test
+    public void testIsProperUtilsClass() throws ReflectiveOperationException
+    {
+        assertUtilsClassHasPrivateConstructor(JavadocUtils.class);
     }
 }

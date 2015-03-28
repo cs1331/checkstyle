@@ -18,8 +18,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 package com.puppycrawl.tools.checkstyle;
 
-import com.puppycrawl.tools.checkstyle.api.Utils;
-
 import com.google.common.collect.Lists;
 import com.puppycrawl.tools.checkstyle.api.AuditListener;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
@@ -78,7 +76,6 @@ public final class Main
             line = clp.parse(OPTS, args);
         }
         catch (final ParseException e) {
-            e.printStackTrace();
             usage();
         }
         assert line != null;
@@ -181,7 +178,6 @@ public final class Main
         catch (final Exception e) {
             System.out.println("Unable to create Checker: "
                                + e.getMessage());
-            e.printStackTrace(System.out);
             System.exit(1);
         }
         return c;
@@ -303,9 +299,8 @@ public final class Main
     private static Properties loadProperties(File file)
     {
         final Properties properties = new Properties();
-        FileInputStream fis = null;
-        try {
-            fis = new FileInputStream(file);
+
+        try (FileInputStream fis = new FileInputStream(file)) {
             properties.load(fis);
         }
         catch (final IOException ex) {
@@ -313,9 +308,6 @@ public final class Main
                 + file.getAbsolutePath());
             ex.printStackTrace(System.out);
             System.exit(1);
-        }
-        finally {
-            Utils.closeQuietly(fis);
         }
 
         return properties;
