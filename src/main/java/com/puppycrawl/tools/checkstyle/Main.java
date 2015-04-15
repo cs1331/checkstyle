@@ -57,6 +57,7 @@ public final class Main
             "Sets the output format. (plain|xml). Defaults to plain");
         OPTS.addOption("v", false, "Print product version and exit");
         OPTS.addOption("j", false, "Use Javadoc XML");
+        OPTS.addOption("a", false, "Use both default and Javadoc XML");
     }
 
     /** Stop instances being created. */
@@ -99,7 +100,59 @@ public final class Main
         // ensure a config file is specified
         Configuration config = null;
         if (!line.hasOption("c")) {
-            if (line.hasOption("j")) {
+            if (line.hasOption("a")) {
+                try {
+                    config = ConfigurationLoader.loadConfiguration(
+                        Main.class.getClassLoader().getResource("cs1331_checkstyle.xml").toString(), new PropertiesExpander(props));
+                    // Run once for default XML
+
+                    // setup the output stream
+                    OutputStream out = null;
+                    boolean closeOut = false;
+                    if (line.hasOption("o")) {
+                        final String fname = line.getOptionValue("o");
+                        try {
+                            out = new FileOutputStream(fname);
+                            closeOut = true;
+                        }
+                        catch (final FileNotFoundException e) {
+                            System.out.println("Could not find file: '" + fname + "'");
+                            System.exit(1);
+                        }
+                    }
+                    else {
+                        out = System.out;
+                        closeOut = false;
+                    }
+                    try {
+                        out.write("Checkstyle:\n".getBytes());
+                    } catch (final IOException e) {
+                        System.out.println("Error writing output");
+                        e.printStackTrace(System.out);
+                        System.exit(1);
+                    }
+                    final AuditListener listener = createListener(line, out, closeOut);
+                    final List<File> files = getFilesToProcess(line);
+                    final Checker c = createChecker(config, listener);
+                    final int numErrs = c.process(files);
+                    c.destroy();
+
+                    config = ConfigurationLoader.loadConfiguration(
+                        Main.class.getClassLoader().getResource("cs1331_javadoc.xml").toString(), new PropertiesExpander(props));
+                    try {
+                        out.write("\nJavadoc:\n".getBytes());
+                    } catch (final IOException e) {
+                        System.out.println("Error writing output");
+                        e.printStackTrace(System.out);
+                        System.exit(1);
+                    }
+                    // Run again for Javadoc XML
+                } catch (final CheckstyleException e) {
+                    System.out.println("Error loading configuration file");
+                    e.printStackTrace(System.out);
+                    System.exit(1);
+                }
+            } else if (line.hasOption("j")) {
                 try {
                     config = ConfigurationLoader.loadConfiguration(
                         Main.class.getClassLoader().getResource("cs1331_javadoc.xml").toString(), new PropertiesExpander(props));
