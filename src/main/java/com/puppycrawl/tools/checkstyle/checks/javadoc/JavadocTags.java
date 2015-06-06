@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.javadoc;
 
 import java.util.List;
@@ -25,8 +26,7 @@ import java.util.List;
  * about invalid validTags encountered in a certain Javadoc comment.
  * @author Oliver Burn
  */
-public final class JavadocTags
-{
+public final class JavadocTags {
     /** Valid validTags. */
     private final List<JavadocTag> validTags;
     /** Invalid validTags. */
@@ -38,19 +38,24 @@ public final class JavadocTags
      * @param invalidTags the list of invalid tags
      */
     public JavadocTags(List<JavadocTag> tags,
-            List<InvalidJavadocTag> invalidTags)
-    {
+            List<InvalidJavadocTag> invalidTags) {
         validTags = tags;
         this.invalidTags = invalidTags;
     }
 
-    public List<JavadocTag> getValidTags()
-    {
+    /**
+     *  Getter for validTags field.
+     *  @return validTags field
+     */
+    public List<JavadocTag> getValidTags() {
         return validTags;
     }
 
-    public List<InvalidJavadocTag> getInvalidTags()
-    {
+    /**
+     *  Getter for invalidTags field.
+     *  @return invalidTags field
+     */
+    public List<InvalidJavadocTag> getInvalidTags() {
         return invalidTags;
     }
 }

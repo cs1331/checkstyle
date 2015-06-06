@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
 /**
@@ -26,8 +27,7 @@ package com.puppycrawl.tools.checkstyle.checks.coding;
  * @author smckay@google.com (Steve McKay)
  * @author lkuehne
  */
-public class NoFinalizerCheck extends AbstractIllegalMethodCheck
-{
+public class NoFinalizerCheck extends AbstractIllegalMethodCheck {
 
     /**
      * A key is pointing to the warning message text in "messages.properties"
@@ -38,8 +38,7 @@ public class NoFinalizerCheck extends AbstractIllegalMethodCheck
     /**
      * Creates an instance.
      */
-    public NoFinalizerCheck()
-    {
+    public NoFinalizerCheck() {
         super("finalize", MSG_KEY);
     }
 }

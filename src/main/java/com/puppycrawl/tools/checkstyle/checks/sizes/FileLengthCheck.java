@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.sizes;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractFileSetCheck;
@@ -52,8 +53,7 @@ import java.util.List;
  * </pre>
  * @author Lars Kühne
  */
-public class FileLengthCheck extends AbstractFileSetCheck
-{
+public class FileLengthCheck extends AbstractFileSetCheck {
 
     /**
      * A key is pointing to the warning message text in "messages.properties"
@@ -68,8 +68,7 @@ public class FileLengthCheck extends AbstractFileSetCheck
     private int maxFileLength = DEFAULT_MAX_LINES;
 
     @Override
-    protected void processFiltered(File file, List<String> lines)
-    {
+    protected void processFiltered(File file, List<String> lines) {
         if (lines.size() > maxFileLength) {
             log(1, MSG_KEY, lines.size(), maxFileLength);
         }
@@ -78,8 +77,7 @@ public class FileLengthCheck extends AbstractFileSetCheck
     /**
      * @param length the maximum length of a Java source file
      */
-    public void setMax(int length)
-    {
+    public void setMax(int length) {
         maxFileLength = length;
     }
 

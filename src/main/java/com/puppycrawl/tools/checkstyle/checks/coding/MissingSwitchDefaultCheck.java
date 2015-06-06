@@ -16,8 +16,10 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
+import com.puppycrawl.tools.checkstyle.Utils;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import com.puppycrawl.tools.checkstyle.checks.DescendantTokenCheck;
 
@@ -42,8 +44,7 @@ import com.puppycrawl.tools.checkstyle.checks.DescendantTokenCheck;
  * </pre>
  * @author o_sukhodolsky
  */
-public class MissingSwitchDefaultCheck extends DescendantTokenCheck
-{
+public class MissingSwitchDefaultCheck extends DescendantTokenCheck {
 
     /**
      * A key is pointing to the warning message text in "messages.properties"
@@ -52,25 +53,20 @@ public class MissingSwitchDefaultCheck extends DescendantTokenCheck
     public static final String MSG_KEY = "missing.switch.default";
 
     /** Creates new instance of the check. */
-    public MissingSwitchDefaultCheck()
-    {
-        setLimitedTokens(new String[] {
-            TokenTypes.getTokenName(TokenTypes.LITERAL_DEFAULT),
-        });
+    public MissingSwitchDefaultCheck() {
+        setLimitedTokens(Utils.getTokenName(TokenTypes.LITERAL_DEFAULT));
         setMinimumNumber(1);
         setMaximumDepth(2);
         setMinimumMessage(MSG_KEY);
     }
 
     @Override
-    public int[] getDefaultTokens()
-    {
+    public int[] getDefaultTokens() {
         return new int[]{TokenTypes.LITERAL_SWITCH};
     }
 
     @Override
-    public int[] getAcceptableTokens()
-    {
+    public int[] getAcceptableTokens() {
         return getDefaultTokens();
     }
 }

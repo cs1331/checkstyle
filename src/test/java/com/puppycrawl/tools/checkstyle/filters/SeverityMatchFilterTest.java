@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.filters;
 
 import static org.junit.Assert.assertFalse;
@@ -27,13 +28,11 @@ import com.puppycrawl.tools.checkstyle.api.SeverityLevel;
 import org.junit.Test;
 
 /** Tests SeverityMatchFilter */
-public class SeverityMatchFilterTest
-{
+public class SeverityMatchFilterTest {
     private final SeverityMatchFilter filter = new SeverityMatchFilter();
 
     @Test
-    public void testDefault()
-    {
+    public void testDefault() {
         final AuditEvent ev = new AuditEvent(this, "Test.java");
         assertFalse("no message", filter.accept(ev));
         SeverityLevel level = SeverityLevel.ERROR;
@@ -50,8 +49,7 @@ public class SeverityMatchFilterTest
     }
 
     @Test
-    public void testSeverity()
-    {
+    public void testSeverity() {
         filter.setSeverity("info");
         final AuditEvent ev = new AuditEvent(this, "Test.java");
         // event with no message has severity level INFO
@@ -70,8 +68,7 @@ public class SeverityMatchFilterTest
     }
 
     @Test
-    public void testAcceptOnMatch()
-    {
+    public void testAcceptOnMatch() {
         filter.setSeverity("info");
         filter.setAcceptOnMatch(false);
         final AuditEvent ev = new AuditEvent(this, "Test.java");

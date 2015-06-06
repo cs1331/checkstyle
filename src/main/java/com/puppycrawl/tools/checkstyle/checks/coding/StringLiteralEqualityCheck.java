@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
 import com.puppycrawl.tools.checkstyle.api.Check;
@@ -35,8 +36,7 @@ import antlr.collections.AST;
  *
  * @author Lars K&uuml;hne
  */
-public class StringLiteralEqualityCheck extends Check
-{
+public class StringLiteralEqualityCheck extends Check {
 
     /**
      * A key is pointing to the warning message text in "messages.properties"
@@ -45,27 +45,23 @@ public class StringLiteralEqualityCheck extends Check
     public static final String MSG_KEY = "string.literal.equality";
 
     @Override
-    public int[] getDefaultTokens()
-    {
+    public int[] getDefaultTokens() {
         return new int[] {TokenTypes.EQUAL, TokenTypes.NOT_EQUAL};
     }
 
     @Override
-    public int[] getAcceptableTokens()
-    {
+    public int[] getAcceptableTokens() {
         return new int[] {TokenTypes.EQUAL, TokenTypes.NOT_EQUAL};
     }
 
     @Override
-    public void visitToken(DetailAST ast)
-    {
+    public void visitToken(DetailAST ast) {
         // no need to check for nulls here, == and != always have two children
         final AST firstChild = ast.getFirstChild();
         final AST secondChild = firstChild.getNextSibling();
 
         if (firstChild.getType() == TokenTypes.STRING_LITERAL
-                || secondChild.getType() == TokenTypes.STRING_LITERAL)
-        {
+                || secondChild.getType() == TokenTypes.STRING_LITERAL) {
             log(ast.getLineNo(), ast.getColumnNo(),
                     MSG_KEY, ast.getText());
         }

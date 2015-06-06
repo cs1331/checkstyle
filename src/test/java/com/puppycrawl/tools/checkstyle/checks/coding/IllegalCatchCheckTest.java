@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
 import java.io.File;
@@ -27,11 +28,9 @@ import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 
 import static com.puppycrawl.tools.checkstyle.checks.coding.IllegalCatchCheck.MSG_KEY;
 
-public class IllegalCatchCheckTest extends BaseCheckTestSupport
-{
+public class IllegalCatchCheckTest extends BaseCheckTestSupport {
     @Test
-    public void testDefault() throws Exception
-    {
+    public void testDefault() throws Exception {
         DefaultConfiguration checkConfig = createCheckConfig(IllegalCatchCheck.class);
 
         String[] expected = {
@@ -47,8 +46,7 @@ public class IllegalCatchCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testIllegalClassNames() throws Exception
-    {
+    public void testIllegalClassNames() throws Exception {
         DefaultConfiguration checkConfig = createCheckConfig(IllegalCatchCheck.class);
         checkConfig.addAttribute("illegalClassNames",
                                  "java.lang.Error, java.lang.Exception, java.lang.Throwable");
@@ -64,8 +62,7 @@ public class IllegalCatchCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testMultipleTypes() throws Exception
-    {
+    public void testMultipleTypes() throws Exception {
         DefaultConfiguration checkConfig = createCheckConfig(IllegalCatchCheck.class);
 
         String[] expected = {

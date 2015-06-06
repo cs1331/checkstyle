@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.api;
 
 
@@ -27,8 +28,7 @@ package com.puppycrawl.tools.checkstyle.api;
  * href="http://jakarta.apache.org/avalon/">Jakarta's Avalon framework</a>.
  * @author lkuehne
  */
-public interface Contextualizable
-{
+public interface Contextualizable {
     /**
      * Sets the context for this Component.
      * @param context the context.

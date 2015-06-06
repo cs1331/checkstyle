@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.annotation;
 
 import java.io.File;
@@ -29,15 +30,13 @@ import static com.puppycrawl.tools.checkstyle.checks.annotation.AnnotationUseSty
 import static com.puppycrawl.tools.checkstyle.checks.annotation.AnnotationUseStyleCheck.MSG_KEY_ANNOTATION_TRAILING_COMMA_MISSING;
 import static com.puppycrawl.tools.checkstyle.checks.annotation.AnnotationUseStyleCheck.MSG_KEY_ANNOTATION_TRAILING_COMMA_PRESENT;
 
-public class AnnotationUseStyleTest extends BaseCheckTestSupport
-{
+public class AnnotationUseStyleTest extends BaseCheckTestSupport {
     /**
      * Test that annotation parens are always present.
      * @throws Exception
      */
     @Test
-    public void testParansAlways() throws Exception
-    {
+    public void testParansAlways() throws Exception {
         DefaultConfiguration checkConfig = createCheckConfig(AnnotationUseStyleCheck.class);
         checkConfig.addAttribute("closingParens", "ALWAYS");
         checkConfig.addAttribute("elementStyle", "ignore");
@@ -56,8 +55,7 @@ public class AnnotationUseStyleTest extends BaseCheckTestSupport
      * @throws Exception
      */
     @Test
-    public void testParansNever() throws Exception
-    {
+    public void testParansNever() throws Exception {
         DefaultConfiguration checkConfig = createCheckConfig(AnnotationUseStyleCheck.class);
         checkConfig.addAttribute("closingParens", "NEVER");
         checkConfig.addAttribute("elementStyle", "ignore");
@@ -72,8 +70,7 @@ public class AnnotationUseStyleTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testStyleExpanded() throws Exception
-    {
+    public void testStyleExpanded() throws Exception {
         DefaultConfiguration checkConfig = createCheckConfig(AnnotationUseStyleCheck.class);
         checkConfig.addAttribute("closingParens", "ignore");
         checkConfig.addAttribute("elementStyle", "EXPANDED");
@@ -92,8 +89,7 @@ public class AnnotationUseStyleTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testStyleCompact() throws Exception
-    {
+    public void testStyleCompact() throws Exception {
         DefaultConfiguration checkConfig = createCheckConfig(AnnotationUseStyleCheck.class);
         checkConfig.addAttribute("closingParens", "ignore");
         checkConfig.addAttribute("elementStyle", "COMPACT");
@@ -107,8 +103,7 @@ public class AnnotationUseStyleTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testStyleCompactNoArray() throws Exception
-    {
+    public void testStyleCompactNoArray() throws Exception {
         DefaultConfiguration checkConfig = createCheckConfig(AnnotationUseStyleCheck.class);
         checkConfig.addAttribute("closingParens", "ignore");
         checkConfig.addAttribute("elementStyle", "COMPACT_NO_ARRAY");
@@ -125,8 +120,7 @@ public class AnnotationUseStyleTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testCommaAlwaysViolations() throws Exception
-    {
+    public void testCommaAlwaysViolations() throws Exception {
         DefaultConfiguration checkConfig = createCheckConfig(AnnotationUseStyleCheck.class);
         checkConfig.addAttribute("closingParens", "ignore");
         checkConfig.addAttribute("elementStyle", "ignore");
@@ -151,8 +145,7 @@ public class AnnotationUseStyleTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testCommaAlwaysNoViolations() throws Exception
-    {
+    public void testCommaAlwaysNoViolations() throws Exception {
         DefaultConfiguration checkConfig = createCheckConfig(AnnotationUseStyleCheck.class);
         checkConfig.addAttribute("closingParens", "ignore");
         checkConfig.addAttribute("elementStyle", "ignore");
@@ -164,8 +157,7 @@ public class AnnotationUseStyleTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testCommaNeverViolations() throws Exception
-    {
+    public void testCommaNeverViolations() throws Exception {
         DefaultConfiguration checkConfig = createCheckConfig(AnnotationUseStyleCheck.class);
         checkConfig.addAttribute("closingParens", "ignore");
         checkConfig.addAttribute("elementStyle", "ignore");
@@ -185,8 +177,7 @@ public class AnnotationUseStyleTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testCommaNeverNoViolations() throws Exception
-    {
+    public void testCommaNeverNoViolations() throws Exception {
         DefaultConfiguration checkConfig = createCheckConfig(AnnotationUseStyleCheck.class);
         checkConfig.addAttribute("closingParens", "ignore");
         checkConfig.addAttribute("elementStyle", "ignore");
@@ -198,8 +189,7 @@ public class AnnotationUseStyleTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testEverythingMixed() throws Exception
-    {
+    public void testEverythingMixed() throws Exception {
         DefaultConfiguration checkConfig = createCheckConfig(AnnotationUseStyleCheck.class);
         checkConfig.addAttribute("closingParens", "ignore");
         checkConfig.addAttribute("elementStyle", "ignore");
@@ -211,8 +201,7 @@ public class AnnotationUseStyleTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testAnnotationsWithoutDefaultValues() throws Exception
-    {
+    public void testAnnotationsWithoutDefaultValues() throws Exception {
         DefaultConfiguration checkConfig = createCheckConfig(AnnotationUseStyleCheck.class);
         checkConfig.addAttribute("closingParens", "NEVER");
         final String[] expected = {

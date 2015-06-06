@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.imports;
 
 import java.io.File;
@@ -27,6 +28,7 @@ import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.FullIdent;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import org.apache.commons.beanutils.ConversionException;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Check that controls what packages can be imported in each package. Useful
@@ -41,8 +43,7 @@ import org.apache.commons.beanutils.ConversionException;
  *
  * @author Oliver Burn
  */
-public class ImportControlCheck extends Check
-{
+public class ImportControlCheck extends Check {
 
     /**
      * A key is pointing to the warning message text in "messages.properties"
@@ -74,28 +75,24 @@ public class ImportControlCheck extends Check
     private PkgControl currentLeaf;
 
     @Override
-    public int[] getDefaultTokens()
-    {
+    public int[] getDefaultTokens() {
         return new int[] {TokenTypes.PACKAGE_DEF, TokenTypes.IMPORT,
                           TokenTypes.STATIC_IMPORT, };
     }
 
     @Override
-    public int[] getAcceptableTokens()
-    {
+    public int[] getAcceptableTokens() {
         return new int[] {TokenTypes.PACKAGE_DEF, TokenTypes.IMPORT,
                           TokenTypes.STATIC_IMPORT, };
     }
 
     @Override
-    public void beginTree(final DetailAST rootAST)
-    {
+    public void beginTree(final DetailAST rootAST) {
         currentLeaf = null;
     }
 
     @Override
-    public void visitToken(final DetailAST ast)
-    {
+    public void visitToken(final DetailAST ast) {
         if (ast.getType() == TokenTypes.PACKAGE_DEF) {
             final DetailAST nameAST = ast.getLastChild().getPreviousSibling();
             final FullIdent full = FullIdent.createFullIdent(nameAST);
@@ -134,10 +131,9 @@ public class ImportControlCheck extends Check
      * @param url the url of the file to load.
      * @throws ConversionException on error loading the file.
      */
-    public void setUrl(final String url)
-    {
+    public void setUrl(final String url) {
         // Handle empty param
-        if (url == null || url.trim().length() == 0) {
+        if (StringUtils.isBlank(url)) {
             return;
         }
         final URI uri;
@@ -161,10 +157,9 @@ public class ImportControlCheck extends Check
      * @param name the name of the file to load.
      * @throws ConversionException on error loading the file.
      */
-    public void setFile(final String name)
-    {
+    public void setFile(final String name) {
         // Handle empty param
-        if (name == null || name.trim().length() == 0) {
+        if (StringUtils.isBlank(name)) {
             return;
         }
 

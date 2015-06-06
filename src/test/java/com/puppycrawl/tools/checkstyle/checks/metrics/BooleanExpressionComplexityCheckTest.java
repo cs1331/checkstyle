@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.metrics;
 
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
@@ -26,11 +27,9 @@ import org.junit.Test;
 import static com.puppycrawl.tools.checkstyle.checks.metrics.BooleanExpressionComplexityCheck
 .MSG_KEY;
 
-public class BooleanExpressionComplexityCheckTest extends BaseCheckTestSupport
-{
+public class BooleanExpressionComplexityCheckTest extends BaseCheckTestSupport {
     @Test
-    public void test() throws Exception
-    {
+    public void test() throws Exception {
         DefaultConfiguration checkConfig =
             createCheckConfig(BooleanExpressionComplexityCheck.class);
 
@@ -45,8 +44,7 @@ public class BooleanExpressionComplexityCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testNoBitwise() throws Exception
-    {
+    public void testNoBitwise() throws Exception {
         DefaultConfiguration checkConfig =
             createCheckConfig(BooleanExpressionComplexityCheck.class);
         checkConfig.addAttribute("max", "5");
@@ -59,8 +57,7 @@ public class BooleanExpressionComplexityCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testNPE() throws Exception
-    {
+    public void testNPE() throws Exception {
         DefaultConfiguration checkConfig =
             createCheckConfig(BooleanExpressionComplexityCheck.class);
 

@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.indentation;
 
 import com.google.common.collect.Maps;
@@ -26,8 +27,7 @@ import java.util.SortedMap;
  *
  * @author jrichard
  */
-public class LineSet
-{
+public class LineSet {
     /**
      * Maps line numbers to their start column.
      */
@@ -40,8 +40,7 @@ public class LineSet
      *
      * @return the starting column for the given line number
      */
-    public Integer getStartColumn(Integer lineNum)
-    {
+    public Integer getStartColumn(Integer lineNum) {
         return lines.get(lineNum);
     }
 
@@ -50,8 +49,7 @@ public class LineSet
      *
      * @return the starting column for the first line.
      */
-    public int firstLineCol()
-    {
+    public int firstLineCol() {
         final Object firstLineKey = lines.firstKey();
         return lines.get(firstLineKey).intValue();
     }
@@ -61,8 +59,7 @@ public class LineSet
      *
      * @return the line number of the first line
      */
-    public int firstLine()
-    {
+    public int firstLine() {
         return lines.firstKey().intValue();
     }
 
@@ -71,8 +68,7 @@ public class LineSet
      *
      * @return the line number of the last line
      */
-    public int lastLine()
-    {
+    public int lastLine() {
         return lines.lastKey().intValue();
     }
 
@@ -82,8 +78,7 @@ public class LineSet
      * @param lineNum   the line to add
      * @param col       the starting column of the new line
      */
-    public void addLineAndCol(int lineNum, int col)
-    {
+    public void addLineAndCol(int lineNum, int col) {
         lines.put(lineNum, col);
     }
 
@@ -92,14 +87,12 @@ public class LineSet
      *
      * @return true if it is empty, false otherwise
      */
-    public boolean isEmpty()
-    {
+    public boolean isEmpty() {
         return lines.isEmpty();
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return "LineSet[ start=" + firstLine() + ", last=" + lastLine() + "]";
     }
 }

@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.imports;
 
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
@@ -25,11 +26,9 @@ import org.junit.Test;
 
 import static com.puppycrawl.tools.checkstyle.checks.imports.ImportControlCheck.MSG_DISALLOWED;
 
-public class ImportControlCheckRegExTest extends BaseCheckTestSupport
-{
+public class ImportControlCheckRegExTest extends BaseCheckTestSupport {
     @Test
-    public void testOne() throws Exception
-    {
+    public void testOne() throws Exception {
         final DefaultConfiguration checkConfig = createCheckConfig(ImportControlCheck.class);
         checkConfig.addAttribute("file",
                 "src/test/resources/com/puppycrawl/tools/checkstyle/import-control_one-re.xml");
@@ -40,8 +39,7 @@ public class ImportControlCheckRegExTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testTwo() throws Exception
-    {
+    public void testTwo() throws Exception {
         final DefaultConfiguration checkConfig = createCheckConfig(ImportControlCheck.class);
         checkConfig.addAttribute("file",
                 "src/test/resources/com/puppycrawl/tools/checkstyle/import-control_two-re.xml");

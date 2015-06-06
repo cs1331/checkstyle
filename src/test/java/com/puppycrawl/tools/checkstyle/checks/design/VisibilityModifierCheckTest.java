@@ -16,9 +16,15 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.design;
 
 import static com.puppycrawl.tools.checkstyle.checks.design.VisibilityModifierCheck.MSG_KEY;
+import static org.junit.Assert.assertArrayEquals;
+import antlr.CommonHiddenStreamToken;
+
+import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
 import org.junit.Test;
 
@@ -27,10 +33,8 @@ import com.puppycrawl.tools.checkstyle.Checker;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 
 public class VisibilityModifierCheckTest
-    extends BaseCheckTestSupport
-{
-    private Checker getChecker() throws Exception
-    {
+    extends BaseCheckTestSupport {
+    private Checker getChecker() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(VisibilityModifierCheck.class);
         checkConfig.addAttribute("publicMemberPattern", "^f[A-Z][a-zA-Z0-9]*$");
@@ -39,8 +43,7 @@ public class VisibilityModifierCheckTest
 
     @Test
     public void testInner()
-        throws Exception
-    {
+        throws Exception {
         final String[] expected = {
             "30:24: " + getCheckMessage(MSG_KEY, "rData"),
             "33:27: " + getCheckMessage(MSG_KEY, "protectedVariable"),
@@ -54,8 +57,7 @@ public class VisibilityModifierCheckTest
 
     @Test
     public void testIgnoreAccess()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(VisibilityModifierCheck.class);
         checkConfig.addAttribute("publicMemberPattern", "^r[A-Z]");
@@ -69,8 +71,7 @@ public class VisibilityModifierCheckTest
     }
 
     @Test
-    public void testSimple() throws Exception
-    {
+    public void testSimple() throws Exception {
         final String[] expected = {
             "39:19: " + getCheckMessage(MSG_KEY, "mNumCreated2"),
             "49:23: " + getCheckMessage(MSG_KEY, "sTest1"),
@@ -83,8 +84,7 @@ public class VisibilityModifierCheckTest
     }
 
     @Test
-    public void testStrictJavadoc() throws Exception
-    {
+    public void testStrictJavadoc() throws Exception {
         final String[] expected = {
             "44:9: " + getCheckMessage(MSG_KEY, "mLen"),
             "45:19: " + getCheckMessage(MSG_KEY, "mDeer"),
@@ -94,8 +94,7 @@ public class VisibilityModifierCheckTest
     }
 
     @Test
-    public void testAllowPublicFinalFieldsInImmutableClass() throws Exception
-    {
+    public void testAllowPublicFinalFieldsInImmutableClass() throws Exception {
         final DefaultConfiguration checkConfig =
                 createCheckConfig(VisibilityModifierCheck.class);
         final String[] expected = {
@@ -110,8 +109,7 @@ public class VisibilityModifierCheckTest
     }
 
     @Test
-    public void testUserSpecifiedImmutableClassesList() throws Exception
-    {
+    public void testUserSpecifiedImmutableClassesList() throws Exception {
         final DefaultConfiguration checkConfig =
                 createCheckConfig(VisibilityModifierCheck.class);
         checkConfig.addAttribute("immutableClassCanonicalNames", "java.util.List,"
@@ -130,8 +128,7 @@ public class VisibilityModifierCheckTest
     }
 
     @Test
-    public void testImmutableSpecifiedSameTypeName() throws Exception
-    {
+    public void testImmutableSpecifiedSameTypeName() throws Exception {
         final DefaultConfiguration checkConfig =
                 createCheckConfig(VisibilityModifierCheck.class);
         checkConfig.addAttribute("immutableClassCanonicalNames",
@@ -145,8 +142,7 @@ public class VisibilityModifierCheckTest
     }
 
     @Test
-    public void testImmutableDefaultValueSameTypeName() throws Exception
-    {
+    public void testImmutableDefaultValueSameTypeName() throws Exception {
         final DefaultConfiguration checkConfig =
                 createCheckConfig(VisibilityModifierCheck.class);
         final String[] expected = {
@@ -159,8 +155,7 @@ public class VisibilityModifierCheckTest
     }
 
     @Test
-    public void testImmutableStarImportFalseNegative() throws Exception
-    {
+    public void testImmutableStarImportFalseNegative() throws Exception {
         final DefaultConfiguration checkConfig =
                 createCheckConfig(VisibilityModifierCheck.class);
         checkConfig.addAttribute("immutableClassCanonicalNames", "java.util.Arrays");
@@ -170,8 +165,7 @@ public class VisibilityModifierCheckTest
     }
 
     @Test
-    public void testImmutableStarImportNoWarn() throws Exception
-    {
+    public void testImmutableStarImportNoWarn() throws Exception {
         final DefaultConfiguration checkConfig =
                 createCheckConfig(VisibilityModifierCheck.class);
         checkConfig.addAttribute("immutableClassCanonicalNames",
@@ -182,8 +176,7 @@ public class VisibilityModifierCheckTest
     }
 
     @Test
-    public void testDefaultAnnotationPatterns() throws Exception
-    {
+    public void testDefaultAnnotationPatterns() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(VisibilityModifierCheck.class);
         final String[] expected = {
@@ -198,8 +191,7 @@ public class VisibilityModifierCheckTest
     }
 
     @Test
-    public void testCustomAnnotationPatterns() throws Exception
-    {
+    public void testCustomAnnotationPatterns() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(VisibilityModifierCheck.class);
         checkConfig.addAttribute("ignoreAnnotationCanonicalNames",
@@ -221,8 +213,7 @@ public class VisibilityModifierCheckTest
     }
 
     @Test
-    public void testIgnoreAnnotationNoPattern() throws Exception
-    {
+    public void testIgnoreAnnotationNoPattern() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(VisibilityModifierCheck.class);
         checkConfig.addAttribute("ignoreAnnotationCanonicalNames", "");
@@ -246,13 +237,56 @@ public class VisibilityModifierCheckTest
     }
 
     @Test
-    public void testIgnoreAnnotationSameName() throws Exception
-    {
+    public void testIgnoreAnnotationSameName() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(VisibilityModifierCheck.class);
         final String[] expected = {
             "10:28: " + getCheckMessage(MSG_KEY, "publicJUnitRule"),
         };
         verify(checkConfig, getPath("AnnotatedVisibilitySameTypeName.java"), expected);
+    }
+
+    @Test
+    public void testGetAcceptableTokens() {
+        VisibilityModifierCheck obj = new VisibilityModifierCheck();
+        int[] expected = {
+            TokenTypes.VARIABLE_DEF,
+            TokenTypes.OBJBLOCK,
+            TokenTypes.IMPORT,
+        };
+        assertArrayEquals(expected, obj.getAcceptableTokens());
+    }
+
+    @Test
+    public void testPublicImmutableFieldsNotAllowed() throws Exception {
+        final DefaultConfiguration checkConfig =
+            createCheckConfig(VisibilityModifierCheck.class);
+        checkConfig.addAttribute("allowPublicImmutableFields", "false");
+        final String[] expected = {
+            "10:22: " + getCheckMessage(MSG_KEY, "someIntValue"),
+            "11:39: " + getCheckMessage(MSG_KEY, "includes"),
+            "12:35: " + getCheckMessage(MSG_KEY, "notes"),
+            "13:29: " + getCheckMessage(MSG_KEY, "value"),
+            "14:23: " + getCheckMessage(MSG_KEY, "list"),
+        };
+        verify(checkConfig, getPath("InputPublicImmutable.java"), expected);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testWrongTokenType() {
+        VisibilityModifierCheck obj = new VisibilityModifierCheck();
+        DetailAST ast = new DetailAST();
+        ast.initialize(new CommonHiddenStreamToken(TokenTypes.CLASS_DEF, "class"));
+        obj.visitToken(ast);
+    }
+
+    @Test
+    public void testNullModifiers() throws Exception {
+        final DefaultConfiguration checkConfig =
+            createCheckConfig(VisibilityModifierCheck.class);
+        final String[] expected = {
+            "11:50: " + getCheckMessage(MSG_KEY, "i"),
+        };
+        verify(checkConfig, getPath("InputNullModifiers.java"), expected);
     }
 }

@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.filters;
 
 import com.google.common.collect.Lists;
@@ -38,10 +39,8 @@ import java.util.Collection;
 import java.util.Locale;
 
 public class SuppressWarningsFilterTest
-    extends BaseCheckTestSupport
-{
-    private static String[] sAllMessages =
-    {
+    extends BaseCheckTestSupport {
+    private static String[] sAllMessages = {
         "22:45: Name 'I' must match pattern '^[a-z][a-zA-Z0-9]*$'.",
         "24:17: Name 'J' must match pattern '^[a-z][a-zA-Z0-9]*$'.",
         "25:17: Name 'K' must match pattern '^[a-z][a-zA-Z0-9]*$'.",
@@ -55,16 +54,14 @@ public class SuppressWarningsFilterTest
     };
 
     @Test
-    public void testNone() throws Exception
-    {
+    public void testNone() throws Exception {
         final DefaultConfiguration filterConfig = null;
         final String[] suppressed = {};
         verifySuppressed(filterConfig, suppressed);
     }
 
     @Test
-    public void testDefault() throws Exception
-    {
+    public void testDefault() throws Exception {
         final DefaultConfiguration filterConfig =
             createFilterConfig(SuppressWarningsFilter.class);
         final String[] suppressed = {
@@ -77,14 +74,12 @@ public class SuppressWarningsFilterTest
         verifySuppressed(filterConfig, suppressed);
     }
 
-    public static DefaultConfiguration createFilterConfig(Class<?> classObj)
-    {
+    public static DefaultConfiguration createFilterConfig(Class<?> classObj) {
         return new DefaultConfiguration(classObj.getName());
     }
 
     protected void verifySuppressed(Configuration aFilterConfig,
-        String[] aSuppressed) throws Exception
-    {
+        String[] aSuppressed) throws Exception {
         verify(createChecker(aFilterConfig),
             getPath("filters/InputSuppressWarningsFilter.java"),
             removeSuppressed(sAllMessages, aSuppressed));
@@ -92,8 +87,7 @@ public class SuppressWarningsFilterTest
 
     @Override
     protected Checker createChecker(Configuration filterConfig)
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkerConfig =
             new DefaultConfiguration("configuration");
         final DefaultConfiguration checksConfig =
@@ -113,7 +107,7 @@ public class SuppressWarningsFilterTest
             checkerConfig.addChild(filterConfig);
         }
         final Checker checker = new Checker();
-        final Locale locale = Locale.ENGLISH;
+        final Locale locale = Locale.ROOT;
         checker.setLocaleCountry(locale.getCountry());
         checker.setLocaleLanguage(locale.getLanguage());
         checker.setModuleClassLoader(Thread.currentThread()
@@ -123,8 +117,7 @@ public class SuppressWarningsFilterTest
         return checker;
     }
 
-    private String[] removeSuppressed(String[] from, String[] remove)
-    {
+    private String[] removeSuppressed(String[] from, String[] remove) {
         final Collection<String> coll =
             Lists.newArrayList(Arrays.asList(from));
         coll.removeAll(Arrays.asList(remove));

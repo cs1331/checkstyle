@@ -16,33 +16,29 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.api;
 
-// TODO: check that this class is in the right package
-// as soon as architecture has settled. At the time of writing
-// this class is not necessary as a part of the public api
-
 import com.google.common.collect.Sets;
-import java.util.TreeSet;
+
+import java.util.Set;
+import java.util.SortedSet;
 
 /**
  * Collection of messages.
  * @author Oliver Burn
  */
-public final class LocalizedMessages
-{
+public final class LocalizedMessages {
     /** contains the messages logged **/
-    private final TreeSet<LocalizedMessage> messages = Sets.newTreeSet();
+    private final Set<LocalizedMessage> messages = Sets.newTreeSet();
 
     /** @return the logged messages **/
-    public TreeSet<LocalizedMessage> getMessages()
-    {
+    public SortedSet<LocalizedMessage> getMessages() {
         return Sets.newTreeSet(messages);
     }
 
     /** Reset the object. **/
-    public void reset()
-    {
+    public void reset() {
         messages.clear();
     }
 
@@ -50,14 +46,12 @@ public final class LocalizedMessages
      * Logs a message to be reported.
      * @param aMsg the message to log
      **/
-    public void add(LocalizedMessage aMsg)
-    {
+    public void add(LocalizedMessage aMsg) {
         messages.add(aMsg);
     }
 
     /** @return the number of messages */
-    public int size()
-    {
+    public int size() {
         return messages.size();
     }
 }

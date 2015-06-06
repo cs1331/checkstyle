@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle;
 
 import com.google.common.collect.Sets;
@@ -30,8 +31,7 @@ import java.util.Set;
  * @author Rick Giles
  * @author lkuehne
  */
-class PackageObjectFactory implements ModuleFactory
-{
+class PackageObjectFactory implements ModuleFactory {
     /** Logger for PackageObjectFactory. */
     private static final Log LOG = LogFactory.getLog(PackageObjectFactory.class);
 
@@ -48,8 +48,7 @@ class PackageObjectFactory implements ModuleFactory
      *          core and custom modules
      */
     public PackageObjectFactory(Set<String> packageNames,
-            ClassLoader moduleClassLoader)
-    {
+            ClassLoader moduleClassLoader) {
         if (moduleClassLoader == null) {
             throw new IllegalArgumentException(
                     "moduleClassLoader must not be null");
@@ -64,8 +63,7 @@ class PackageObjectFactory implements ModuleFactory
      * Registers a package name to use for shortName resolution.
      * @param packageName the package name
      */
-    void addPackage(String packageName)
-    {
+    void addPackage(String packageName) {
         packages.add(packageName);
     }
 
@@ -79,8 +77,7 @@ class PackageObjectFactory implements ModuleFactory
      * @throws CheckstyleException if an error occurs.
      */
     private Object doMakeObject(String name)
-        throws CheckstyleException
-    {
+        throws CheckstyleException {
         //try name first
         try {
             return createObject(name);
@@ -111,8 +108,7 @@ class PackageObjectFactory implements ModuleFactory
      * @throws CheckstyleException if an error occurs.
      */
     private Object createObject(String className)
-        throws CheckstyleException
-    {
+        throws CheckstyleException {
         try {
             final Class<?> clazz = Class.forName(className, true, moduleClassLoader);
             return clazz.newInstance();
@@ -134,8 +130,7 @@ class PackageObjectFactory implements ModuleFactory
      */
     @Override
     public Object createModule(String name)
-        throws CheckstyleException
-    {
+        throws CheckstyleException {
         try {
             return doMakeObject(name);
         }

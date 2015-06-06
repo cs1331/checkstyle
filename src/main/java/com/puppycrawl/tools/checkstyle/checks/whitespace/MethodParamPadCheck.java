@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.whitespace;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
@@ -62,8 +63,7 @@ import com.puppycrawl.tools.checkstyle.checks.AbstractOptionCheck;
  */
 
 public class MethodParamPadCheck
-    extends AbstractOptionCheck<PadOption>
-{
+    extends AbstractOptionCheck<PadOption> {
 
     /**
      * A key is pointing to the warning message text in "messages.properties"
@@ -83,21 +83,19 @@ public class MethodParamPadCheck
      */
     public static final String WS_NOT_PRECEDED = "ws.notPreceded";
 
-    /**
-     * Sets the pad option to nospace.
-     */
-    public MethodParamPadCheck()
-    {
-        super(PadOption.NOSPACE, PadOption.class);
-    }
-
     /** Whether whitespace is allowed if the method identifier is at a
      * linebreak */
     private boolean allowLineBreaks;
 
+    /**
+     * Sets the pad option to nospace.
+     */
+    public MethodParamPadCheck() {
+        super(PadOption.NOSPACE, PadOption.class);
+    }
+
     @Override
-    public int[] getDefaultTokens()
-    {
+    public int[] getDefaultTokens() {
         return new int[] {
             TokenTypes.CTOR_DEF,
             TokenTypes.LITERAL_NEW,
@@ -108,8 +106,7 @@ public class MethodParamPadCheck
     }
 
     @Override
-    public int[] getAcceptableTokens()
-    {
+    public int[] getAcceptableTokens() {
         return new int[] {
             TokenTypes.CTOR_DEF,
             TokenTypes.LITERAL_NEW,
@@ -120,8 +117,7 @@ public class MethodParamPadCheck
     }
 
     @Override
-    public void visitToken(DetailAST ast)
-    {
+    public void visitToken(DetailAST ast) {
         final DetailAST parenAST;
         if (ast.getType() == TokenTypes.METHOD_CALL) {
             parenAST = ast;
@@ -143,13 +139,11 @@ public class MethodParamPadCheck
         else {
             final int before = parenAST.getColumnNo() - 1;
             if (PadOption.NOSPACE == getAbstractOption()
-                && Character.isWhitespace(line.charAt(before)))
-            {
+                && Character.isWhitespace(line.charAt(before))) {
                 log(parenAST , WS_PRECEDED, parenAST.getText());
             }
             else if (PadOption.SPACE == getAbstractOption()
-                     && !Character.isWhitespace(line.charAt(before)))
-            {
+                     && !Character.isWhitespace(line.charAt(before))) {
                 log(parenAST, WS_NOT_PRECEDED, parenAST.getText());
             }
         }
@@ -160,8 +154,7 @@ public class MethodParamPadCheck
      * @param allowLineBreaks whether whitespace should be
      * flagged at linebreaks.
      */
-    public void setAllowLineBreaks(boolean allowLineBreaks)
-    {
+    public void setAllowLineBreaks(boolean allowLineBreaks) {
         this.allowLineBreaks = allowLineBreaks;
     }
 }

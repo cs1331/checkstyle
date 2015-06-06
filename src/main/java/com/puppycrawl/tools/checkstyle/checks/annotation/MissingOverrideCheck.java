@@ -16,12 +16,13 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.annotation;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.puppycrawl.tools.checkstyle.api.AnnotationUtility;
+import com.puppycrawl.tools.checkstyle.AnnotationUtility;
 import com.puppycrawl.tools.checkstyle.api.Check;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.JavadocTagInfo;
@@ -74,18 +75,7 @@ import com.puppycrawl.tools.checkstyle.Utils;
  *
  * @author Travis Schneeberger
  */
-public final class MissingOverrideCheck extends Check
-{
-    /** {@link Override Override} annotation name */
-    private static final String OVERRIDE = "Override";
-
-    /** fully-qualified {@link Override Override} annotation name */
-    private static final String FQ_OVERRIDE = "java.lang." + OVERRIDE;
-
-    /** compiled regexp to match Javadoc tags with no argument and {} * */
-    private static final Pattern MATCH_INHERITDOC =
-        Utils.createPattern("\\{\\s*@(inheritDoc)\\s*\\}");
-
+public final class MissingOverrideCheck extends Check {
     /**
      * A key is pointing to the warning message text in "messages.properties"
      * file.
@@ -98,6 +88,16 @@ public final class MissingOverrideCheck extends Check
      */
     public static final String MSG_KEY_ANNOTATION_MISSING_OVERRIDE =
         "annotation.missing.override";
+
+    /** {@link Override Override} annotation name */
+    private static final String OVERRIDE = "Override";
+
+    /** fully-qualified {@link Override Override} annotation name */
+    private static final String FQ_OVERRIDE = "java.lang." + OVERRIDE;
+
+    /** compiled regexp to match Javadoc tags with no argument and {} * */
+    private static final Pattern MATCH_INHERITDOC =
+        Utils.createPattern("\\{\\s*@(inheritDoc)\\s*\\}");
 
     /** @see #setJavaFiveCompatibility(boolean) */
     private boolean javaFiveCompatibility;
@@ -118,37 +118,32 @@ public final class MissingOverrideCheck extends Check
      *
      * @param compatibility compatibility or not
      */
-    public void setJavaFiveCompatibility(final boolean compatibility)
-    {
+    public void setJavaFiveCompatibility(final boolean compatibility) {
         this.javaFiveCompatibility = compatibility;
     }
 
     /** {@inheritDoc} */
     @Override
-    public int[] getDefaultTokens()
-    {
+    public int[] getDefaultTokens() {
         return this.getRequiredTokens();
     }
 
     /** {@inheritDoc} */
     @Override
-    public int[] getAcceptableTokens()
-    {
+    public int[] getAcceptableTokens() {
         return this.getRequiredTokens();
     }
 
     /** {@inheritDoc} */
     @Override
-    public int[] getRequiredTokens()
-    {
+    public int[] getRequiredTokens() {
         return new int[]
         {TokenTypes.METHOD_DEF, };
     }
 
     /** {@inheritDoc} */
     @Override
-    public void visitToken(final DetailAST ast)
-    {
+    public void visitToken(final DetailAST ast) {
         final TextBlock javadoc =
             this.getFileContents().getJavadocBefore(ast.getLineNo());
 
@@ -165,16 +160,14 @@ public final class MissingOverrideCheck extends Check
 
             if (defOrNew.branchContains(TokenTypes.EXTENDS_CLAUSE)
                 || defOrNew.branchContains(TokenTypes.IMPLEMENTS_CLAUSE)
-                || defOrNew.getType() == TokenTypes.LITERAL_NEW)
-            {
+                || defOrNew.getType() == TokenTypes.LITERAL_NEW) {
                 return;
             }
         }
 
         if (containastag
             && !AnnotationUtility.containsAnnotation(ast, OVERRIDE)
-            && !AnnotationUtility.containsAnnotation(ast, FQ_OVERRIDE))
-        {
+            && !AnnotationUtility.containsAnnotation(ast, FQ_OVERRIDE)) {
             this.log(ast.getLineNo(), MSG_KEY_ANNOTATION_MISSING_OVERRIDE);
         }
     }
@@ -185,8 +178,7 @@ public final class MissingOverrideCheck extends Check
      * @param javadoc the javadoc of the AST
      * @return true if contains the tag
      */
-    private boolean containsJavadocTag(final TextBlock javadoc)
-    {
+    private boolean containsJavadocTag(final TextBlock javadoc) {
         if (javadoc == null) {
             return false;
         }

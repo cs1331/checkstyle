@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
 import com.puppycrawl.tools.checkstyle.api.Check;
@@ -42,8 +43,7 @@ import com.puppycrawl.tools.checkstyle.checks.CheckUtils;
  * </pre>
  * @author o_sukhodolsky
  */
-public class MultipleVariableDeclarationsCheck extends Check
-{
+public class MultipleVariableDeclarationsCheck extends Check {
 
     /**
      * A key is pointing to the warning message text in "messages.properties"
@@ -57,44 +57,34 @@ public class MultipleVariableDeclarationsCheck extends Check
      */
     public static final String MSG_MULTIPLE_COMMA = "multiple.variable.declarations.comma";
 
-    /** Creates new instance of the check. */
-    public MultipleVariableDeclarationsCheck()
-    {
-    }
-
     @Override
-    public int[] getDefaultTokens()
-    {
+    public int[] getDefaultTokens() {
         return new int[] {TokenTypes.VARIABLE_DEF};
     }
 
     @Override
-    public int[] getAcceptableTokens()
-    {
+    public int[] getAcceptableTokens() {
         return new int[] {TokenTypes.VARIABLE_DEF};
     }
 
     @Override
-    public void visitToken(DetailAST ast)
-    {
+    public void visitToken(DetailAST ast) {
         DetailAST nextNode = ast.getNextSibling();
-        final boolean isCommaSeparated =
-                nextNode != null && nextNode.getType() == TokenTypes.COMMA;
 
         if (nextNode == null) {
             // no next statement - no check
             return;
         }
 
+        final boolean isCommaSeparated = nextNode.getType() == TokenTypes.COMMA;
+
         if (nextNode.getType() == TokenTypes.COMMA
-            || nextNode.getType() == TokenTypes.SEMI)
-        {
+            || nextNode.getType() == TokenTypes.SEMI) {
             nextNode = nextNode.getNextSibling();
         }
 
         if (nextNode != null
-            && nextNode.getType() == TokenTypes.VARIABLE_DEF)
-        {
+            && nextNode.getType() == TokenTypes.VARIABLE_DEF) {
             final DetailAST firstNode = CheckUtils.getFirstNode(ast);
             if (isCommaSeparated) {
                 // Check if the multiple variable declarations are in a
@@ -124,16 +114,14 @@ public class MultipleVariableDeclarationsCheck extends Check
      * @param node the root of tree for search.
      * @return sub-node with maximum (line, column) pair.
      */
-    private static DetailAST getLastNode(final DetailAST node)
-    {
+    private static DetailAST getLastNode(final DetailAST node) {
         DetailAST currentNode = node;
         DetailAST child = node.getFirstChild();
         while (child != null) {
             final DetailAST newNode = getLastNode(child);
             if (newNode.getLineNo() > currentNode.getLineNo()
                 || newNode.getLineNo() == currentNode.getLineNo()
-                    && newNode.getColumnNo() > currentNode.getColumnNo())
-            {
+                    && newNode.getColumnNo() > currentNode.getColumnNo()) {
                 currentNode = newNode;
             }
             child = child.getNextSibling();

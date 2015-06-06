@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.indentation;
 
 import java.io.File;
@@ -28,11 +29,9 @@ import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 /**
  * @author Ilja Dubinin
  */
-public class NewHandlerTest extends BaseCheckTestSupport
-{
+public class NewHandlerTest extends BaseCheckTestSupport {
     @Test
-    public void testInvalidLabel() throws Exception
-    {
+    public void testInvalidLabel() throws Exception {
         final DefaultConfiguration checkConfig = createCheckConfig(IndentationCheck.class);
         final String[] expected = {
 

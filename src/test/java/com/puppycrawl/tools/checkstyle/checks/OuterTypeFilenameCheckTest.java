@@ -16,26 +16,25 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks;
 
 import org.junit.Test;
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 
-public class OuterTypeFilenameCheckTest extends BaseCheckTestSupport
-{
+public class OuterTypeFilenameCheckTest extends BaseCheckTestSupport {
 
     @Test
-    public void testGood1() throws Exception
-    {
+    public void testGood1() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(OuterTypeFilenameCheck.class);
         final String[] expected = {};
         verify(checkConfig, getPath("InputIllegalTokens.java"), expected);
     }
+
     @Test
-    public void testGood2() throws Exception
-    {
+    public void testGood2() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(OuterTypeFilenameCheck.class);
         final String[] expected = {};

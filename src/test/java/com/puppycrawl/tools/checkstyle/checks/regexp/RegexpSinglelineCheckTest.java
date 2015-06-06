@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.regexp;
 
 import com.puppycrawl.tools.checkstyle.BaseFileSetCheckTestSupport;
@@ -25,19 +26,16 @@ import org.junit.Test;
 
 import static com.puppycrawl.tools.checkstyle.checks.regexp.MultilineDetector.REGEXP_EXCEEDED;
 
-public class RegexpSinglelineCheckTest extends BaseFileSetCheckTestSupport
-{
+public class RegexpSinglelineCheckTest extends BaseFileSetCheckTestSupport {
     private DefaultConfiguration checkConfig;
 
     @Before
-    public void setUp()
-    {
+    public void setUp() {
         checkConfig = createCheckConfig(RegexpSinglelineCheck.class);
     }
 
     @Test
-    public void testIt() throws Exception
-    {
+    public void testIt() throws Exception {
         final String illegal = "System\\.(out)|(err)\\.print(ln)?\\(";
         checkConfig.addAttribute("format", illegal);
         final String[] expected = {
@@ -48,8 +46,7 @@ public class RegexpSinglelineCheckTest extends BaseFileSetCheckTestSupport
 
     @Test
     public void testMessageProperty()
-        throws Exception
-    {
+        throws Exception {
         final String illegal = "System\\.(out)|(err)\\.print(ln)?\\(";
         final String message = "Bad line :(";
         checkConfig.addAttribute("format", illegal);
@@ -61,8 +58,7 @@ public class RegexpSinglelineCheckTest extends BaseFileSetCheckTestSupport
     }
 
     @Test
-    public void testIgnoreCaseTrue() throws Exception
-    {
+    public void testIgnoreCaseTrue() throws Exception {
         final String illegal = "SYSTEM\\.(OUT)|(ERR)\\.PRINT(LN)?\\(";
         checkConfig.addAttribute("format", illegal);
         checkConfig.addAttribute("ignoreCase", "true");
@@ -73,8 +69,7 @@ public class RegexpSinglelineCheckTest extends BaseFileSetCheckTestSupport
     }
 
     @Test
-    public void testIgnoreCaseFalse() throws Exception
-    {
+    public void testIgnoreCaseFalse() throws Exception {
         final String illegal = "SYSTEM\\.(OUT)|(ERR)\\.PRINT(LN)?\\(";
         checkConfig.addAttribute("format", illegal);
         checkConfig.addAttribute("ignoreCase", "false");

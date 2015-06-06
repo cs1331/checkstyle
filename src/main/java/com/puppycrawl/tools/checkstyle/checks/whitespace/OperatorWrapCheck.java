@@ -23,6 +23,7 @@ import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import com.puppycrawl.tools.checkstyle.Utils;
 import com.puppycrawl.tools.checkstyle.checks.AbstractOptionCheck;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * <p>
@@ -87,8 +88,7 @@ import com.puppycrawl.tools.checkstyle.checks.AbstractOptionCheck;
  * @author Rick Giles
  */
 public class OperatorWrapCheck
-    extends AbstractOptionCheck<WrapOption>
-{
+    extends AbstractOptionCheck<WrapOption> {
 
     /**
      * A key is pointing to the warning message text in "messages.properties"
@@ -105,14 +105,12 @@ public class OperatorWrapCheck
     /**
      * Sets the operator wrap option to new line.
      */
-    public OperatorWrapCheck()
-    {
+    public OperatorWrapCheck() {
         super(WrapOption.NL, WrapOption.class);
     }
 
     @Override
-    public int[] getDefaultTokens()
-    {
+    public int[] getDefaultTokens() {
         return new int[] {
             TokenTypes.QUESTION,          // '?'
             TokenTypes.COLON,             // ':' (not reported for a case)
@@ -141,8 +139,7 @@ public class OperatorWrapCheck
     }
 
     @Override
-    public int[] getAcceptableTokens()
-    {
+    public int[] getAcceptableTokens() {
         return new int[] {
             TokenTypes.QUESTION,          // '?'
             TokenTypes.COLON,             // ':' (not reported for a case)
@@ -184,13 +181,11 @@ public class OperatorWrapCheck
     }
 
     @Override
-    public void visitToken(DetailAST ast)
-    {
+    public void visitToken(DetailAST ast) {
         if (ast.getType() == TokenTypes.COLON) {
             final DetailAST parent = ast.getParent();
             if (parent.getType() == TokenTypes.LITERAL_DEFAULT
-                || parent.getType() == TokenTypes.LITERAL_CASE)
-            {
+                || parent.getType() == TokenTypes.LITERAL_CASE) {
                 //we do not want to check colon for cases and defaults
                 return;
             }
@@ -202,20 +197,16 @@ public class OperatorWrapCheck
         final int lineNo = ast.getLineNo();
         final String currentLine = getLine(lineNo - 1);
 
-        // TODO: Handle comments before and after operator
         // Check if rest of line is whitespace, and not just the operator
         // by itself. This last bit is to handle the operator on a line by
         // itself.
         if (wOp == WrapOption.NL
-            && !text.equals(currentLine.trim())
-            && currentLine.substring(colNo + text.length())
-                .trim().length() == 0)
-        {
+                && !text.equals(currentLine.trim())
+                && StringUtils.isBlank(currentLine.substring(colNo + text.length()))) {
             log(lineNo, colNo, LINE_NEW, text);
         }
         else if (wOp == WrapOption.EOL
-                  && Utils.whitespaceBefore(colNo - 1, currentLine))
-        {
+                  && Utils.whitespaceBefore(colNo - 1, currentLine)) {
             log(lineNo, colNo, LINE_PREVIOUS, text);
         }
     }

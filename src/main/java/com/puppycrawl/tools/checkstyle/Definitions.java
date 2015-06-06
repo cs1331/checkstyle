@@ -16,22 +16,21 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle;
 
 /**
  * Contains constant definitions common to the package.
  * @author Oliver Burn
  **/
-public final class Defn
-{
-    /**
-     * Do no allow <code>Defn</code> instances to be created.
-     **/
-    private Defn()
-    {
-    }
-
+public final class Definitions {
     /** Name of resource bundle for Checkstyle. */
     public static final String CHECKSTYLE_BUNDLE =
             "com.puppycrawl.tools.checkstyle.messages";
+
+    /**
+     * Do no allow <code>Definitions</code> instances to be created.
+     **/
+    private Definitions() {
+    }
 }

@@ -16,8 +16,10 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks;
 
+import com.puppycrawl.tools.checkstyle.Utils;
 import com.puppycrawl.tools.checkstyle.api.Check;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
@@ -45,8 +47,7 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  *
  * @author Oliver Burn
  */
-public class UpperEllCheck extends Check
-{
+public class UpperEllCheck extends Check {
 
     /**
      * A key is pointing to the warning message text in "messages.properties"
@@ -55,21 +56,18 @@ public class UpperEllCheck extends Check
     public static final String MSG_KEY = "upperEll";
 
     @Override
-    public int[] getDefaultTokens()
-    {
+    public int[] getDefaultTokens() {
         return new int[] {TokenTypes.NUM_LONG};
     }
 
     @Override
-    public int[] getAcceptableTokens()
-    {
+    public int[] getAcceptableTokens() {
         return new int[] {TokenTypes.NUM_LONG};
     }
 
     @Override
-    public void visitToken(DetailAST ast)
-    {
-        if (ast.getText().endsWith("l")) {
+    public void visitToken(DetailAST ast) {
+        if (Utils.endsWithChar(ast.getText(), 'l')) {
             log(ast.getLineNo(),
                 ast.getColumnNo() + ast.getText().length() - 1,
                 MSG_KEY);

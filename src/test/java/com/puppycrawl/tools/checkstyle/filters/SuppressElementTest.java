@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.filters;
 
 import static org.junit.Assert.assertEquals;
@@ -25,32 +26,31 @@ import static org.junit.Assert.assertTrue;
 import com.puppycrawl.tools.checkstyle.api.AuditEvent;
 import com.puppycrawl.tools.checkstyle.api.LocalizedMessage;
 import java.util.regex.PatternSyntaxException;
+
+import nl.jqno.equalsverifier.EqualsVerifier;
+import nl.jqno.equalsverifier.Warning;
 import org.junit.Before;
 import org.junit.Test;
 
 /** Tests SuppressElementFilter */
-public class SuppressElementTest
-{
+public class SuppressElementTest {
     private SuppressElement filter;
 
     @Before
     public void setUp()
-        throws PatternSyntaxException
-    {
+        throws PatternSyntaxException {
         filter = new SuppressElement("Test");
         filter.setChecks("Test");
     }
 
     @Test
-    public void testDecideDefault()
-    {
+    public void testDecideDefault() {
         final AuditEvent ev = new AuditEvent(this, "Test.java");
         assertTrue(ev.getFileName(), filter.accept(ev));
     }
 
     @Test
-    public void testDecideLocalizedMessage()
-    {
+    public void testDecideLocalizedMessage() {
         LocalizedMessage message =
             new LocalizedMessage(0, 0, "", "", null, null, this.getClass(), null);
         final AuditEvent ev = new AuditEvent(this, "ATest.java", message);
@@ -59,8 +59,7 @@ public class SuppressElementTest
     }
 
     @Test
-    public void testDecideByLine()
-    {
+    public void testDecideByLine() {
         LocalizedMessage message =
             new LocalizedMessage(10, 10, "", "", null, null, this.getClass(), null);
         final AuditEvent ev = new AuditEvent(this, "ATest.java", message);
@@ -72,8 +71,7 @@ public class SuppressElementTest
     }
 
     @Test
-    public void testDecideByColumn()
-    {
+    public void testDecideByColumn() {
         LocalizedMessage message =
             new LocalizedMessage(10, 10, "", "", null, null, this.getClass(), null);
         final AuditEvent ev = new AuditEvent(this, "ATest.java", message);
@@ -85,8 +83,7 @@ public class SuppressElementTest
     }
 
     @Test
-    public void testEquals() throws PatternSyntaxException
-    {
+    public void testEquals() throws PatternSyntaxException {
         final SuppressElement filter2 = new SuppressElement("Test");
         filter2.setChecks("Test");
         assertEquals("filter, filter2", filter, filter2);
@@ -108,5 +105,13 @@ public class SuppressElementTest
         assertFalse("filter, filter2", filter.equals(filter2));
         filter2.setColumns("1-10");
         assertEquals("filter, filter2", filter, filter2);
+    }
+
+    @Test
+    public void testEqualsAndHashCode() {
+        EqualsVerifier.forClass(SuppressElement.class)
+                .usingGetClass()
+                .suppress(Warning.NONFINAL_FIELDS)
+                .verify();
     }
 }

@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.api;
 
 import java.util.BitSet;
@@ -23,6 +24,7 @@ import java.util.BitSet;
 import antlr.CommonASTWithHiddenTokens;
 import antlr.Token;
 import antlr.collections.AST;
+import com.puppycrawl.tools.checkstyle.Utils;
 
 /**
  * An extension of the CommonAST that records the line and column
@@ -34,8 +36,7 @@ import antlr.collections.AST;
  * @author lkuehne
  * @see <a href="http://www.antlr.org/">ANTLR Website</a>
  */
-public final class DetailAST extends CommonASTWithHiddenTokens
-{
+public final class DetailAST extends CommonASTWithHiddenTokens {
     /** For Serialisation that will never happen. */
     private static final long serialVersionUID = -2580884815577559874L;
 
@@ -62,16 +63,14 @@ public final class DetailAST extends CommonASTWithHiddenTokens
     private BitSet branchTokenTypes;
 
     @Override
-    public void initialize(Token tok)
-    {
+    public void initialize(Token tok) {
         super.initialize(tok);
         lineNo = tok.getLine();
         columnNo = tok.getColumn() - 1; // expect columns to start @ 0
     }
 
     @Override
-    public void initialize(AST ast)
-    {
+    public void initialize(AST ast) {
         final DetailAST da = (DetailAST) ast;
         setText(da.getText());
         setType(da.getType());
@@ -82,8 +81,7 @@ public final class DetailAST extends CommonASTWithHiddenTokens
     }
 
     @Override
-    public void setFirstChild(AST ast)
-    {
+    public void setFirstChild(AST ast) {
         childCount = NOT_INITIALIZED;
         super.setFirstChild(ast);
         if (ast != null) {
@@ -92,8 +90,7 @@ public final class DetailAST extends CommonASTWithHiddenTokens
     }
 
     @Override
-    public void setNextSibling(AST ast)
-    {
+    public void setNextSibling(AST ast) {
         super.setNextSibling(ast);
         if (ast != null && parent != null) {
             ((DetailAST) ast).setParent(parent);
@@ -108,8 +105,7 @@ public final class DetailAST extends CommonASTWithHiddenTokens
      * @param ast
      *        DetailAST object.
      */
-    public void addPreviousSibling(DetailAST ast)
-    {
+    public void addPreviousSibling(DetailAST ast) {
         if (ast != null) {
             ast.setParent(parent);
             final DetailAST previousSibling = this.getPreviousSibling();
@@ -132,8 +128,7 @@ public final class DetailAST extends CommonASTWithHiddenTokens
      * @param ast
      *        DetailAST object.
      */
-    public void addNextSibling(DetailAST ast)
-    {
+    public void addNextSibling(DetailAST ast) {
         if (ast != null) {
             ast.setParent(parent);
             final DetailAST nextSibling = this.getNextSibling();
@@ -152,14 +147,12 @@ public final class DetailAST extends CommonASTWithHiddenTokens
      * Sets previous sibling.
      * @param ast a previous sibling
      */
-    void setPreviousSibling(DetailAST ast)
-    {
+    void setPreviousSibling(DetailAST ast) {
         previousSibling = ast;
     }
 
     @Override
-    public void addChild(AST ast)
-    {
+    public void addChild(AST ast) {
         super.addChild(ast);
         if (ast != null) {
             ((DetailAST) ast).setParent(this);
@@ -172,8 +165,7 @@ public final class DetailAST extends CommonASTWithHiddenTokens
      * does not recurse down the tree.
      * @return the number of child nodes
      */
-    public int getChildCount()
-    {
+    public int getChildCount() {
         // lazy init
         if (childCount == NOT_INITIALIZED) {
             childCount = 0;
@@ -191,12 +183,7 @@ public final class DetailAST extends CommonASTWithHiddenTokens
      * Set the parent token.
      * @param parent the parent token
      */
-    // TODO: should be private but that breaks the DetailASTTest
-    // until we manage parent in DetailAST instead of externally
-    void setParent(DetailAST parent)
-    {
-        // TODO: Check visibility, could be private
-        // if set in setFirstChild() and friends
+    void setParent(DetailAST parent) {
         this.parent = parent;
         final DetailAST nextSibling = getNextSibling();
         if (nextSibling != null) {
@@ -209,21 +196,19 @@ public final class DetailAST extends CommonASTWithHiddenTokens
      * Returns the parent token.
      * @return the parent token
      */
-    public DetailAST getParent()
-    {
+    public DetailAST getParent() {
         return parent;
     }
 
     /** @return the line number **/
-    public int getLineNo()
-    {
+    public int getLineNo() {
         if (lineNo == NOT_INITIALIZED) {
             // an inner AST that has been initialized
             // with initialize(String text)
             DetailAST child = getFirstChild();
             while (child != null) {
                 // comment node can't be start of any java statement/definition
-                if (TokenTypes.isCommentType(child.getType())) {
+                if (Utils.isCommentType(child.getType())) {
                     child = child.getNextSibling();
                 }
                 else {
@@ -234,7 +219,7 @@ public final class DetailAST extends CommonASTWithHiddenTokens
             DetailAST sibling = getNextSibling();
             while (sibling != null) {
                 // comment node can't be start of any java statement/definition
-                if (TokenTypes.isCommentType(sibling.getType())) {
+                if (Utils.isCommentType(sibling.getType())) {
                     sibling = sibling.getNextSibling();
                 }
                 else {
@@ -250,21 +235,19 @@ public final class DetailAST extends CommonASTWithHiddenTokens
      * @param lineNo
      *        line number.
      */
-    public void setLineNo(int lineNo)
-    {
+    public void setLineNo(int lineNo) {
         this.lineNo = lineNo;
     }
 
     /** @return the column number **/
-    public int getColumnNo()
-    {
+    public int getColumnNo() {
         if (columnNo == NOT_INITIALIZED) {
             // an inner AST that has been initialized
             // with initialize(String text)
             DetailAST child = getFirstChild();
             while (child != null) {
                 // comment node can't be start of any java statement/definition
-                if (TokenTypes.isCommentType(child.getType())) {
+                if (Utils.isCommentType(child.getType())) {
                     child = child.getNextSibling();
                 }
                 else {
@@ -275,7 +258,7 @@ public final class DetailAST extends CommonASTWithHiddenTokens
             DetailAST sibling = getNextSibling();
             while (sibling != null) {
                 // comment node can't be start of any java statement/definition
-                if (TokenTypes.isCommentType(sibling.getType())) {
+                if (Utils.isCommentType(sibling.getType())) {
                     sibling = sibling.getNextSibling();
                 }
                 else {
@@ -291,14 +274,12 @@ public final class DetailAST extends CommonASTWithHiddenTokens
      * @param columnNo
      *        column number.
      */
-    public void setColumnNo(int columnNo)
-    {
+    public void setColumnNo(int columnNo) {
         this.columnNo = columnNo;
     }
 
     /** @return the last child node */
-    public DetailAST getLastChild()
-    {
+    public DetailAST getLastChild() {
         DetailAST ast = getFirstChild();
         while (ast != null && ast.getNextSibling() != null) {
             ast = ast.getNextSibling();
@@ -309,8 +290,7 @@ public final class DetailAST extends CommonASTWithHiddenTokens
     /**
      * @return the token types that occur in the branch as a sorted set.
      */
-    private BitSet getBranchTokenTypes()
-    {
+    private BitSet getBranchTokenTypes() {
         // lazy init
         if (branchTokenTypes == null) {
 
@@ -336,8 +316,7 @@ public final class DetailAST extends CommonASTWithHiddenTokens
      * @return true if and only if this branch (including this node)
      * contains a token of type <code>type</code>.
      */
-    public boolean branchContains(int type)
-    {
+    public boolean branchContains(int type) {
         return getBranchTokenTypes().get(type);
     }
 
@@ -346,8 +325,7 @@ public final class DetailAST extends CommonASTWithHiddenTokens
      * @param type the token type to match
      * @return the number of matching token
      */
-    public int getChildCount(int type)
-    {
+    public int getChildCount(int type) {
         int count = 0;
         for (AST i = getFirstChild(); i != null; i = i.getNextSibling()) {
             if (i.getType() == type) {
@@ -361,8 +339,7 @@ public final class DetailAST extends CommonASTWithHiddenTokens
      * Returns the previous sibling or null if no such sibling exists.
      * @return the previous sibling or null if no such sibling exists.
      */
-    public DetailAST getPreviousSibling()
-    {
+    public DetailAST getPreviousSibling() {
         return previousSibling;
     }
 
@@ -371,8 +348,7 @@ public final class DetailAST extends CommonASTWithHiddenTokens
      * @param type the token type to match
      * @return the matching token, or null if no match
      */
-    public DetailAST findFirstToken(int type)
-    {
+    public DetailAST findFirstToken(int type) {
         DetailAST retVal = null;
         for (DetailAST i = getFirstChild(); i != null; i = i.getNextSibling()) {
             if (i.getType() == type) {
@@ -384,20 +360,17 @@ public final class DetailAST extends CommonASTWithHiddenTokens
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return super.toString() + "[" + getLineNo() + "x" + getColumnNo() + "]";
     }
 
     @Override
-    public DetailAST getNextSibling()
-    {
+    public DetailAST getNextSibling() {
         return (DetailAST) super.getNextSibling();
     }
 
     @Override
-    public DetailAST getFirstChild()
-    {
+    public DetailAST getFirstChild() {
         return (DetailAST) super.getFirstChild();
     }
 

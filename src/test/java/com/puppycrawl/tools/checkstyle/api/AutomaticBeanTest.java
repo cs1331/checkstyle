@@ -16,17 +16,15 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.api;
 
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import org.junit.Test;
 
-public class AutomaticBeanTest
-{
-    private static class TestBean extends AutomaticBean
-    {
-        public void setName(String name)
-        {
+public class AutomaticBeanTest {
+    private static class TestBean extends AutomaticBean {
+        public void setName(String name) {
         }
     }
 
@@ -36,8 +34,7 @@ public class AutomaticBeanTest
     private final TestBean testBean = new TestBean();
 
     @Test(expected = CheckstyleException.class)
-    public void testNoSuchAttribute() throws CheckstyleException
-    {
+    public void testNoSuchAttribute() throws CheckstyleException {
         conf.addAttribute("NonExisting", "doesn't matter");
         testBean.configure(conf);
     }

@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
 import static com.puppycrawl.tools.checkstyle.checks.coding.FinalLocalVariableCheck.MSG_KEY;
@@ -28,11 +29,9 @@ import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 
 public class FinalLocalVariableCheckTest
-    extends BaseCheckTestSupport
-{
+    extends BaseCheckTestSupport {
     @Test
-    public void testDefault() throws Exception
-    {
+    public void testDefault() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(FinalLocalVariableCheck.class);
 
@@ -60,8 +59,7 @@ public class FinalLocalVariableCheckTest
     }
 
     @Test
-    public void testParameter() throws Exception
-    {
+    public void testParameter() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(FinalLocalVariableCheck.class);
         checkConfig.addAttribute("tokens", "PARAMETER_DEF");
@@ -75,8 +73,7 @@ public class FinalLocalVariableCheckTest
     }
 
     @Test
-    public void testNativeMethods() throws Exception
-    {
+    public void testNativeMethods() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(FinalLocalVariableCheck.class);
         checkConfig.addAttribute("tokens", "PARAMETER_DEF");
@@ -88,8 +85,7 @@ public class FinalLocalVariableCheckTest
     }
 
     @Test
-    public void testFalsePositive() throws Exception
-    {
+    public void testFalsePositive() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(FinalLocalVariableCheck.class);
         checkConfig.addAttribute("tokens", "VARIABLE_DEF, PARAMETER_DEF");
@@ -99,9 +95,9 @@ public class FinalLocalVariableCheckTest
         };
         verify(checkConfig, getPath("coding/InputFinalLocalVariableCheckFalsePositive.java"), expected);
     }
+
     @Test
-    public void testEnhancedForLoopVariableTrue() throws Exception
-    {
+    public void testEnhancedForLoopVariableTrue() throws Exception {
         final DefaultConfiguration checkConfig =
                 createCheckConfig(FinalLocalVariableCheck.class);
         checkConfig.addAttribute("tokens", "VARIABLE_DEF, PARAMETER_DEF");
@@ -112,9 +108,9 @@ public class FinalLocalVariableCheckTest
         };
         verify(checkConfig, getPath("coding/InputFinalLocalVariableEnhancedForLoopVariable.java"), expected);
     }
+
     @Test
-    public void testEnhancedForLoopVariableFalse() throws Exception
-    {
+    public void testEnhancedForLoopVariableFalse() throws Exception {
         final DefaultConfiguration checkConfig =
                 createCheckConfig(FinalLocalVariableCheck.class);
         checkConfig.addAttribute("tokens", "VARIABLE_DEF, PARAMETER_DEF");
@@ -126,14 +122,13 @@ public class FinalLocalVariableCheckTest
 
     @Test
     public void testLambda()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(FinalLocalVariableCheck.class);
         checkConfig.addAttribute("tokens", "PARAMETER_DEF,VARIABLE_DEF");
         final String[] expected = {};
         verify(checkConfig, new File("src/test/resources-noncompilable/com/puppycrawl/"
-                + "tools/checkstyle/naming/InputFinalLocalVariableNameLambda.java").
-                getCanonicalPath(), expected);
+                + "tools/checkstyle/naming/InputFinalLocalVariableNameLambda.java")
+                .getCanonicalPath(), expected);
     }
 }

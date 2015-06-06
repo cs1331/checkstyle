@@ -16,9 +16,11 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks;
 
 import com.google.common.collect.Lists;
+import com.puppycrawl.tools.checkstyle.Utils;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.FullIdent;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
@@ -31,11 +33,19 @@ import java.util.List;
  * @author <a href="mailto:simon@redhillconsulting.com.au">Simon Harris</a>
  * @author o_sukhodolsky
  */
-public final class CheckUtils
-{
+public final class CheckUtils {
+    // constants for parseDouble()
+    /** octal radix */
+    private static final int BASE_8 = 8;
+
+    /** decimal radix */
+    private static final int BASE_10 = 10;
+
+    /** hex radix */
+    private static final int BASE_16 = 16;
+
     /** prevent instances */
-    private CheckUtils()
-    {
+    private CheckUtils() {
         throw new UnsupportedOperationException();
     }
 
@@ -45,8 +55,7 @@ public final class CheckUtils
      * Precondition: ast is a TokenTypes.METHOD_DEF node.
      * @return true if ast defines an equals covariant.
      */
-    public static boolean isEqualsMethod(DetailAST ast)
-    {
+    public static boolean isEqualsMethod(DetailAST ast) {
         if (ast.getType() != TokenTypes.METHOD_DEF) {
             // A node must be method def
             return false;
@@ -55,8 +64,7 @@ public final class CheckUtils
         // non-static, non-abstract?
         final DetailAST modifiers = ast.findFirstToken(TokenTypes.MODIFIERS);
         if (modifiers.branchContains(TokenTypes.LITERAL_STATIC)
-            || modifiers.branchContains(TokenTypes.ABSTRACT))
-        {
+            || modifiers.branchContains(TokenTypes.ABSTRACT)) {
             return false;
         }
 
@@ -77,8 +85,7 @@ public final class CheckUtils
      * @param ast the token to check
      * @return whether it is
      */
-    public static boolean isElseIf(DetailAST ast)
-    {
+    public static boolean isElseIf(DetailAST ast) {
         final DetailAST parentAST = ast.getParent();
 
         return ast.getType() == TokenTypes.LITERAL_IF
@@ -90,8 +97,7 @@ public final class CheckUtils
      * @param ast the token to check
      * @return whether the token represents an ELSE
      */
-    private static boolean isElse(DetailAST ast)
-    {
+    private static boolean isElse(DetailAST ast) {
         return ast.getType() == TokenTypes.LITERAL_ELSE;
     }
 
@@ -101,8 +107,7 @@ public final class CheckUtils
      * @param ast the token to check
      * @return whether the toke does represent an SLIST as part of an ELSE
      */
-    private static boolean isElseWithCurlyBraces(DetailAST ast)
-    {
+    private static boolean isElseWithCurlyBraces(DetailAST ast) {
         return ast.getType() == TokenTypes.SLIST
             && ast.getChildCount() == 2
             && isElse(ast.getParent());
@@ -113,8 +118,7 @@ public final class CheckUtils
      * @param typeAST a type node.
      * @return <code>FullIdent</code> for given type.
      */
-    public static FullIdent createFullType(DetailAST typeAST)
-    {
+    public static FullIdent createFullType(DetailAST typeAST) {
         final DetailAST arrayDeclAST =
             typeAST.findFirstToken(TokenTypes.ARRAY_DECLARATOR);
 
@@ -126,20 +130,9 @@ public final class CheckUtils
      * @param typeAST a type node (no array)
      * @return <code>FullIdent</code> for given type.
      */
-    private static FullIdent createFullTypeNoArrays(DetailAST typeAST)
-    {
+    private static FullIdent createFullTypeNoArrays(DetailAST typeAST) {
         return FullIdent.createFullIdent(typeAST.getFirstChild());
     }
-
-    // constants for parseDouble()
-    /** octal radix */
-    private static final int BASE_8 = 8;
-
-    /** decimal radix */
-    private static final int BASE_10 = 10;
-
-    /** hex radix */
-    private static final int BASE_16 = 16;
 
     /**
      * Returns the value represented by the specified string of the specified
@@ -149,8 +142,7 @@ public final class CheckUtils
      * {@link com.puppycrawl.tools.checkstyle.api.TokenTypes}.
      * @return the double value represented by the string argument.
      */
-    public static double parseDouble(String text, int type)
-    {
+    public static double parseDouble(String text, int type) {
         String txt = text.replaceAll("_", "");
         double result = 0;
         switch (type) {
@@ -169,7 +161,7 @@ public final class CheckUtils
                     radix = BASE_8;
                     txt = txt.substring(1);
                 }
-                if (txt.endsWith("L") || txt.endsWith("l")) {
+                if (Utils.endsWithChar(txt, 'L') || Utils.endsWithChar(txt, 'l')) {
                     txt = txt.substring(0, txt.length() - 1);
                 }
                 if (txt.length() > 0) {
@@ -198,8 +190,7 @@ public final class CheckUtils
      * @return the integer represented by the string argument in the specified
      * radix.
      */
-    public static int parseInt(String text, int radix)
-    {
+    public static int parseInt(String text, int radix) {
         int result = 0;
         final int max = text.length();
         for (int i = 0; i < max; i++) {
@@ -221,8 +212,7 @@ public final class CheckUtils
      * @return the long represented by the string argument in the specified
      * radix.
      */
-    public static long parseLong(String text, int radix)
-    {
+    public static long parseLong(String text, int radix) {
         long result = 0;
         final int max = text.length();
         for (int i = 0; i < max; i++) {
@@ -241,8 +231,7 @@ public final class CheckUtils
      * {@link com.puppycrawl.tools.checkstyle.api.TokenTypes}.
      * @return the float value represented by the string argument.
      */
-    public static double parseFloat(String text, int type)
-    {
+    public static double parseFloat(String text, int type) {
         return (float) parseDouble(text, type);
     }
 
@@ -251,16 +240,14 @@ public final class CheckUtils
      * @param node the root of tree for search.
      * @return sub-node with minimal (line, column) pair.
      */
-    public static DetailAST getFirstNode(final DetailAST node)
-    {
+    public static DetailAST getFirstNode(final DetailAST node) {
         DetailAST currentNode = node;
         DetailAST child = node.getFirstChild();
         while (child != null) {
             final DetailAST newNode = getFirstNode(child);
             if (newNode.getLineNo() < currentNode.getLineNo()
                 || newNode.getLineNo() == currentNode.getLineNo()
-                    && newNode.getColumnNo() < currentNode.getColumnNo())
-            {
+                    && newNode.getColumnNo() < currentNode.getColumnNo()) {
                 currentNode = newNode;
             }
             child = child.getNextSibling();
@@ -274,8 +261,7 @@ public final class CheckUtils
      * @param node the parameterised AST node
      * @return a list of type parameter names
      */
-    public static List<String> getTypeParameterNames(final DetailAST node)
-    {
+    public static List<String> getTypeParameterNames(final DetailAST node) {
         final DetailAST typeParameters =
             node.findFirstToken(TokenTypes.TYPE_PARAMETERS);
 
@@ -304,8 +290,7 @@ public final class CheckUtils
      * @param node the parameterised AST node
      * @return a list of type parameter names
      */
-    public static List<DetailAST> getTypeParameters(final DetailAST node)
-    {
+    public static List<DetailAST> getTypeParameters(final DetailAST node) {
         final DetailAST typeParameters =
             node.findFirstToken(TokenTypes.TYPE_PARAMETERS);
 

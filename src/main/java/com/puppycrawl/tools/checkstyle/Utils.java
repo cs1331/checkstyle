@@ -16,31 +16,70 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle;
 
+import com.google.common.collect.ImmutableMap;
+import com.puppycrawl.tools.checkstyle.api.TokenTypes;
+import org.apache.commons.beanutils.ConversionException;
+
 import java.io.File;
+import java.lang.reflect.Field;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ResourceBundle;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-
-import org.apache.commons.beanutils.ConversionException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 
 /**
  * Contains utility methods.
  *
  * @author <a href="mailto:nesterenko-aleksey@list.ru">Aleksey Nesterenko</a>
  */
-public final class Utils
-{
-    /** Shared instance of logger for exception logging. */
-    private static final Log EXCEPTION_LOG =
-        LogFactory.getLog("com.puppycrawl.tools.checkstyle.ExceptionLog");
+public final class Utils {
+
+    /** maps from a token name to value */
+    private static final ImmutableMap<String, Integer> TOKEN_NAME_TO_VALUE;
+    /** maps from a token value to name */
+    private static final String[] TOKEN_VALUE_TO_NAME;
+
+    // initialise the constants
+    static {
+        final ImmutableMap.Builder<String, Integer> builder =
+                ImmutableMap.builder();
+        final Field[] fields = TokenTypes.class.getDeclaredFields();
+        String[] tempTokenValueToName = new String[0];
+        for (final Field f : fields) {
+            // Only process the int declarations.
+            if (f.getType() != Integer.TYPE) {
+                continue;
+            }
+
+            final String name = f.getName();
+            try {
+                final int tokenValue = f.getInt(name);
+                builder.put(name, tokenValue);
+                if (tokenValue > tempTokenValueToName.length - 1) {
+                    final String[] temp = new String[tokenValue + 1];
+                    System.arraycopy(tempTokenValueToName, 0,
+                            temp, 0, tempTokenValueToName.length);
+                    tempTokenValueToName = temp;
+                }
+                tempTokenValueToName[tokenValue] = name;
+            }
+            catch (final IllegalArgumentException | IllegalAccessException e) {
+                throw new IllegalStateException(
+                        "Failed to instantiate collection of Java tokens", e);
+            }
+        }
+
+        TOKEN_NAME_TO_VALUE = builder.build();
+        TOKEN_VALUE_TO_NAME = tempTokenValueToName;
+    }
+
 
     /** stop instances being created **/
-    private Utils()
-    {
+    private Utils() {
     }
 
     /**
@@ -50,8 +89,7 @@ public final class Utils
      * @param fileExtensions files extensions, empty property in config makes it matches to all.
      * @return whether there is a match.
      */
-    public static boolean fileExtensionMatches(File file, String[] fileExtensions)
-    {
+    public static boolean fileExtensionMatches(File file, String... fileExtensions) {
         boolean result = false;
         if (fileExtensions == null || fileExtensions.length == 0) {
             result = true;
@@ -61,7 +99,7 @@ public final class Utils
             final String[] withDotExtensions = new String[fileExtensions.length];
             for (int i = 0; i < fileExtensions.length; i++) {
                 final String extension = fileExtensions[i];
-                if (extension.startsWith(".")) {
+                if (startsWithChar(extension, '.')) {
                     withDotExtensions[i] = extension;
                 }
                 else {
@@ -81,17 +119,6 @@ public final class Utils
     }
 
     /**
-     * Accessor for shared instance of logger which should be
-     * used to log all exceptions occurred during <code>FileSetCheck</code>
-     * work (<code>debug()</code> should be used).
-     * @return shared exception logger.
-     */
-    public static Log getExceptionLogger()
-    {
-        return EXCEPTION_LOG;
-    }
-
-    /**
      * Returns whether the specified string contains only whitespace up to the
      * specified index.
      *
@@ -99,8 +126,7 @@ public final class Utils
      * @param line the line to check
      * @return whether there is only whitespace
      */
-    public static boolean whitespaceBefore(int index, String line)
-    {
+    public static boolean whitespaceBefore(int index, String line) {
         for (int i = 0; i < index; i++) {
             if (!Character.isWhitespace(line.charAt(i))) {
                 return false;
@@ -116,8 +142,7 @@ public final class Utils
      * @param line the string to process
      * @return the length of the string ignoring all trailing whitespace
      **/
-    public static int lengthMinusTrailingWhitespace(String line)
-    {
+    public static int lengthMinusTrailingWhitespace(String line) {
         int len = line.length();
         for (int i = len - 1; i >= 0; i--) {
             if (!Character.isWhitespace(line.charAt(i))) {
@@ -139,8 +164,7 @@ public final class Utils
      */
     public static int lengthExpandedTabs(String string,
                                          int toIdx,
-                                         int tabWidth)
-    {
+                                         int tabWidth) {
         int len = 0;
         for (int idx = 0; idx < toIdx; idx++) {
             if (string.charAt(idx) == '\t') {
@@ -159,8 +183,7 @@ public final class Utils
      *        string to validate
      * @return true if the pattern is valid false otherwise
      */
-    public static boolean isPatternValid(String pattern)
-    {
+    public static boolean isPatternValid(String pattern) {
         try {
             Pattern.compile(pattern);
         }
@@ -177,8 +200,7 @@ public final class Utils
      * @throws ConversionException if unable to create Pattern object.
      **/
     public static Pattern createPattern(String pattern)
-        throws ConversionException
-    {
+        throws ConversionException {
         try {
             return Pattern.compile(pattern);
         }
@@ -189,33 +211,129 @@ public final class Utils
     }
 
     /**
-     * @return the base class name from a fully qualified name
      * @param type the fully qualified name. Cannot be null
+     * @return the base class name from a fully qualified name
      */
-    public static String baseClassname(String type)
-    {
-        final int i = type.lastIndexOf(".");
+    public static String baseClassname(String type) {
+        final int i = type.lastIndexOf('.');
         return i == -1 ? type : type.substring(i + 1);
     }
 
     /**
-     * Create a stripped down version of a filename.
-     * @param basedir the prefix to strip off the original filename
-     * @param fileName the original filename
-     * @return the filename where an initial prefix of basedir is stripped
+     * Constructs a normalized relative path between base directory and a given path.
+     * @param baseDirectory the base path to which given path is relativized
+     * @param path the path to relativize against base directory
+     * @return the relative normalized path between base directory and path or path if base
+     * directory is null
      */
-    public static String getStrippedFileName(
-            final String basedir, final String fileName)
-    {
-        final String stripped;
-        if (basedir == null || !fileName.startsWith(basedir)) {
-            stripped = fileName;
+    public static String relativizeAndNormalizePath(final String baseDirectory, final String path) {
+        if (baseDirectory == null) {
+            return path;
         }
-        else {
-            // making the assumption that there is text after basedir
-            final int skipSep = basedir.endsWith(File.separator) ? 0 : 1;
-            stripped = fileName.substring(basedir.length() + skipSep);
+        final Path pathAbsolute = Paths.get(path).normalize();
+        final Path pathBase = Paths.get(baseDirectory).normalize();
+        return pathBase.relativize(pathAbsolute).toString();
+    }
+
+    /**
+     * Tests if this string starts with the specified prefix.
+     * <p/>
+     * It is faster version of {@link String#startsWith(String)} optimized for one-character
+     * prefixes at the expense of some readability. Suggested by SimplifyStartsWith PMD rule:
+     * http://pmd.sourceforge.net/pmd-5.3.1/pmd-java/rules/java/optimizations.html#SimplifyStartsWith
+     *
+     * @param string the <code>String</code> to check
+     * @param prefix the prefix to find
+     * @return <code>true</code> if the <code>char</code> is a prefix of the given
+     * <code>String</code>; <code>false</code> otherwise.
+     */
+    public static boolean startsWithChar(String string, char prefix) {
+        return string.length() > 0 && string.charAt(0) == prefix;
+    }
+
+    /**
+     * Tests if this string ends with the specified suffix.
+     * <p/>
+     * It is faster version of {@link String#endsWith(String)} optimized for one-character
+     * suffixes at the expense of some readability. Suggested by SimplifyStartsWith PMD rule:
+     * http://pmd.sourceforge.net/pmd-5.3.1/pmd-java/rules/java/optimizations.html#SimplifyStartsWith
+     *
+     * @param string the <code>String</code> to check
+     * @param suffix the suffix to find
+     * @return <code>true</code> if the <code>char</code> is a suffix of the given
+     * <code>String</code>; <code>false</code> otherwise.
+     */
+    public static boolean endsWithChar(String string, char suffix) {
+        return string.length() > 0 && string.charAt(string.length() - 1) == suffix;
+    }
+
+    /**
+     * Returns the name of a token for a given ID.
+     * @param iD the ID of the token name to get
+     * @return a token name
+     */
+    public static String getTokenName(int iD) {
+        if (iD > TOKEN_VALUE_TO_NAME.length - 1) {
+            throw new IllegalArgumentException("given id " + iD);
         }
-        return stripped;
+        final String name = TOKEN_VALUE_TO_NAME[iD];
+        if (name == null) {
+            throw new IllegalArgumentException("given id " + iD);
+        }
+        return name;
+    }
+
+    /**
+     * Returns the ID of a token for a given name.
+     * @param name the name of the token ID to get
+     * @return a token ID
+     */
+    public static int getTokenId(String name) {
+        final Integer id = TOKEN_NAME_TO_VALUE.get(name);
+        if (id == null) {
+            throw new IllegalArgumentException("given name " + name);
+        }
+        return id.intValue();
+    }
+
+    /**
+     * Returns the short description of a token for a given name.
+     * @param name the name of the token ID to get
+     * @return a short description
+     */
+    public static String getShortDescription(String name) {
+        if (!TOKEN_NAME_TO_VALUE.containsKey(name)) {
+            throw new IllegalArgumentException("given name " + name);
+        }
+
+        final String tokentypes =
+            "com.puppycrawl.tools.checkstyle.api.tokentypes";
+        final ResourceBundle bundle = ResourceBundle.getBundle(tokentypes);
+        return bundle.getString(name);
+    }
+
+    /**
+     * Is argument comment-related type (SINGLE_LINE_COMMENT,
+     * BLOCK_COMMENT_BEGIN, BLOCK_COMMENT_END, COMMENT_CONTENT).
+     * @param type
+     *        token type.
+     * @return true if type is comment-related type.
+     */
+    public static boolean isCommentType(int type) {
+        return type == TokenTypes.SINGLE_LINE_COMMENT
+                || type == TokenTypes.BLOCK_COMMENT_BEGIN
+                || type == TokenTypes.BLOCK_COMMENT_END
+                || type == TokenTypes.COMMENT_CONTENT;
+    }
+
+    /**
+     * Is argument comment-related type name (SINGLE_LINE_COMMENT,
+     * BLOCK_COMMENT_BEGIN, BLOCK_COMMENT_END, COMMENT_CONTENT).
+     * @param type
+     *        token type name.
+     * @return true if type is comment-related type name.
+     */
+    public static boolean isCommentType(String type) {
+        return isCommentType(getTokenId(type));
     }
 }

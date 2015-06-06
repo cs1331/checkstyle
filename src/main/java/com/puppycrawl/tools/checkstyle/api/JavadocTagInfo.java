@@ -16,9 +16,12 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.api;
 
 import com.google.common.collect.ImmutableMap;
+import com.puppycrawl.tools.checkstyle.ScopeUtils;
+
 import java.util.Map;
 
 /**
@@ -57,17 +60,14 @@ import java.util.Map;
  *
  * @author Travis Schneeberger
  */
-public enum JavadocTagInfo
-{
+public enum JavadocTagInfo {
     /**
      * {@code @author}.
      */
-    AUTHOR("@author", "author", Type.BLOCK, true, true)
-    {
+    AUTHOR("@author", "author", Type.BLOCK, true, true) {
         /** {@inheritDoc} */
         @Override
-        public boolean isValidOn(final DetailAST ast)
-        {
+        public boolean isValidOn(final DetailAST ast) {
             final int type = ast.getType();
             return type == TokenTypes.PACKAGE_DEF
                 || type == TokenTypes.CLASS_DEF
@@ -80,12 +80,10 @@ public enum JavadocTagInfo
     /**
      * {@code {@code}}.
      */
-    CODE("{@code}", "code", Type.INLINE, true, true)
-    {
+    CODE("{@code}", "code", Type.INLINE, true, true) {
         /** {@inheritDoc} */
         @Override
-        public boolean isValidOn(final DetailAST ast)
-        {
+        public boolean isValidOn(final DetailAST ast) {
             final int type = ast.getType();
             return type == TokenTypes.PACKAGE_DEF
                 || type == TokenTypes.CLASS_DEF
@@ -102,12 +100,10 @@ public enum JavadocTagInfo
     /**
      * {@code {@docRoot}}.
      */
-    DOC_ROOT("{@docRoot}", "docRoot", Type.INLINE, true, true)
-    {
+    DOC_ROOT("{@docRoot}", "docRoot", Type.INLINE, true, true) {
         /** {@inheritDoc} */
         @Override
-        public boolean isValidOn(final DetailAST ast)
-        {
+        public boolean isValidOn(final DetailAST ast) {
             final int type = ast.getType();
             return type == TokenTypes.PACKAGE_DEF
                 || type == TokenTypes.CLASS_DEF
@@ -123,12 +119,10 @@ public enum JavadocTagInfo
     /**
      * {@code @deprecated}.
      */
-    DEPRECATED("@deprecated", "deprecated", Type.BLOCK, false, false)
-    {
+    DEPRECATED("@deprecated", "deprecated", Type.BLOCK, false, false) {
         /** {@inheritDoc} */
         @Override
-        public boolean isValidOn(final DetailAST ast)
-        {
+        public boolean isValidOn(final DetailAST ast) {
             final int type = ast.getType();
             return type == TokenTypes.CLASS_DEF
                 || type == TokenTypes.INTERFACE_DEF
@@ -146,12 +140,10 @@ public enum JavadocTagInfo
     /**
      * {@code @exception}.
      */
-    EXCEPTION("@exception", "exception", Type.BLOCK, false, false)
-    {
+    EXCEPTION("@exception", "exception", Type.BLOCK, false, false) {
         /** {@inheritDoc} */
         @Override
-        public boolean isValidOn(final DetailAST ast)
-        {
+        public boolean isValidOn(final DetailAST ast) {
             final int type = ast.getType();
             return type == TokenTypes.METHOD_DEF || type == TokenTypes.CTOR_DEF;
         }
@@ -160,12 +152,10 @@ public enum JavadocTagInfo
     /**
      * {@code {@inheritDoc}}.
      */
-    INHERIT_DOC("{@inheritDoc}", "inheritDoc", Type.INLINE, false, false)
-    {
+    INHERIT_DOC("{@inheritDoc}", "inheritDoc", Type.INLINE, false, false) {
         /** {@inheritDoc} */
         @Override
-        public boolean isValidOn(final DetailAST ast)
-        {
+        public boolean isValidOn(final DetailAST ast) {
             final int type = ast.getType();
 
             return type == TokenTypes.METHOD_DEF
@@ -178,12 +168,10 @@ public enum JavadocTagInfo
     /**
      * {@code {@link}}.
      */
-    LINK("{@link}", "link", Type.INLINE, true, true)
-    {
+    LINK("{@link}", "link", Type.INLINE, true, true) {
         /** {@inheritDoc} */
         @Override
-        public boolean isValidOn(final DetailAST ast)
-        {
+        public boolean isValidOn(final DetailAST ast) {
             final int type = ast.getType();
             return type == TokenTypes.PACKAGE_DEF
                 || type == TokenTypes.CLASS_DEF
@@ -199,12 +187,10 @@ public enum JavadocTagInfo
     /**
      * {@code {@linkplain}}.
      */
-    LINKPLAIN("{@linkplain}", "linkplain", Type.INLINE, true, true)
-    {
+    LINKPLAIN("{@linkplain}", "linkplain", Type.INLINE, true, true) {
         /** {@inheritDoc} */
         @Override
-        public boolean isValidOn(final DetailAST ast)
-        {
+        public boolean isValidOn(final DetailAST ast) {
             final int type = ast.getType();
             return type == TokenTypes.PACKAGE_DEF
                 || type == TokenTypes.CLASS_DEF
@@ -220,12 +206,10 @@ public enum JavadocTagInfo
     /**
      * {@code {@literal}}.
      */
-    LITERAL("{@literal}", "literal", Type.INLINE, true, true)
-    {
+    LITERAL("{@literal}", "literal", Type.INLINE, true, true) {
         /** {@inheritDoc} */
         @Override
-        public boolean isValidOn(final DetailAST ast)
-        {
+        public boolean isValidOn(final DetailAST ast) {
             final int type = ast.getType();
             return type == TokenTypes.PACKAGE_DEF
                 || type == TokenTypes.CLASS_DEF
@@ -241,12 +225,10 @@ public enum JavadocTagInfo
     /**
      * {@code @param}.
      */
-    PARAM("@param", "param", Type.BLOCK, false, false)
-    {
+    PARAM("@param", "param", Type.BLOCK, false, false) {
         /** {@inheritDoc} */
         @Override
-        public boolean isValidOn(final DetailAST ast)
-        {
+        public boolean isValidOn(final DetailAST ast) {
             final int type = ast.getType();
             return type == TokenTypes.CLASS_DEF
                 || type == TokenTypes.INTERFACE_DEF
@@ -258,12 +240,10 @@ public enum JavadocTagInfo
     /**
      * {@code @return}.
      */
-    RETURN("@return", "return", Type.BLOCK, false, false)
-    {
+    RETURN("@return", "return", Type.BLOCK, false, false) {
         /** {@inheritDoc} */
         @Override
-        public boolean isValidOn(final DetailAST ast)
-        {
+        public boolean isValidOn(final DetailAST ast) {
             final int type = ast.getType();
             final DetailAST returnType = ast.findFirstToken(TokenTypes.TYPE);
 
@@ -277,12 +257,10 @@ public enum JavadocTagInfo
     /**
      * {@code @see}.
      */
-    SEE("@see", "see", Type.BLOCK, true, true)
-    {
+    SEE("@see", "see", Type.BLOCK, true, true) {
         /** {@inheritDoc} */
         @Override
-        public boolean isValidOn(final DetailAST ast)
-        {
+        public boolean isValidOn(final DetailAST ast) {
             final int type = ast.getType();
             return type == TokenTypes.PACKAGE_DEF
                 || type == TokenTypes.CLASS_DEF
@@ -299,12 +277,10 @@ public enum JavadocTagInfo
     /**
      * {@code @serial}.
      */
-    SERIAL("@serial", "serial", Type.BLOCK, true, false)
-    {
+    SERIAL("@serial", "serial", Type.BLOCK, true, false) {
         /** {@inheritDoc} */
         @Override
-        public boolean isValidOn(final DetailAST ast)
-        {
+        public boolean isValidOn(final DetailAST ast) {
             final int type = ast.getType();
 
             return type == TokenTypes.VARIABLE_DEF
@@ -315,12 +291,10 @@ public enum JavadocTagInfo
     /**
      * {@code @serialData}.
      */
-    SERIAL_DATA("@serialData", "serialData", Type.BLOCK, false, false)
-    {
+    SERIAL_DATA("@serialData", "serialData", Type.BLOCK, false, false) {
         /** {@inheritDoc} */
         @Override
-        public boolean isValidOn(final DetailAST ast)
-        {
+        public boolean isValidOn(final DetailAST ast) {
             final int type = ast.getType();
             final DetailAST methodNameAst = ast
                 .findFirstToken(TokenTypes.IDENT);
@@ -340,12 +314,10 @@ public enum JavadocTagInfo
     /**
      * {@code @serialField}.
      */
-    SERIAL_FIELD("@serialField", "serialField", Type.BLOCK, false, false)
-    {
+    SERIAL_FIELD("@serialField", "serialField", Type.BLOCK, false, false) {
         /** {@inheritDoc} */
         @Override
-        public boolean isValidOn(final DetailAST ast)
-        {
+        public boolean isValidOn(final DetailAST ast) {
             final int type = ast.getType();
             final DetailAST varType = ast.findFirstToken(TokenTypes.TYPE);
 
@@ -359,12 +331,10 @@ public enum JavadocTagInfo
     /**
      * {@code @since}.
      */
-    SINCE("@since", "since", Type.BLOCK, true, true)
-    {
+    SINCE("@since", "since", Type.BLOCK, true, true) {
         /** {@inheritDoc} */
         @Override
-        public boolean isValidOn(final DetailAST ast)
-        {
+        public boolean isValidOn(final DetailAST ast) {
             final int type = ast.getType();
             return type == TokenTypes.PACKAGE_DEF
                 || type == TokenTypes.CLASS_DEF
@@ -381,12 +351,10 @@ public enum JavadocTagInfo
     /**
      * {@code @throws}.
      */
-    THROWS("@throws", "throws", Type.BLOCK, false, false)
-    {
+    THROWS("@throws", "throws", Type.BLOCK, false, false) {
         /** {@inheritDoc} */
         @Override
-        public boolean isValidOn(final DetailAST ast)
-        {
+        public boolean isValidOn(final DetailAST ast) {
             final int type = ast.getType();
             return type == TokenTypes.METHOD_DEF
                 || type == TokenTypes.CTOR_DEF;
@@ -396,12 +364,10 @@ public enum JavadocTagInfo
     /**
      * {@code {@value}}.
      */
-    VALUE("{@value}", "value", Type.INLINE, true, true)
-    {
+    VALUE("{@value}", "value", Type.INLINE, true, true) {
         /** {@inheritDoc} */
         @Override
-        public boolean isValidOn(final DetailAST ast)
-        {
+        public boolean isValidOn(final DetailAST ast) {
             final int type = ast.getType();
             return type == TokenTypes.PACKAGE_DEF
                 || type == TokenTypes.CLASS_DEF
@@ -418,12 +384,10 @@ public enum JavadocTagInfo
     /**
      * {@code @version}.
      */
-    VERSION("@version", "version", Type.BLOCK, true, true)
-    {
+    VERSION("@version", "version", Type.BLOCK, true, true) {
         /** {@inheritDoc} */
         @Override
-        public boolean isValidOn(final DetailAST ast)
-        {
+        public boolean isValidOn(final DetailAST ast) {
             final int type = ast.getType();
             return type == TokenTypes.PACKAGE_DEF
                 || type == TokenTypes.CLASS_DEF
@@ -438,8 +402,7 @@ public enum JavadocTagInfo
     /** holds tag name to tag enum mappings **/
     private static final Map<String, JavadocTagInfo> NAME_TO_TAG;
 
-    static
-    {
+    static {
         final ImmutableMap.Builder<String, JavadocTagInfo> textToTagBuilder =
             new ImmutableMap.Builder<>();
 
@@ -479,8 +442,7 @@ public enum JavadocTagInfo
      */
     private JavadocTagInfo(final String text, final String name,
         final Type type, final boolean validInPackageHtml,
-        final boolean validInOverviewHtml)
-    {
+        final boolean validInOverviewHtml) {
         this.text = text;
         this.name = name;
         this.type = type;
@@ -514,8 +476,7 @@ public enum JavadocTagInfo
      *
      * @return true if tag is valid.
      */
-    public boolean isValidInPackageHtml()
-    {
+    public boolean isValidInPackageHtml() {
         return this.validInPackageHtml;
     }
 
@@ -524,8 +485,7 @@ public enum JavadocTagInfo
      *
      * @return true if tag is valid.
      */
-    public boolean isValidInOverviewHtml()
-    {
+    public boolean isValidInOverviewHtml() {
         return this.validInOverviewHtml;
     }
 
@@ -533,8 +493,7 @@ public enum JavadocTagInfo
      * Gets the tag text.
      * @return the tag text
      */
-    public String getText()
-    {
+    public String getText() {
         return this.text;
     }
 
@@ -542,8 +501,7 @@ public enum JavadocTagInfo
      * Gets the tag name.
      * @return the tag name
      */
-    public String getName()
-    {
+    public String getName() {
         return this.name;
     }
 
@@ -551,8 +509,7 @@ public enum JavadocTagInfo
      * Gets the Tag type defined by {@link JavadocTagInfo.Type Type}.
      * @return the Tag type
      */
-    public Type getType()
-    {
+    public Type getType() {
         return this.type;
     }
 
@@ -563,10 +520,9 @@ public enum JavadocTagInfo
      * @throws NullPointerException if the text is null
      * @throws IllegalArgumentException if the text is not a valid tag
      */
-    public static JavadocTagInfo fromText(final String text)
-    {
+    public static JavadocTagInfo fromText(final String text) {
         if (text == null) {
-            throw new NullPointerException("the text is null");
+            throw new IllegalArgumentException("the text is null");
         }
 
         final JavadocTagInfo tag = TEXT_TO_TAG.get(text);
@@ -587,10 +543,9 @@ public enum JavadocTagInfo
      * @throws IllegalArgumentException if the text is not a valid tag. The name
      *    can be checked using {@link JavadocTagInfo#isValidName(String)}
      */
-    public static JavadocTagInfo fromName(final String name)
-    {
+    public static JavadocTagInfo fromName(final String name) {
         if (name == null) {
-            throw new NullPointerException("the name is null");
+            throw new IllegalArgumentException("the name is null");
         }
 
         final JavadocTagInfo tag = NAME_TO_TAG.get(name);
@@ -608,8 +563,7 @@ public enum JavadocTagInfo
      * @param name the tag name to check.
      * @return whether the provided name is for a valid tag.
      */
-    public static boolean isValidName(final String name)
-    {
+    public static boolean isValidName(final String name) {
         return NAME_TO_TAG.containsKey(name);
     }
 
@@ -617,8 +571,7 @@ public enum JavadocTagInfo
      * {@inheritDoc}
      */
     @Override
-    public String toString()
-    {
+    public String toString() {
         return "text [" + this.text + "] name [" + this.name
             + "] type [" + this.type
             + "] validInPackageHtml [" + this.validInPackageHtml
@@ -633,8 +586,7 @@ public enum JavadocTagInfo
      *
      * @author Travis Schneeberger
      */
-    public enum Type
-    {
+    public enum Type {
         /** block type. **/
         BLOCK,
 

@@ -4,6 +4,10 @@
 [![][versioneye img]][versioneye]
 [![][sonar img]][sonar]
 
+
+Members chat: [![][gitter img]][gitter]
+Contributors chat: [![https://gitter.im/checkstyle/checkstyle](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/checkstyle/checkstyle?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 ![](https://raw.githubusercontent.com/checkstyle/checkstyle/master/src/site/resources/images/logo.png)
 
 Checkstyle is a tool for
@@ -22,9 +26,11 @@ Quality reports: http://checkstyle.sourceforge.net/project-reports.html
 Feedback/Support
 ========
 
+[![https://gitter.im/checkstyle/checkstyle](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/checkstyle/checkstyle?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Please send any feedback to https://groups.google.com/forum/?hl=en#!forum/checkstyle
 
-Questions and Answers from community: http://stackoverflow.com/questions/tagged/checkstyle
+Questions and Answers from community: [![][stackoverflow img]][stackoverflow]
 
 Bugs and Feature requests: https://github.com/checkstyle/checkstyle/issues
 
@@ -57,10 +63,10 @@ directory.
 [travis img]:https://secure.travis-ci.org/checkstyle/checkstyle.png
 
 [sonar]:http://nemo.sonarqube.org/dashboard/index/com.puppycrawl.tools:checkstyle
-[sonar img]:https://dev.eclipse.org/sonar/images/sonarqube-24x100.png
+[sonar img]:https://dev.eclipse.org/sonar/images/logo.png?1400775536
 
 [coverage]:https://coveralls.io/r/checkstyle/checkstyle
-[coverage img]:https://coveralls.io/repos/checkstyle/checkstyle/badge.png
+[coverage img]:https://coveralls.io/repos/checkstyle/checkstyle/badge.svg
 
 [license]:LICENSE
 [license img]:https://img.shields.io/badge/license-GNU%20LGPL%20v2.1-blue.svg
@@ -70,3 +76,13 @@ directory.
 
 [versioneye]:https://www.versioneye.com/user/projects/5504ca834a1064774400049a
 [versioneye img]:https://www.versioneye.com/user/projects/5504ca834a1064774400049a/badge.svg
+
+[gitter]:https://gitter.im/checkstyle
+[gitter img]:http://img.shields.io/badge/gitter-JOIN%20CHAT-blue.svg
+
+[gitterpublic]:https://gitter.im/checkstyle/checkstyle
+[gitterpublic img]:https://badges.gitter.im/Join%20Chat.svg)
+
+[stackoverflow]:http://stackoverflow.com/questions/tagged/checkstyle
+[stackoverflow img]:https://img.shields.io/badge/stackoverflow-CHECKSTYLE-blue.svg
+

@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.api;
 
 import com.google.common.collect.Maps;
@@ -46,8 +47,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * @author Oliver Burn
  */
 public abstract class AbstractLoader
-    extends DefaultHandler
-{
+    extends DefaultHandler {
     /** maps public id to resolve to esource name for the DTD */
     private final Map<String, String> publicIdToResourceNameMap;
     /** parser to read XML files **/
@@ -61,8 +61,7 @@ public abstract class AbstractLoader
      * @throws ParserConfigurationException if an error occurs
      */
     protected AbstractLoader(String publicId, String dtdResourceName)
-        throws SAXException, ParserConfigurationException
-    {
+        throws SAXException, ParserConfigurationException {
         this(new HashMap<String, String>(1));
         publicIdToResourceNameMap.put(publicId, dtdResourceName);
     }
@@ -74,8 +73,7 @@ public abstract class AbstractLoader
      * @throws ParserConfigurationException if an error occurs
      */
     protected AbstractLoader(Map<String, String> publicIdToResourceNameMap)
-        throws SAXException, ParserConfigurationException
-    {
+        throws SAXException, ParserConfigurationException {
         this.publicIdToResourceNameMap =
             Maps.newHashMap(publicIdToResourceNameMap);
         final SAXParserFactory factory = SAXParserFactory.newInstance();
@@ -94,15 +92,13 @@ public abstract class AbstractLoader
      * @throws SAXException in an error occurs
      */
     public void parseInputSource(InputSource inputSource)
-        throws IOException, SAXException
-    {
+        throws IOException, SAXException {
         parser.parse(inputSource);
     }
 
     @Override
     public InputSource resolveEntity(String publicId, String systemId)
-        throws SAXException, IOException
-    {
+        throws SAXException, IOException {
         if (publicIdToResourceNameMap.keySet().contains(publicId)) {
             final String dtdResourceName =
                     publicIdToResourceNameMap.get(publicId);
@@ -120,20 +116,17 @@ public abstract class AbstractLoader
     }
 
     @Override
-    public void warning(SAXParseException ex) throws SAXException
-    {
+    public void warning(SAXParseException ex) throws SAXException {
         throw ex;
     }
 
     @Override
-    public void error(SAXParseException ex) throws SAXException
-    {
+    public void error(SAXParseException ex) throws SAXException {
         throw ex;
     }
 
     @Override
-    public void fatalError(SAXParseException ex) throws SAXException
-    {
+    public void fatalError(SAXParseException ex) throws SAXException {
         throw ex;
     }
 }

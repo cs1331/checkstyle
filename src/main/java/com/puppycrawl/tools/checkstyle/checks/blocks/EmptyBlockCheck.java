@@ -16,11 +16,13 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.blocks;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import com.puppycrawl.tools.checkstyle.checks.AbstractOptionCheck;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Checks for empty blocks. The policy to verify is specified using the {@link
@@ -36,6 +38,7 @@ import com.puppycrawl.tools.checkstyle.checks.AbstractOptionCheck;
  *  {@link TokenTypes#LITERAL_FOR LITERAL_FOR},
  *  {@link TokenTypes#STATIC_INIT STATIC_INIT},
  *  {@link TokenTypes#LITERAL_SWITCH LITERAL_SWITCH}.
+ *  {@link TokenTypes#LITERAL_SYNCHRONIZED LITERAL_SYNCHRONIZED}.
  * </p>
  *
  * <p> An example of how to configure the check is:
@@ -58,8 +61,7 @@ import com.puppycrawl.tools.checkstyle.checks.AbstractOptionCheck;
  * @author Lars Kühne
  */
 public class EmptyBlockCheck
-    extends AbstractOptionCheck<BlockOption>
-{
+    extends AbstractOptionCheck<BlockOption> {
     /**
      * A key is pointing to the warning message text in "messages.properties"
      * file.
@@ -75,14 +77,12 @@ public class EmptyBlockCheck
     /**
      * Creates a new <code>EmptyBlockCheck</code> instance.
      */
-    public EmptyBlockCheck()
-    {
+    public EmptyBlockCheck() {
         super(BlockOption.STMT, BlockOption.class);
     }
 
     @Override
-    public int[] getDefaultTokens()
-    {
+    public int[] getDefaultTokens() {
         return new int[] {
             TokenTypes.LITERAL_WHILE,
             TokenTypes.LITERAL_TRY,
@@ -94,13 +94,12 @@ public class EmptyBlockCheck
             TokenTypes.INSTANCE_INIT,
             TokenTypes.STATIC_INIT,
             TokenTypes.LITERAL_SWITCH,
-            //TODO: does this handle TokenTypes.LITERAL_SYNCHRONIZED?
+            TokenTypes.LITERAL_SYNCHRONIZED,
         };
     }
 
     @Override
-    public int[] getAcceptableTokens()
-    {
+    public int[] getAcceptableTokens() {
         return new int[] {
             TokenTypes.LITERAL_WHILE,
             TokenTypes.LITERAL_TRY,
@@ -113,17 +112,15 @@ public class EmptyBlockCheck
             TokenTypes.INSTANCE_INIT,
             TokenTypes.STATIC_INIT,
             TokenTypes.LITERAL_SWITCH,
+            TokenTypes.LITERAL_SYNCHRONIZED,
             TokenTypes.LITERAL_CASE,
-            TokenTypes.LITERAL_SWITCH,
             TokenTypes.LITERAL_DEFAULT,
             TokenTypes.ARRAY_INIT,
-            //TODO: does this handle TokenTypes.LITERAL_SYNCHRONIZED?
         };
     }
 
     @Override
-    public void visitToken(DetailAST ast)
-    {
+    public void visitToken(DetailAST ast) {
         final DetailAST slistToken = ast.findFirstToken(TokenTypes.SLIST);
         final DetailAST leftCurly = slistToken != null
                 ? slistToken : ast.findFirstToken(TokenTypes.LCURLY);
@@ -144,8 +141,7 @@ public class EmptyBlockCheck
                 }
             }
             else if (getAbstractOption() == BlockOption.TEXT
-                    && !hasText(leftCurly))
-            {
+                    && !hasText(leftCurly)) {
                 log(leftCurly.getLineNo(),
                     leftCurly.getColumnNo(),
                     MSG_KEY_BLOCK_EMPTY,
@@ -158,8 +154,7 @@ public class EmptyBlockCheck
      * @param slistAST a <code>DetailAST</code> value
      * @return whether the SLIST token contains any text.
      */
-    protected boolean hasText(final DetailAST slistAST)
-    {
+    protected boolean hasText(final DetailAST slistAST) {
         boolean retVal = false;
 
         final DetailAST rightCurly = slistAST.findFirstToken(TokenTypes.RCURLY);
@@ -175,7 +170,7 @@ public class EmptyBlockCheck
                 // Handle braces on the same line
                 final String txt = lines[slistLineNo - 1]
                     .substring(slistColNo + 1, rcurlyColNo);
-                if (txt.trim().length() != 0) {
+                if (StringUtils.isNotBlank(txt)) {
                     retVal = true;
                 }
             }
@@ -184,8 +179,7 @@ public class EmptyBlockCheck
                 if (lines[slistLineNo - 1]
                      .substring(slistColNo + 1).trim().length() != 0
                     || lines[rcurlyLineNo - 1]
-                        .substring(0, rcurlyColNo).trim().length() != 0)
-                {
+                        .substring(0, rcurlyColNo).trim().length() != 0) {
                     retVal = true;
                 }
                 else {

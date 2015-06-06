@@ -16,9 +16,12 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.api;
 
 import com.google.common.collect.Sets;
+
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -28,8 +31,7 @@ import java.util.Set;
  * @author Rick Giles
  */
 public class FilterSet
-    implements Filter
-{
+    implements Filter {
     /** filter set */
     private final Set<Filter> filters = Sets.newHashSet();
 
@@ -37,8 +39,7 @@ public class FilterSet
      * Adds a Filter to the set.
      * @param filter the Filter to add.
      */
-    public void addFilter(Filter filter)
-    {
+    public void addFilter(Filter filter) {
         filters.add(filter);
     }
 
@@ -46,8 +47,7 @@ public class FilterSet
      * Removes filter.
      * @param filter filter to remove.
      */
-    public void removeFilter(Filter filter)
-    {
+    public void removeFilter(Filter filter) {
         filters.remove(filter);
     }
 
@@ -55,37 +55,35 @@ public class FilterSet
      * Returns the Filters of the filter set.
      * @return the Filters of the filter set.
      */
-    protected Set<Filter> getFilters()
-    {
+    public Set<Filter> getFilters() {
         return filters;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return filters.toString();
     }
 
     @Override
-    public int hashCode()
-    {
-        return filters.hashCode();
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        final FilterSet filterSet = (FilterSet) o;
+        return Objects.equals(filters, filterSet.filters);
     }
 
     @Override
-    public boolean equals(Object object)
-    {
-        if (object instanceof FilterSet) {
-            final FilterSet other = (FilterSet) object;
-            return this.filters.equals(other.filters);
-        }
-        return false;
+    public int hashCode() {
+        return Objects.hash(filters);
     }
 
     /** {@inheritDoc} */
     @Override
-    public boolean accept(AuditEvent event)
-    {
+    public boolean accept(AuditEvent event) {
         for (Filter filter : filters) {
             if (!filter.accept(event)) {
                 return false;
@@ -95,8 +93,7 @@ public class FilterSet
     }
 
     /** Clears the FilterSet. */
-    public void clear()
-    {
+    public void clear() {
         filters.clear();
     }
 }

@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
@@ -26,11 +27,9 @@ import java.io.File;
 
 import static com.puppycrawl.tools.checkstyle.checks.coding.IllegalThrowsCheck.MSG_KEY;
 
-public class IllegalThrowsCheckTest extends BaseCheckTestSupport
-{
+public class IllegalThrowsCheckTest extends BaseCheckTestSupport {
     @Test
-    public void testDefault() throws Exception
-    {
+    public void testDefault() throws Exception {
         DefaultConfiguration checkConfig = createCheckConfig(IllegalThrowsCheck.class);
 
         String[] expected = {
@@ -43,8 +42,7 @@ public class IllegalThrowsCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testIllegalClassNames() throws Exception
-    {
+    public void testIllegalClassNames() throws Exception {
         DefaultConfiguration checkConfig = createCheckConfig(IllegalThrowsCheck.class);
         checkConfig.addAttribute("illegalClassNames",
                                  "java.lang.Error, java.lang.Exception, NullPointerException");
@@ -62,8 +60,7 @@ public class IllegalThrowsCheckTest extends BaseCheckTestSupport
      * @throws Exception
      */
     @Test
-    public void testIgnoreMethodNames() throws Exception
-    {
+    public void testIgnoreMethodNames() throws Exception {
         DefaultConfiguration checkConfig = createCheckConfig(IllegalThrowsCheck.class);
         checkConfig.addAttribute("ignoredMethodNames", "methodTwo");
 
@@ -80,8 +77,7 @@ public class IllegalThrowsCheckTest extends BaseCheckTestSupport
      * @throws Exception
      */
     @Test
-    public void testIllegalClassNamesWithIgnoreMethodNames() throws Exception
-    {
+    public void testIllegalClassNamesWithIgnoreMethodNames() throws Exception {
         DefaultConfiguration checkConfig = createCheckConfig(IllegalThrowsCheck.class);
         checkConfig.addAttribute("illegalClassNames",
                                  "java.lang.Error, java.lang.Exception, NullPointerException, Throwable");
@@ -101,8 +97,7 @@ public class IllegalThrowsCheckTest extends BaseCheckTestSupport
      * @throws Exception
      */
     @Test
-    public void testIgnoreOverriddenMethods() throws Exception
-    {
+    public void testIgnoreOverriddenMethods() throws Exception {
         DefaultConfiguration checkConfig = createCheckConfig(IllegalThrowsCheck.class);
 
         String[] expected = {

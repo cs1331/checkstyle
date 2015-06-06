@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.whitespace;
 
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
@@ -28,12 +29,10 @@ import static com.puppycrawl.tools.checkstyle.checks.whitespace.EmptyLineSeparat
 .MSG_SHOULD_BE_SEPARATED;
 
 public class EmptyLineSeparatorCheckTest
-    extends BaseCheckTestSupport
-{
+    extends BaseCheckTestSupport {
 
     @Test
-    public void testDefault() throws Exception
-    {
+    public void testDefault() throws Exception {
         DefaultConfiguration checkConfig = createCheckConfig(EmptyLineSeparatorCheck.class);
 
         final String[] expected = {
@@ -47,8 +46,7 @@ public class EmptyLineSeparatorCheckTest
     }
 
     @Test
-    public void testAllowNoEmptyLineBetweenFields() throws Exception
-    {
+    public void testAllowNoEmptyLineBetweenFields() throws Exception {
 
         DefaultConfiguration checkConfig = createCheckConfig(EmptyLineSeparatorCheck.class);
         checkConfig.addAttribute("allowNoEmptyLineBetweenFields", "true");
@@ -63,8 +61,7 @@ public class EmptyLineSeparatorCheckTest
     }
 
     @Test
-    public void testHeader() throws Exception
-    {
+    public void testHeader() throws Exception {
         DefaultConfiguration checkConfig = createCheckConfig(EmptyLineSeparatorCheck.class);
         final String[] expected = {
             "19: " + getCheckMessage(MSG_SHOULD_BE_SEPARATED, "package"),
@@ -73,8 +70,7 @@ public class EmptyLineSeparatorCheckTest
     }
 
     @Test
-    public void testMultipleEmptyLinesBetweenClassMembers() throws Exception
-    {
+    public void testMultipleEmptyLinesBetweenClassMembers() throws Exception {
         DefaultConfiguration checkConfig = createCheckConfig(EmptyLineSeparatorCheck.class);
         checkConfig.addAttribute("allowMultipleEmptyLines", "false");
         final String[] expected = {
@@ -88,8 +84,7 @@ public class EmptyLineSeparatorCheckTest
     }
 
     @Test
-    public void testFormerArrayIndexOutOfBounds() throws Exception
-    {
+    public void testFormerArrayIndexOutOfBounds() throws Exception {
         DefaultConfiguration checkConfig = createCheckConfig(EmptyLineSeparatorCheck.class);
         checkConfig.addAttribute("allowMultipleEmptyLines", "false");
         final String[] expected = {
@@ -99,8 +94,7 @@ public class EmptyLineSeparatorCheckTest
     }
 
     @Test
-    public void testAllowMultipleFieldInClass() throws Exception
-    {
+    public void testAllowMultipleFieldInClass() throws Exception {
         DefaultConfiguration checkConfig = createCheckConfig(EmptyLineSeparatorCheck.class);
         checkConfig.addAttribute("allowMultipleEmptyLines", "false");
         checkConfig.addAttribute("allowNoEmptyLineBetweenFields", "true");
@@ -111,8 +105,7 @@ public class EmptyLineSeparatorCheckTest
     }
 
     @Test
-    public void testAllowMultipleImportSeparatedFromPackage() throws Exception
-    {
+    public void testAllowMultipleImportSeparatedFromPackage() throws Exception {
         DefaultConfiguration checkConfig = createCheckConfig(EmptyLineSeparatorCheck.class);
         checkConfig.addAttribute("allowMultipleEmptyLines", "false");
         final String[] expected = {

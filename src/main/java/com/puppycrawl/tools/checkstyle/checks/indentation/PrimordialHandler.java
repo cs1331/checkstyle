@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.indentation;
 
 /**
@@ -23,33 +24,28 @@ package com.puppycrawl.tools.checkstyle.checks.indentation;
  *
  * @author jrichard
  */
-public class PrimordialHandler extends ExpressionHandler
-{
+public class PrimordialHandler extends ExpressionHandler {
     /**
      * Construct an instance of this handler with the given indentation check.
      *
      * @param indentCheck   the indentation check
      */
-    public PrimordialHandler(IndentationCheck indentCheck)
-    {
+    public PrimordialHandler(IndentationCheck indentCheck) {
         super(indentCheck, null, null, null);
     }
 
     @Override
-    public void checkIndentation()
-    {
+    public void checkIndentation() {
         // nothing to check
     }
 
     @Override
-    public IndentLevel suggestedChildLevel(ExpressionHandler child)
-    {
+    public IndentLevel suggestedChildLevel(ExpressionHandler child) {
         return new IndentLevel(0);
     }
 
     @Override
-    protected IndentLevel getLevelImpl()
-    {
+    protected IndentLevel getLevelImpl() {
         return new IndentLevel(0);
     }
 }

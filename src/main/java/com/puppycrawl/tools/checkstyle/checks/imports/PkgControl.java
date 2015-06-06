@@ -16,10 +16,12 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.imports;
 
 import com.google.common.collect.Lists;
-import java.util.LinkedList;
+
+import java.util.Deque;
 import java.util.List;
 
 /**
@@ -29,10 +31,9 @@ import java.util.List;
  *
  * @author Oliver Burn
  */
-class PkgControl
-{
+class PkgControl {
     /** List of {@link Guard} objects to check. */
-    private final LinkedList<Guard> guards = Lists.newLinkedList();
+    private final Deque<Guard> guards = Lists.newLinkedList();
     /** List of children {@link PkgControl} objects. */
     private final List<PkgControl> children = Lists.newArrayList();
     /** The parent. Null indicates we are the root node. */
@@ -44,8 +45,7 @@ class PkgControl
      * Construct a root node.
      * @param pkgName the name of the package.
      */
-    PkgControl(final String pkgName)
-    {
+    PkgControl(final String pkgName) {
         assert pkgName != null;
         parent = null;
         fullPackage = pkgName;
@@ -56,8 +56,7 @@ class PkgControl
      * @param parent the parent node.
      * @param subPkg the sub package name.
      */
-    PkgControl(final PkgControl parent, final String subPkg)
-    {
+    PkgControl(final PkgControl parent, final String subPkg) {
         assert parent != null;
         assert subPkg != null;
         this.parent = parent;
@@ -69,16 +68,14 @@ class PkgControl
      * Adds a guard to the node.
      * @param thug the guard to be added.
      */
-    void addGuard(final Guard thug)
-    {
+    void addGuard(final Guard thug) {
         guards.addFirst(thug);
     }
 
     /**
      * @return the full package name represented by the node.
      */
-    String getFullPackage()
-    {
+    String getFullPackage() {
         return fullPackage;
     }
 
@@ -87,8 +84,7 @@ class PkgControl
      * @param forPkg the package to search for.
      * @return the finest match, or null if no match at all.
      */
-    PkgControl locateFinest(final String forPkg)
-    {
+    PkgControl locateFinest(final String forPkg) {
         // Check if we are a match.
         // This algormithm should be improved to check for a trailing "."
         // or nothing following.
@@ -118,8 +114,7 @@ class PkgControl
      * @param inPkg the package doing the import.
      * @return an {@link AccessResult}.
      */
-    AccessResult checkAccess(final String forImport, final String inPkg)
-    {
+    AccessResult checkAccess(final String forImport, final String inPkg) {
         final AccessResult retVal = localCheckAccess(forImport, inPkg);
         if (retVal != AccessResult.UNKNOWN) {
             return retVal;
@@ -140,8 +135,7 @@ class PkgControl
      * @return an {@link AccessResult}.
      */
     private AccessResult localCheckAccess(final String forImport,
-        final String inPkg)
-    {
+        final String inPkg) {
         for (Guard g : guards) {
             // Check if a Guard is only meant to be applied locally.
             if (g.isLocalOnly() && !fullPackage.equals(inPkg)) {

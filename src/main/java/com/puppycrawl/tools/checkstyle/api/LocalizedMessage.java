@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.api;
 
 import java.io.IOException;
@@ -32,6 +33,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
+import java.util.Objects;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 import java.util.ResourceBundle.Control;
@@ -46,13 +48,9 @@ import java.util.ResourceBundle.Control;
  * @author lkuehne
  */
 public final class LocalizedMessage
-    implements Comparable<LocalizedMessage>, Serializable
-{
+    implements Comparable<LocalizedMessage>, Serializable {
     /** Required for serialization. */
     private static final long serialVersionUID = 5675176836184862150L;
-
-    /** hash function multiplicand */
-    private static final int HASH_MULT = 29;
 
     /** the locale to localise messages to **/
     private static Locale sLocale = Locale.getDefault();
@@ -64,6 +62,9 @@ public final class LocalizedMessage
     private static final Map<String, ResourceBundle> BUNDLE_CACHE =
         Collections.synchronizedMap(new HashMap<String, ResourceBundle>());
 
+    /** the default severity level if one is not specified */
+    private static final SeverityLevel DEFAULT_SEVERITY = SeverityLevel.ERROR;
+
     /** the line number **/
     private final int lineNo;
     /** the column number **/
@@ -74,9 +75,6 @@ public final class LocalizedMessage
 
     /** the id of the module generating the message. */
     private final String moduleId;
-
-    /** the default severity level if one is not specified */
-    private static final SeverityLevel DEFAULT_SEVERITY = SeverityLevel.ERROR;
 
     /** key for the message format **/
     private final String key;
@@ -92,51 +90,6 @@ public final class LocalizedMessage
 
     /** a custom message overriding the default message from the bundle. */
     private final String customMessage;
-
-    @Override
-    public boolean equals(Object object)
-    {
-        if (this == object) {
-            return true;
-        }
-        if (!(object instanceof LocalizedMessage)) {
-            return false;
-        }
-
-        final LocalizedMessage localizedMessage = (LocalizedMessage) object;
-
-        if (colNo != localizedMessage.colNo) {
-            return false;
-        }
-        if (lineNo != localizedMessage.lineNo) {
-            return false;
-        }
-        if (!key.equals(localizedMessage.key)) {
-            return false;
-        }
-
-        if (!Arrays.equals(args, localizedMessage.args)) {
-            return false;
-        }
-        // ignoring bundle for perf reasons.
-
-        // we currently never load the same error from different bundles.
-
-        return true;
-    }
-
-    @Override
-    public int hashCode()
-    {
-        int result;
-        result = lineNo;
-        result = HASH_MULT * result + colNo;
-        result = HASH_MULT * result + key.hashCode();
-        for (final Object element : args) {
-            result = HASH_MULT * result + element.hashCode();
-        }
-        return result;
-    }
 
     /**
      * Creates a new <code>LocalizedMessage</code> instance.
@@ -159,8 +112,7 @@ public final class LocalizedMessage
                             SeverityLevel severityLevel,
                             String moduleId,
                             Class<?> sourceClass,
-                            String customMessage)
-    {
+                            String customMessage) {
         this.lineNo = lineNo;
         this.colNo = colNo;
         this.key = key;
@@ -191,8 +143,7 @@ public final class LocalizedMessage
                             Object[] args,
                             String moduleId,
                             Class<?> sourceClass,
-                            String customMessage)
-    {
+                            String customMessage) {
         this(lineNo,
              colNo,
              bundle,
@@ -223,8 +174,7 @@ public final class LocalizedMessage
                             SeverityLevel severityLevel,
                             String moduleId,
                             Class<?> sourceClass,
-                            String customMessage)
-    {
+                            String customMessage) {
         this(lineNo, 0, bundle, key, args, severityLevel, moduleId,
                 sourceClass, customMessage);
     }
@@ -248,23 +198,46 @@ public final class LocalizedMessage
         Object[] args,
         String moduleId,
         Class<?> sourceClass,
-        String customMessage)
-    {
+        String customMessage) {
         this(lineNo, 0, bundle, key, args, DEFAULT_SEVERITY, moduleId,
                 sourceClass, customMessage);
     }
 
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+        if (object == null || getClass() != object.getClass()) {
+            return false;
+        }
+        final LocalizedMessage that = (LocalizedMessage) object;
+        return Objects.equals(lineNo, that.lineNo)
+                && Objects.equals(colNo, that.colNo)
+                && Objects.equals(severityLevel, that.severityLevel)
+                && Objects.equals(moduleId, that.moduleId)
+                && Objects.equals(key, that.key)
+                && Objects.equals(bundle, that.bundle)
+                && Objects.equals(sourceClass, that.sourceClass)
+                && Objects.equals(customMessage, that.customMessage)
+                && Arrays.equals(args, that.args);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(lineNo, colNo, severityLevel, moduleId, key, bundle, sourceClass,
+                customMessage, Arrays.hashCode(args));
+    }
+
     /** Clears the cache. */
-    public static void clearCache()
-    {
+    public static void clearCache() {
         synchronized (BUNDLE_CACHE) {
             BUNDLE_CACHE.clear();
         }
     }
 
     /** @return the translated message **/
-    public String getMessage()
-    {
+    public String getMessage() {
 
         final String customMessage = getCustomMessage();
         if (customMessage != null) {
@@ -293,8 +266,7 @@ public final class LocalizedMessage
      * @return the formatted custom message or <code>null</code>
      *          if there is no custom message
      */
-    private String getCustomMessage()
-    {
+    private String getCustomMessage() {
 
         if (customMessage == null) {
             return null;
@@ -310,8 +282,7 @@ public final class LocalizedMessage
      * @param bundleName the bundle name
      * @return a ResourceBundle
      */
-    private ResourceBundle getBundle(String bundleName)
-    {
+    private ResourceBundle getBundle(String bundleName) {
         synchronized (BUNDLE_CACHE) {
             ResourceBundle bundle = BUNDLE_CACHE
                     .get(bundleName);
@@ -325,26 +296,22 @@ public final class LocalizedMessage
     }
 
     /** @return the line number **/
-    public int getLineNo()
-    {
+    public int getLineNo() {
         return lineNo;
     }
 
     /** @return the column number **/
-    public int getColumnNo()
-    {
+    public int getColumnNo() {
         return colNo;
     }
 
     /** @return the severity level **/
-    public SeverityLevel getSeverityLevel()
-    {
+    public SeverityLevel getSeverityLevel() {
         return severityLevel;
     }
 
     /** @return the module identifier. */
-    public String getModuleId()
-    {
+    public String getModuleId() {
         return moduleId;
     }
 
@@ -354,21 +321,23 @@ public final class LocalizedMessage
      *
      * @return the message key
      */
-    public String getKey()
-    {
+    public String getKey() {
         return key;
     }
 
     /** @return the name of the source for this LocalizedMessage */
-    public String getSourceName()
-    {
+    public String getSourceName() {
         return sourceClass.getName();
     }
 
     /** @param locale the locale to use for localization **/
-    public static void setLocale(Locale locale)
-    {
-        sLocale = locale;
+    public static void setLocale(Locale locale) {
+        if (Locale.ENGLISH.getLanguage().equals(locale.getLanguage())) {
+            sLocale = Locale.ROOT;
+        }
+        else {
+            sLocale = locale;
+        }
     }
 
     ////////////////////////////////////////////////////////////////////////////
@@ -377,8 +346,7 @@ public final class LocalizedMessage
 
     /** {@inheritDoc} */
     @Override
-    public int compareTo(LocalizedMessage other)
-    {
+    public int compareTo(LocalizedMessage other) {
         if (getLineNo() == other.getLineNo()) {
             if (getColumnNo() == other.getColumnNo()) {
                 return getMessage().compareTo(other.getMessage());
@@ -397,13 +365,10 @@ public final class LocalizedMessage
      *
      * @author <a href="mailto:nesterenko-aleksey@list.ru">Aleksey Nesterenko</a>
      */
-    private static class UTF8Control extends Control
-    {
+    private static class UTF8Control extends Control {
         @Override
         public ResourceBundle newBundle(String aBaseName, Locale aLocale, String aFormat,
-                 ClassLoader aLoader, boolean aReload) throws IllegalAccessException,
-                  InstantiationException, IOException
-        {
+                 ClassLoader aLoader, boolean aReload) throws IOException {
             // The below is a copy of the default implementation.
             final String bundleName = toBundleName(aBaseName, aLocale);
             final String resourceName = toResourceName(bundleName, "properties");

@@ -16,29 +16,34 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.regexp;
 
+import com.google.common.base.Charsets;
+import com.google.common.io.Files;
 import com.puppycrawl.tools.checkstyle.BaseFileSetCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import org.junit.Before;
-import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+
+import java.io.File;
 
 import static com.puppycrawl.tools.checkstyle.checks.regexp.MultilineDetector.REGEXP_EXCEEDED;
 
-public class RegexpMultilineCheckTest extends BaseFileSetCheckTestSupport
-{
+public class RegexpMultilineCheckTest extends BaseFileSetCheckTestSupport {
+    @Rule public TemporaryFolder temporaryFolder = new TemporaryFolder();
+
     private DefaultConfiguration checkConfig;
 
     @Before
-    public void setUp()
-    {
+    public void setUp() {
         checkConfig = createCheckConfig(RegexpMultilineCheck.class);
     }
 
     @Test
-    public void testIt() throws Exception
-    {
+    public void testIt() throws Exception {
         final String illegal = "System\\.(out)|(err)\\.print(ln)?\\(";
         checkConfig.addAttribute("format", illegal);
         final String[] expected = {
@@ -49,8 +54,7 @@ public class RegexpMultilineCheckTest extends BaseFileSetCheckTestSupport
 
     @Test
     public void testMessageProperty()
-        throws Exception
-    {
+        throws Exception {
         final String illegal = "System\\.(out)|(err)\\.print(ln)?\\(";
         final String message = "Bad line :(";
         checkConfig.addAttribute("format", illegal);
@@ -62,8 +66,7 @@ public class RegexpMultilineCheckTest extends BaseFileSetCheckTestSupport
     }
 
     @Test
-    public void testIgnoreCaseTrue() throws Exception
-    {
+    public void testIgnoreCaseTrue() throws Exception {
         final String illegal = "SYSTEM\\.(OUT)|(ERR)\\.PRINT(LN)?\\(";
         checkConfig.addAttribute("format", illegal);
         checkConfig.addAttribute("ignoreCase", "true");
@@ -74,8 +77,7 @@ public class RegexpMultilineCheckTest extends BaseFileSetCheckTestSupport
     }
 
     @Test
-    public void testIgnoreCaseFalse() throws Exception
-    {
+    public void testIgnoreCaseFalse() throws Exception {
         final String illegal = "SYSTEM\\.(OUT)|(ERR)\\.PRINT(LN)?\\(";
         checkConfig.addAttribute("format", illegal);
         checkConfig.addAttribute("ignoreCase", "false");
@@ -84,8 +86,7 @@ public class RegexpMultilineCheckTest extends BaseFileSetCheckTestSupport
     }
 
     @Test
-    public void testIllegalFailBelowErrorLimit() throws Exception
-    {
+    public void testIllegalFailBelowErrorLimit() throws Exception {
         final String illegal = "^import";
         checkConfig.addAttribute("format", illegal);
         final String[] expected = {
@@ -96,19 +97,26 @@ public class RegexpMultilineCheckTest extends BaseFileSetCheckTestSupport
         verify(checkConfig, getPath("InputSemantic.java"), expected);
     }
 
-    // Need to fix the line endings in the input file
-    @Ignore @Test
-    public void testCarriageReturn() throws Exception
-    {
+    @Test
+    public void testCarriageReturn() throws Exception {
         final String illegal = "\\r";
         checkConfig.addAttribute("format", illegal);
         final String[] expected = {
-            "14: " + getCheckMessage(REGEXP_EXCEEDED, illegal),
-            "16: " + getCheckMessage(REGEXP_EXCEEDED, illegal),
-            "19: " + getCheckMessage(REGEXP_EXCEEDED, illegal),
-            "21: " + getCheckMessage(REGEXP_EXCEEDED, illegal),
+            "1: " + getCheckMessage(REGEXP_EXCEEDED, illegal),
+            "3: " + getCheckMessage(REGEXP_EXCEEDED, illegal),
         };
-        verify(checkConfig, getPath("InputLineBreaks.java"), expected);
+
+        final File file = temporaryFolder.newFile();
+        Files.write("first line \r\n second line \n\r third line", file, Charsets.UTF_8);
+
+        verify(checkConfig, file.getPath(), expected);
     }
 
+    @Test
+    public void testDefaultConfiguration() throws Exception {
+        final DefaultConfiguration checkConfig = createCheckConfig(RegexpMultilineCheck.class);
+        final String[] expected = {
+        };
+        verify(checkConfig, getPath("InputSemantic.java"), expected);
+    }
 }

@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.naming;
 
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
@@ -25,12 +26,10 @@ import org.junit.Test;
 import static com.puppycrawl.tools.checkstyle.checks.naming.AbstractNameCheck.MSG_INVALID_PATTERN;
 
 public class LocalFinalVariableNameCheckTest
-    extends BaseCheckTestSupport
-{
+    extends BaseCheckTestSupport {
     @Test
     public void testDefault()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(LocalFinalVariableNameCheck.class);
 
@@ -44,8 +43,7 @@ public class LocalFinalVariableNameCheckTest
 
     @Test
     public void testSet()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(LocalFinalVariableNameCheck.class);
         checkConfig.addAttribute("format", "[A-Z]+");
@@ -60,8 +58,7 @@ public class LocalFinalVariableNameCheckTest
 
     @Test
     public void testInnerClass()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(LocalFinalVariableNameCheck.class);
         final String[] expected = {};

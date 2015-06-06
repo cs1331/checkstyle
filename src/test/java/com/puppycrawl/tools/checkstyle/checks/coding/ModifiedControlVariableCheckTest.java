@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
@@ -25,11 +26,9 @@ import org.junit.Test;
 import static com.puppycrawl.tools.checkstyle.checks.coding.ModifiedControlVariableCheck.MSG_KEY;
 
 public class ModifiedControlVariableCheckTest
-    extends BaseCheckTestSupport
-{
+    extends BaseCheckTestSupport {
     @Test
-    public void testModifiedControlVariable() throws Exception
-    {
+    public void testModifiedControlVariable() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(ModifiedControlVariableCheck.class);
         final String[] expected = {
@@ -37,9 +36,12 @@ public class ModifiedControlVariableCheckTest
             "17:15: " + getCheckMessage(MSG_KEY, "i"),
             "20:37: " + getCheckMessage(MSG_KEY, "i"),
             "21:17: " + getCheckMessage(MSG_KEY, "i"),
-            "25:14: " + getCheckMessage(MSG_KEY, "j"),
             "49:15: " + getCheckMessage(MSG_KEY, "s"),
+            "56:14: " + getCheckMessage(MSG_KEY, "m"),
+            "67:15: " + getCheckMessage(MSG_KEY, "i"),
+            "68:15: " + getCheckMessage(MSG_KEY, "k"),
         };
         verify(checkConfig, getPath("coding/InputModifiedControl.java"), expected);
     }
+
 }

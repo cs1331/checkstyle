@@ -16,12 +16,13 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
 import com.puppycrawl.tools.checkstyle.api.Check;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.Scope;
-import com.puppycrawl.tools.checkstyle.api.ScopeUtils;
+import com.puppycrawl.tools.checkstyle.ScopeUtils;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -55,8 +56,7 @@ import java.util.Deque;
  *
  * @author r_auckenthaler
  */
-public class DeclarationOrderCheck extends Check
-{
+public class DeclarationOrderCheck extends Check {
 
     /**
      * A key is pointing to the warning message text in "messages.properties"
@@ -109,10 +109,9 @@ public class DeclarationOrderCheck extends Check
     /**
      * private class to encapsulate the state
      */
-    private static class ScopeState
-    {
+    private static class ScopeState {
         /** The state the check is in */
-        private int scopeState = STATE_STATIC_VARIABLE_DEF;
+        private int currentScopeState = STATE_STATIC_VARIABLE_DEF;
 
         /** The sub-state the check is in */
         private Scope declarationAccess = Scope.PUBLIC;
@@ -126,8 +125,7 @@ public class DeclarationOrderCheck extends Check
     private boolean ignoreModifiers;
 
     @Override
-    public int[] getDefaultTokens()
-    {
+    public int[] getDefaultTokens() {
         return new int[] {
             TokenTypes.CTOR_DEF,
             TokenTypes.METHOD_DEF,
@@ -137,8 +135,7 @@ public class DeclarationOrderCheck extends Check
     }
 
     @Override
-    public int[] getAcceptableTokens()
-    {
+    public int[] getAcceptableTokens() {
         return new int[] {
             TokenTypes.CTOR_DEF,
             TokenTypes.METHOD_DEF,
@@ -148,8 +145,7 @@ public class DeclarationOrderCheck extends Check
     }
 
     @Override
-    public void visitToken(DetailAST ast)
-    {
+    public void visitToken(DetailAST ast) {
         final int parentType = ast.getParent().getType();
         ScopeState state;
 
@@ -164,13 +160,13 @@ public class DeclarationOrderCheck extends Check
                 }
 
                 state = scopeStates.peek();
-                if (state.scopeState > STATE_CTOR_DEF) {
+                if (state.currentScopeState > STATE_CTOR_DEF) {
                     if (!ignoreConstructors) {
                         log(ast, MSG_CONSTRUCTOR);
                     }
                 }
                 else {
-                    state.scopeState = STATE_CTOR_DEF;
+                    state.currentScopeState = STATE_CTOR_DEF;
                 }
                 break;
 
@@ -180,44 +176,42 @@ public class DeclarationOrderCheck extends Check
                     return;
                 }
 
-                if (state.scopeState > STATE_METHOD_DEF) {
+                if (state.currentScopeState > STATE_METHOD_DEF) {
                     if (!ignoreMethods) {
                         log(ast, MSG_METHOD);
                     }
                 }
                 else {
-                    state.scopeState = STATE_METHOD_DEF;
+                    state.currentScopeState = STATE_METHOD_DEF;
                 }
                 break;
 
             case TokenTypes.MODIFIERS:
                 if (parentType != TokenTypes.VARIABLE_DEF
                     || ast.getParent().getParent().getType()
-                        != TokenTypes.OBJBLOCK)
-                {
+                        != TokenTypes.OBJBLOCK) {
                     return;
                 }
 
                 state = scopeStates.peek();
                 if (ast.findFirstToken(TokenTypes.LITERAL_STATIC) != null) {
-                    if (state.scopeState > STATE_STATIC_VARIABLE_DEF) {
+                    if (state.currentScopeState > STATE_STATIC_VARIABLE_DEF) {
                         if (!ignoreModifiers
-                            || state.scopeState > STATE_INSTANCE_VARIABLE_DEF)
-                        {
+                            || state.currentScopeState > STATE_INSTANCE_VARIABLE_DEF) {
                             log(ast, MSG_STATIC);
                         }
                     }
                     else {
-                        state.scopeState = STATE_STATIC_VARIABLE_DEF;
+                        state.currentScopeState = STATE_STATIC_VARIABLE_DEF;
                     }
                 }
                 else {
-                    if (state.scopeState > STATE_INSTANCE_VARIABLE_DEF) {
+                    if (state.currentScopeState > STATE_INSTANCE_VARIABLE_DEF) {
                         log(ast, MSG_INSTANCE);
                     }
-                    else if (state.scopeState == STATE_STATIC_VARIABLE_DEF) {
+                    else if (state.currentScopeState == STATE_STATIC_VARIABLE_DEF) {
                         state.declarationAccess = Scope.PUBLIC;
-                        state.scopeState = STATE_INSTANCE_VARIABLE_DEF;
+                        state.currentScopeState = STATE_INSTANCE_VARIABLE_DEF;
                     }
                 }
 
@@ -237,14 +231,9 @@ public class DeclarationOrderCheck extends Check
     }
 
     @Override
-    public void leaveToken(DetailAST ast)
-    {
-        switch (ast.getType()) {
-            case TokenTypes.OBJBLOCK:
-                scopeStates.pop();
-                break;
-
-            default:
+    public void leaveToken(DetailAST ast) {
+        if (ast.getType() == TokenTypes.OBJBLOCK) {
+            scopeStates.pop();
         }
     }
 
@@ -252,8 +241,7 @@ public class DeclarationOrderCheck extends Check
      * Sets whether to ignore constructors.
      * @param ignoreConstructors whether to ignore constructors.
      */
-    public void setIgnoreConstructors(boolean ignoreConstructors)
-    {
+    public void setIgnoreConstructors(boolean ignoreConstructors) {
         this.ignoreConstructors = ignoreConstructors;
     }
 
@@ -261,8 +249,7 @@ public class DeclarationOrderCheck extends Check
      * Sets whether to ignore methods.
      * @param ignoreMethods whether to ignore methods.
      */
-    public void setIgnoreMethods(boolean ignoreMethods)
-    {
+    public void setIgnoreMethods(boolean ignoreMethods) {
         this.ignoreMethods = ignoreMethods;
     }
 
@@ -270,8 +257,7 @@ public class DeclarationOrderCheck extends Check
      * Sets whether to ignore modifiers.
      * @param ignoreModifiers whether to ignore modifiers.
      */
-    public void setIgnoreModifiers(boolean ignoreModifiers)
-    {
+    public void setIgnoreModifiers(boolean ignoreModifiers) {
         this.ignoreModifiers = ignoreModifiers;
     }
 }

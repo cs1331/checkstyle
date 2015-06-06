@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.imports;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractLoader;
@@ -37,8 +38,7 @@ import org.xml.sax.SAXException;
  * Responsible for loading the contents of an import control configuration file.
  * @author Oliver Burn
  */
-final class ImportControlLoader extends AbstractLoader
-{
+final class ImportControlLoader extends AbstractLoader {
     /** the public ID for the configuration dtd */
     private static final String DTD_PUBLIC_ID_1_0 =
         "-//Puppy Crawl//DTD Import Control 1.0//EN";
@@ -55,11 +55,11 @@ final class ImportControlLoader extends AbstractLoader
     private static final String DTD_RESOURCE_NAME_1_1 =
         "com/puppycrawl/tools/checkstyle/checks/imports/import_control_1_1.dtd";
 
-    /** Used to hold the {@link PkgControl} objects. */
-    private final Deque<PkgControl> stack = new ArrayDeque<>();
-
     /** the map to lookup the resource name by the id */
     private static final Map<String, String> DTD_RESOURCE_BY_ID = new HashMap<>();
+
+    /** Used to hold the {@link PkgControl} objects. */
+    private final Deque<PkgControl> stack = new ArrayDeque<>();
 
     /** Initialise the map */
     static {
@@ -72,8 +72,7 @@ final class ImportControlLoader extends AbstractLoader
      * @throws SAXException if an error occurs.
      */
     private ImportControlLoader() throws ParserConfigurationException,
-            SAXException
-    {
+            SAXException {
         super(DTD_RESOURCE_BY_ID);
     }
 
@@ -82,8 +81,7 @@ final class ImportControlLoader extends AbstractLoader
                              final String locqName,
                              final String qName,
                              final Attributes atts)
-        throws SAXException
-    {
+        throws SAXException {
         if ("import-control".equals(qName)) {
             final String pkg = safeGet(atts, "pkg");
             stack.push(new PkgControl(pkg));
@@ -122,8 +120,7 @@ final class ImportControlLoader extends AbstractLoader
 
     @Override
     public void endElement(final String namespaceURI, final String localName,
-        final String qName)
-    {
+        final String qName) {
         if ("subpackage".equals(qName)) {
             assert stack.size() > 1;
             stack.pop();
@@ -136,8 +133,7 @@ final class ImportControlLoader extends AbstractLoader
      * @return the root {@link PkgControl} object.
      * @throws CheckstyleException if an error occurs.
      */
-    static PkgControl load(final URI uri) throws CheckstyleException
-    {
+    static PkgControl load(final URI uri) throws CheckstyleException {
         InputStream is = null;
         try {
             is = uri.toURL().openStream();
@@ -160,8 +156,7 @@ final class ImportControlLoader extends AbstractLoader
      * @throws CheckstyleException if an error occurs.
      */
     private static PkgControl load(final InputSource source,
-        final URI uri) throws CheckstyleException
-    {
+        final URI uri) throws CheckstyleException {
         try {
             final ImportControlLoader loader = new ImportControlLoader();
             loader.parseInputSource(source);
@@ -179,8 +174,7 @@ final class ImportControlLoader extends AbstractLoader
     /**
      * @return the root {@link PkgControl} object loaded.
      */
-    private PkgControl getRoot()
-    {
+    private PkgControl getRoot() {
         assert stack.size() == 1;
         return stack.peek();
     }
@@ -194,8 +188,7 @@ final class ImportControlLoader extends AbstractLoader
      * @throws SAXException if the attribute does not exist.
      */
     private String safeGet(final Attributes atts, final String name)
-        throws SAXException
-    {
+        throws SAXException {
         final String retVal = atts.getValue(name);
         if (retVal == null) {
             throw new SAXException("missing attribute " + name);

@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.filters;
 
 import com.puppycrawl.tools.checkstyle.api.AuditEvent;
@@ -23,6 +24,8 @@ import com.puppycrawl.tools.checkstyle.api.AutomaticBean;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 import com.puppycrawl.tools.checkstyle.api.Filter;
 import com.puppycrawl.tools.checkstyle.api.FilterSet;
+
+import java.util.Objects;
 
 /**
  * <p>
@@ -33,8 +36,7 @@ import com.puppycrawl.tools.checkstyle.api.FilterSet;
  */
 public class SuppressionFilter
     extends AutomaticBean
-    implements Filter
-{
+    implements Filter {
     /** set of individual suppresses */
     private FilterSet filters = new FilterSet();
 
@@ -44,37 +46,30 @@ public class SuppressionFilter
      * @throws CheckstyleException if there is an error.
      */
     public void setFile(String fileName)
-        throws CheckstyleException
-    {
+        throws CheckstyleException {
         filters = SuppressionsLoader.loadSuppressions(fileName);
     }
 
     /** {@inheritDoc} */
     @Override
-    public boolean accept(AuditEvent event)
-    {
+    public boolean accept(AuditEvent event) {
         return filters.accept(event);
     }
 
     @Override
-    public String toString()
-    {
-        return filters.toString();
-    }
-
-    @Override
-    public int hashCode()
-    {
-        return filters.hashCode();
-    }
-
-    @Override
-    public boolean equals(Object object)
-    {
-        if (object instanceof SuppressionFilter) {
-            final SuppressionFilter other = (SuppressionFilter) object;
-            return this.filters.equals(other.filters);
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
         }
-        return false;
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        final SuppressionFilter that = (SuppressionFilter) obj;
+        return Objects.equals(filters, that.filters);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(filters);
     }
 }

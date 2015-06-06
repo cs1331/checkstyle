@@ -16,21 +16,22 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.design;
 
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
+import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import org.junit.Test;
 
 import static com.puppycrawl.tools.checkstyle.checks.design.InterfaceIsTypeCheck.MSG_KEY;
+import static org.junit.Assert.assertArrayEquals;
 
 public class InterfaceIsTypeCheckTest
-    extends BaseCheckTestSupport
-{
+    extends BaseCheckTestSupport {
     @Test
     public void testDefault()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(InterfaceIsTypeCheck.class);
         final String[] expected = {
@@ -41,8 +42,7 @@ public class InterfaceIsTypeCheckTest
 
     @Test
     public void testAllowMarker()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(InterfaceIsTypeCheck.class);
         checkConfig.addAttribute("allowMarkerInterfaces", "false");
@@ -53,4 +53,17 @@ public class InterfaceIsTypeCheckTest
         verify(checkConfig, getPath("InputInterfaceIsType.java"), expected);
     }
 
+    @Test
+    public void testGetAcceptableTokens() {
+        InterfaceIsTypeCheck obj = new InterfaceIsTypeCheck();
+        int[] expected = {TokenTypes.INTERFACE_DEF};
+        assertArrayEquals(expected, obj.getAcceptableTokens());
+    }
+
+    @Test
+    public void testGetRequiredTokens() {
+        InterfaceIsTypeCheck obj = new InterfaceIsTypeCheck();
+        int[] expected = {TokenTypes.INTERFACE_DEF};
+        assertArrayEquals(expected, obj.getRequiredTokens());
+    }
 }

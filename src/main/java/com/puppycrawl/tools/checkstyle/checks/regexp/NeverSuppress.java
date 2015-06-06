@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.regexp;
 
 /**
@@ -23,20 +24,17 @@ package com.puppycrawl.tools.checkstyle.checks.regexp;
  * match.
  * @author oliver
  */
-public final class NeverSuppress implements MatchSuppressor
-{
+public final class NeverSuppress implements MatchSuppressor {
     /** The shared instance. */
     public static final MatchSuppressor INSTANCE = new NeverSuppress();
 
     /** Stop creation of instances. */
-    private NeverSuppress()
-    {
+    private NeverSuppress() {
     }
 
     /** {@inheritDoc} */
     public boolean shouldSuppress(int startLineNo, int startColNo,
-            int endLineNo, int endColNo)
-    {
+            int endLineNo, int endColNo) {
         return false;
     }
 }

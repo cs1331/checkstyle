@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks;
 
 import com.puppycrawl.tools.checkstyle.api.Check;
@@ -34,8 +35,7 @@ import org.apache.commons.beanutils.ConversionException;
  * @author Oliver Burn
  */
 public abstract class AbstractFormatCheck
-    extends Check
-{
+    extends Check {
     /** the flags to create the regular expression with */
     private int compileFlags;
     /** the regexp to match against */
@@ -50,8 +50,7 @@ public abstract class AbstractFormatCheck
      * @throws ConversionException unable to parse defaultFormat
      */
     public AbstractFormatCheck(String defaultFormat)
-        throws ConversionException
-    {
+        throws ConversionException {
         this(defaultFormat, 0);
     }
 
@@ -63,8 +62,7 @@ public abstract class AbstractFormatCheck
      * @throws ConversionException unable to parse defaultFormat
      */
     public AbstractFormatCheck(String defaultFormat, int compileFlags)
-        throws ConversionException
-    {
+        throws ConversionException {
         updateRegexp(defaultFormat, compileFlags);
     }
 
@@ -74,8 +72,7 @@ public abstract class AbstractFormatCheck
      * @throws ConversionException unable to parse format
      */
     public final void setFormat(String format)
-        throws ConversionException
-    {
+        throws ConversionException {
         updateRegexp(format, compileFlags);
     }
 
@@ -83,20 +80,17 @@ public abstract class AbstractFormatCheck
      * Set the compile flags for the regular expression.
      * @param compileFlags the compile flags to use.
      */
-    public final void setCompileFlags(int compileFlags)
-    {
+    public final void setCompileFlags(int compileFlags) {
         updateRegexp(format, compileFlags);
     }
 
     /** @return the regexp to match against */
-    public final Pattern getRegexp()
-    {
+    public final Pattern getRegexp() {
         return regexp;
     }
 
     /** @return the regexp format */
-    public final String getFormat()
-    {
+    public final String getFormat() {
         return format;
     }
 
@@ -106,8 +100,7 @@ public abstract class AbstractFormatCheck
      * @param format the format of the regular expression.
      * @param compileFlagsParam the compiler flags to use.
      */
-    private void updateRegexp(String format, int compileFlagsParam)
-    {
+    private void updateRegexp(String format, int compileFlagsParam) {
         try {
             regexp = Pattern.compile(format, compileFlagsParam);
             this.format = format;

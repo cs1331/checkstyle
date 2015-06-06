@@ -16,7 +16,10 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks;
+
+import java.util.Locale;
 
 import org.apache.commons.beanutils.ConversionException;
 
@@ -28,13 +31,12 @@ import com.puppycrawl.tools.checkstyle.api.Check;
  * representation to the {@link Enum} is to {@link String#trim()} the string
  * and convert using {@link String#toUpperCase()} and then look up using
  * {@link Enum#valueOf}.
- * @param <T> the type of the option.
  * @author Oliver Burn
  * @author Rick Giles
+ * @param <T> the type of the option.
  */
 public abstract class AbstractOptionCheck<T extends Enum<T>>
-    extends Check
-{
+    extends Check {
     /** Since I cannot get this by going <tt>T.class</tt>. */
     private final Class<T> optionClass;
     /** the policy to enforce */
@@ -46,8 +48,7 @@ public abstract class AbstractOptionCheck<T extends Enum<T>>
      * @param optionClass the class for the option. Required due to a quirk
      *        in the Java language.
      */
-    public AbstractOptionCheck(T literalDefault, Class<T> optionClass)
-    {
+    public AbstractOptionCheck(T literalDefault, Class<T> optionClass) {
         option = literalDefault;
         this.optionClass = optionClass;
     }
@@ -57,10 +58,9 @@ public abstract class AbstractOptionCheck<T extends Enum<T>>
      * @param optionStr string to decode option from
      * @throws ConversionException if unable to decode
      */
-    public void setOption(String optionStr) throws ConversionException
-    {
+    public void setOption(String optionStr) throws ConversionException {
         try {
-            option = Enum.valueOf(optionClass, optionStr.trim().toUpperCase());
+            option = Enum.valueOf(optionClass, optionStr.trim().toUpperCase(Locale.ENGLISH));
         }
         catch (IllegalArgumentException iae) {
             throw new ConversionException("unable to parse " + option, iae);
@@ -70,8 +70,7 @@ public abstract class AbstractOptionCheck<T extends Enum<T>>
     /**
      * @return the <code>AbstractOption</code> set
      */
-    public T getAbstractOption()
-    {
+    public T getAbstractOption() {
         // WARNING!! Do not rename this method to getOption(). It breaks
         // BeanUtils, which will silently not call setOption. Very annoying!
         return option;

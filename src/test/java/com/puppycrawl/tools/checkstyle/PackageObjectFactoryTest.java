@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle;
 
 import static org.junit.Assert.assertEquals;
@@ -31,16 +32,14 @@ import org.junit.Test;
  * Enter a description of class PackageObjectFactoryTest.java.
  * @author Rick Giles
  */
-public class PackageObjectFactoryTest
-{
+public class PackageObjectFactoryTest {
 
     private final PackageObjectFactory factory = new PackageObjectFactory(
             new HashSet<String>(), Thread.currentThread().getContextClassLoader());
 
     @Test
     public void testMakeObjectFromName()
-        throws CheckstyleException
-    {
+        throws CheckstyleException {
         final Checker checker =
             (Checker) factory.createModule(
                         "com.puppycrawl.tools.checkstyle.Checker");
@@ -49,8 +48,7 @@ public class PackageObjectFactoryTest
 
     @Test
     public void testMakeCheckFromName()
-        throws CheckstyleException
-    {
+        throws CheckstyleException {
         final ConstantNameCheck check =
                 (ConstantNameCheck) factory.createModule(
                         "com.puppycrawl.tools.checkstyle.checks.naming.ConstantName");
@@ -59,8 +57,7 @@ public class PackageObjectFactoryTest
 
     @Test
     public void testMakeObectFromList()
-        throws CheckstyleException
-    {
+        throws CheckstyleException {
         factory.addPackage("com.");
         final Checker checker =
                 (Checker) factory.createModule(
@@ -69,8 +66,7 @@ public class PackageObjectFactoryTest
     }
 
     @Test
-    public void testMakeObectNoClass()
-    {
+    public void testMakeObectNoClass() {
         try {
             factory.createModule("NoClass");
             fail("Instantiated non-existant class");

@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
 import com.google.common.collect.Sets;
@@ -26,8 +27,7 @@ import java.util.Set;
  * Support for checks that look for usage of illegal types.
  * @author Oliver Burn
  */
-public abstract class AbstractIllegalCheck extends Check
-{
+public abstract class AbstractIllegalCheck extends Check {
     /** Illegal class names */
     private final Set<String> illegalClassNames = Sets.newHashSet();
 
@@ -35,8 +35,7 @@ public abstract class AbstractIllegalCheck extends Check
      * Constructs an object.
      * @param initialNames the initial class names to treat as illegal
      */
-    protected AbstractIllegalCheck(final String[] initialNames)
-    {
+    protected AbstractIllegalCheck(final String... initialNames) {
         assert initialNames != null;
         setIllegalClassNames(initialNames);
     }
@@ -48,8 +47,7 @@ public abstract class AbstractIllegalCheck extends Check
      *            ident to check.
      * @return true if given ident is illegal.
      */
-    protected final boolean isIllegalClassName(final String ident)
-    {
+    protected final boolean isIllegalClassName(final String ident) {
         return illegalClassNames.contains(ident);
     }
 
@@ -59,16 +57,15 @@ public abstract class AbstractIllegalCheck extends Check
      * @param classNames
      *            array of illegal exception classes
      */
-    public final void setIllegalClassNames(final String[] classNames)
-    {
+    public final void setIllegalClassNames(final String... classNames) {
         assert classNames != null;
         illegalClassNames.clear();
         for (final String name : classNames) {
             illegalClassNames.add(name);
-            final int lastDot = name.lastIndexOf(".");
+            final int lastDot = name.lastIndexOf('.');
             if (lastDot > 0 && lastDot < name.length() - 1) {
                 final String shortName = name
-                        .substring(name.lastIndexOf(".") + 1);
+                        .substring(name.lastIndexOf('.') + 1);
                 illegalClassNames.add(shortName);
             }
         }

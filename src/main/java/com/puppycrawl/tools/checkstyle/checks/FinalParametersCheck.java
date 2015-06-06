@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks;
 
 import java.util.Set;
@@ -49,28 +50,13 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  * @author Michael Studman
  * @author <a href="mailto:nesterenko-aleksey@list.ru">Aleksey Nesterenko</a>
  */
-public class FinalParametersCheck extends Check
-{
+public class FinalParametersCheck extends Check {
 
     /**
      * A key is pointing to the warning message text in "messages.properties"
      * file.
      */
     public static final String MSG_KEY = "final.parameter";
-
-    /**
-     * Option to ignore primitive types as params.
-     */
-    private boolean ignorePrimitiveTypes;
-
-    /**
-     * Sets ignoring primitive types as params.
-     * @param ignorePrimitiveTypes true or false.
-     */
-    public void setIgnorePrimitiveTypes(boolean ignorePrimitiveTypes)
-    {
-        this.ignorePrimitiveTypes = ignorePrimitiveTypes;
-    }
 
     /**
      * Contains
@@ -87,9 +73,21 @@ public class FinalParametersCheck extends Check
             TokenTypes.LITERAL_BOOLEAN,
             TokenTypes.LITERAL_CHAR);
 
+    /**
+     * Option to ignore primitive types as params.
+     */
+    private boolean ignorePrimitiveTypes;
+
+    /**
+     * Sets ignoring primitive types as params.
+     * @param ignorePrimitiveTypes true or false.
+     */
+    public void setIgnorePrimitiveTypes(boolean ignorePrimitiveTypes) {
+        this.ignorePrimitiveTypes = ignorePrimitiveTypes;
+    }
+
     @Override
-    public int[] getDefaultTokens()
-    {
+    public int[] getDefaultTokens() {
         return new int[] {
             TokenTypes.METHOD_DEF,
             TokenTypes.CTOR_DEF,
@@ -97,8 +95,7 @@ public class FinalParametersCheck extends Check
     }
 
     @Override
-    public int[] getAcceptableTokens()
-    {
+    public int[] getAcceptableTokens() {
         return new int[] {
             TokenTypes.METHOD_DEF,
             TokenTypes.CTOR_DEF,
@@ -108,8 +105,7 @@ public class FinalParametersCheck extends Check
     }
 
     @Override
-    public void visitToken(DetailAST ast)
-    {
+    public void visitToken(DetailAST ast) {
         // don't flag interfaces
         final DetailAST container = ast.getParent().getParent();
         if (container.getType() == TokenTypes.INTERFACE_DEF) {
@@ -131,8 +127,7 @@ public class FinalParametersCheck extends Check
      * Checks parameters of the method or ctor.
      * @param method method or ctor to check.
      */
-    private void visitMethod(final DetailAST method)
-    {
+    private void visitMethod(final DetailAST method) {
         // exit on fast lane if there is nothing to check here
         if (!method.branchContains(TokenTypes.PARAMETER_DEF)) {
             return;
@@ -162,8 +157,7 @@ public class FinalParametersCheck extends Check
      * Checks parameter of the catch block.
      * @param catchClause catch block to check.
      */
-    private void visitCatch(final DetailAST catchClause)
-    {
+    private void visitCatch(final DetailAST catchClause) {
         checkParam(catchClause.findFirstToken(TokenTypes.PARAMETER_DEF));
     }
 
@@ -171,8 +165,7 @@ public class FinalParametersCheck extends Check
      * Checks parameter of the for each clause.
      * @param forEachClause for each clause to check.
      */
-    private void visitForEachClause(final DetailAST forEachClause)
-    {
+    private void visitForEachClause(final DetailAST forEachClause) {
         checkParam(forEachClause.findFirstToken(TokenTypes.VARIABLE_DEF));
     }
 
@@ -180,8 +173,7 @@ public class FinalParametersCheck extends Check
      * Checks if the given parameter is final.
      * @param param parameter to check.
      */
-    private void checkParam(final DetailAST param)
-    {
+    private void checkParam(final DetailAST param) {
         if (!param.branchContains(TokenTypes.FINAL) && !isIgnoredParam(param)) {
             final DetailAST paramName = param.findFirstToken(TokenTypes.IDENT);
             final DetailAST firstNode = CheckUtils.getFirstNode(param);
@@ -195,12 +187,11 @@ public class FinalParametersCheck extends Check
      * @param paramDef {@link TokenTypes#PARAMETER_DEF PARAMETER_DEF}
      * @return true if param has to be skipped.
      */
-    private boolean isIgnoredParam(DetailAST paramDef)
-    {
+    private boolean isIgnoredParam(DetailAST paramDef) {
         boolean result = false;
         if (ignorePrimitiveTypes) {
-            final DetailAST parameterType = paramDef.
-                    findFirstToken(TokenTypes.TYPE).getFirstChild();
+            final DetailAST parameterType = paramDef
+                .findFirstToken(TokenTypes.TYPE).getFirstChild();
             if (primitiveDataTypes.contains(parameterType.getType())) {
                 result = true;
             }

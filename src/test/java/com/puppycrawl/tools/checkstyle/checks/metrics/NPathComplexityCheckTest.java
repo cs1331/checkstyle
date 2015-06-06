@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.metrics;
 
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
@@ -25,11 +26,9 @@ import org.junit.Test;
 
 import static com.puppycrawl.tools.checkstyle.checks.metrics.NPathComplexityCheck.MSG_KEY;
 
-public class NPathComplexityCheckTest extends BaseCheckTestSupport
-{
+public class NPathComplexityCheckTest extends BaseCheckTestSupport {
     @Test
-    public void testCalculation() throws Exception
-    {
+    public void testCalculation() throws Exception {
         DefaultConfiguration checkConfig =
             createCheckConfig(NPathComplexityCheck.class);
 
@@ -51,8 +50,7 @@ public class NPathComplexityCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testIntegerOverflow() throws Exception
-    {
+    public void testIntegerOverflow() throws Exception {
         DefaultConfiguration checkConfig =
             createCheckConfig(NPathComplexityCheck.class);
 

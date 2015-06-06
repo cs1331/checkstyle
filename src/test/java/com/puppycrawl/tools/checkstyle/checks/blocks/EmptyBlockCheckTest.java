@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.blocks;
 
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
@@ -27,12 +28,10 @@ import static com.puppycrawl.tools.checkstyle.checks.blocks.EmptyBlockCheck.MSG_
 import static com.puppycrawl.tools.checkstyle.checks.blocks.EmptyBlockCheck.MSG_KEY_BLOCK_NO_STMT;
 
 public class EmptyBlockCheckTest
-    extends BaseCheckTestSupport
-{
+    extends BaseCheckTestSupport {
     @Test
     public void testDefault()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(EmptyBlockCheck.class);
         final String[] expected = {
@@ -41,14 +40,15 @@ public class EmptyBlockCheckTest
             "79:13: " + getCheckMessage(MSG_KEY_BLOCK_NO_STMT),
             "82:17: " + getCheckMessage(MSG_KEY_BLOCK_NO_STMT),
             "178:5: " + getCheckMessage(MSG_KEY_BLOCK_NO_STMT),
+            "206:29: " + getCheckMessage(MSG_KEY_BLOCK_NO_STMT),
+            "208:41: " + getCheckMessage(MSG_KEY_BLOCK_NO_STMT),
         };
         verify(checkConfig, getPath("InputSemantic.java"), expected);
     }
 
     @Test
     public void testText()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(EmptyBlockCheck.class);
         checkConfig.addAttribute("option", BlockOption.TEXT.toString());
@@ -56,14 +56,14 @@ public class EmptyBlockCheckTest
             "75:13: " + getCheckMessage(MSG_KEY_BLOCK_EMPTY, "try"),
             "77:17: " + getCheckMessage(MSG_KEY_BLOCK_EMPTY, "finally"),
             "178:5: " + getCheckMessage(MSG_KEY_BLOCK_EMPTY, "INSTANCE_INIT"),
+            "206:29: " + getCheckMessage(MSG_KEY_BLOCK_EMPTY, "synchronized"),
         };
         verify(checkConfig, getPath("InputSemantic.java"), expected);
     }
 
     @Test
     public void testStatement()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(EmptyBlockCheck.class);
         checkConfig.addAttribute("option", BlockOption.STMT.toString());
@@ -73,13 +73,14 @@ public class EmptyBlockCheckTest
             "79:13: " + getCheckMessage(MSG_KEY_BLOCK_NO_STMT),
             "82:17: " + getCheckMessage(MSG_KEY_BLOCK_NO_STMT),
             "178:5: " + getCheckMessage(MSG_KEY_BLOCK_NO_STMT),
+            "206:29: " + getCheckMessage(MSG_KEY_BLOCK_NO_STMT),
+            "208:41: " + getCheckMessage(MSG_KEY_BLOCK_NO_STMT),
         };
         verify(checkConfig, getPath("InputSemantic.java"), expected);
     }
 
     @Test
-    public void allowEmptyLoops() throws Exception
-    {
+    public void allowEmptyLoops() throws Exception {
         final DefaultConfiguration checkConfig =
                 createCheckConfig(EmptyBlockCheck.class);
         checkConfig.addAttribute("option", BlockOption.STMT.toString());
@@ -96,8 +97,7 @@ public class EmptyBlockCheckTest
     }
 
     @Test
-    public void allowEmptyLoopsText() throws Exception
-    {
+    public void allowEmptyLoopsText() throws Exception {
         final DefaultConfiguration checkConfig =
                 createCheckConfig(EmptyBlockCheck.class);
         checkConfig.addAttribute("option", BlockOption.TEXT.toString());

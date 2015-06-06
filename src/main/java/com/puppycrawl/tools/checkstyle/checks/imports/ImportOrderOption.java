@@ -16,15 +16,15 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.imports;
 
 /**
  * Represents the policy for checking import order statements.
- * @see com.puppycrawl.tools.checkstyle.checks.imports.ImportOrderCheck
  * @author David DIDIER
+ * @see com.puppycrawl.tools.checkstyle.checks.imports.ImportOrderCheck
  */
-public enum ImportOrderOption
-{
+public enum ImportOrderOption {
     /**
      * Represents the policy that static imports are all at the top.
      * For example:

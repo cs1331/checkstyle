@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
@@ -24,11 +25,9 @@ import org.junit.Test;
 
 import static com.puppycrawl.tools.checkstyle.checks.coding.NestedIfDepthCheck.MSG_KEY;
 
-public class NestedIfDepthCheckTest extends BaseCheckTestSupport
-{
+public class NestedIfDepthCheckTest extends BaseCheckTestSupport {
     @Test
-    public void testDefault() throws Exception
-    {
+    public void testDefault() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(NestedIfDepthCheck.class);
 
@@ -42,8 +41,7 @@ public class NestedIfDepthCheckTest extends BaseCheckTestSupport
     //        checkConfig.addAttribute("max", "2");
 
     @Test
-    public void testCustonestingDepth() throws Exception
-    {
+    public void testCustonestingDepth() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(NestedIfDepthCheck.class);
         checkConfig.addAttribute("max", "2");

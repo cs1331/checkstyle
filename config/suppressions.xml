@@ -29,12 +29,17 @@
     <suppress id="paramNum"
               files="LocalizedMessage.java"
               lines="141,148,181,213"/>
+    <!-- Entry point, higher throws count is not a problem -->
+    <suppress checks="ThrowsCount"
+              files="Main.java"
+              lines="63"/>
 
     <!-- Tone down the checking for test code -->
     <suppress checks="EmptyBlock" files=".*[\\/]src[\\/]test[\\/]"/>
     <suppress checks="ImportControl" files=".*[\\/]src[\\/]test[\\/]"/>
     <suppress checks="Javadoc" files=".*[\\/]src[\\/]test[\\/]"/>
     <suppress checks="MagicNumber" files=".*[\\/]src[\\/]test[\\/]"/>
+    <suppress checks="AvoidStaticImport" files=".*[\\/]src[\\/]test[\\/]"/>
     <suppress checks="MethodCount" files="[\\/]IndentationCheckTest.java$"/>
     <suppress checks="EqualsAvoidNull" files="[\\/]Int.*FilterTest.java$"/>
 

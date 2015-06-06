@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
@@ -23,12 +24,9 @@ import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import org.junit.Test;
 
 import static com.puppycrawl.tools.checkstyle.checks.coding.OneStatementPerLineCheck.MSG_KEY;
-
-public class OneStatementPerLineCheckTest extends BaseCheckTestSupport
-{
+public class OneStatementPerLineCheckTest extends BaseCheckTestSupport {
     @Test
-    public void testMultiCaseClass() throws Exception
-    {
+    public void testMultiCaseClass() throws Exception {
         DefaultConfiguration checkConfig = createCheckConfig(OneStatementPerLineCheck.class);
         final String[] expected = {
             "99:18: " + getCheckMessage(MSG_KEY),
@@ -36,7 +34,7 @@ public class OneStatementPerLineCheckTest extends BaseCheckTestSupport
         };
 
         verify(checkConfig,
-            getSrcPath("checks/coding/OneStatementPerLineCheckInput.java"),
+            getPath("checks/coding/OneStatementPerLineCheckInput.java"),
             expected);
     }
 }

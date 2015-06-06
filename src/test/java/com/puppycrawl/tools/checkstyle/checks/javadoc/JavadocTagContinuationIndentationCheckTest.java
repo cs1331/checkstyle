@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.javadoc;
 
 import org.junit.Test;
@@ -27,11 +28,9 @@ import static com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocTagContinuat
 .MSG_KEY;
 
 public class JavadocTagContinuationIndentationCheckTest
-        extends BaseCheckTestSupport
-{
+        extends BaseCheckTestSupport {
     @Test
-    public void testFP() throws Exception
-    {
+    public void testFP() throws Exception {
         final DefaultConfiguration checkConfig =
                 createCheckConfig(JavadocTagContinuationIndentationCheck.class);
         final String[] expected = {
@@ -40,8 +39,7 @@ public class JavadocTagContinuationIndentationCheckTest
     }
 
     @Test
-    public void testCheck() throws Exception
-    {
+    public void testCheck() throws Exception {
         final DefaultConfiguration checkConfig =
                 createCheckConfig(JavadocTagContinuationIndentationCheck.class);
         final String[] expected = {

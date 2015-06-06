@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.annotation;
 
 import org.junit.Test;
@@ -26,11 +27,9 @@ import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import static com.puppycrawl.tools.checkstyle.checks.annotation.AnnotationLocationCheck.MSG_KEY_ANNOTATION_LOCATION_ALONE;
 import static com.puppycrawl.tools.checkstyle.checks.annotation.AnnotationLocationCheck.MSG_KEY_ANNOTATION_LOCATION;
 
-public class AnnotationLocationCheckTest extends BaseCheckTestSupport
-{
+public class AnnotationLocationCheckTest extends BaseCheckTestSupport {
     @Test
-    public void testCorrect() throws Exception
-    {
+    public void testCorrect() throws Exception {
         DefaultConfiguration checkConfig = createCheckConfig(AnnotationLocationCheck.class);
         final String[] expected = {
         };
@@ -39,8 +38,7 @@ public class AnnotationLocationCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testIncorrect() throws Exception
-    {
+    public void testIncorrect() throws Exception {
         DefaultConfiguration checkConfig = createCheckConfig(AnnotationLocationCheck.class);
         final String[] expected = {
             "6: " + getCheckMessage(MSG_KEY_ANNOTATION_LOCATION_ALONE, "MyAnnotation1"),

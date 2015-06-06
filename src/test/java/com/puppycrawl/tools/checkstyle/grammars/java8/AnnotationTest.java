@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.grammars.java8;
 
 import java.io.File;
@@ -26,13 +27,11 @@ import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.checks.naming.MemberNameCheck;
 
-public class AnnotationTest extends BaseCheckTestSupport
-{
+public class AnnotationTest extends BaseCheckTestSupport {
 
     @Test
     public void testSimpleTypeAnnotation()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
                 createCheckConfig(MemberNameCheck.class);
         final String[] expected = {};
@@ -43,8 +42,7 @@ public class AnnotationTest extends BaseCheckTestSupport
 
     @Test
     public void testAnnotationOnClass()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
                 createCheckConfig(MemberNameCheck.class);
         final String[] expected = {};
@@ -57,8 +55,7 @@ public class AnnotationTest extends BaseCheckTestSupport
 
     @Test
     public void testClassCastTypeAnnotation()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
                 createCheckConfig(MemberNameCheck.class);
         final String[] expected = {};
@@ -71,8 +68,7 @@ public class AnnotationTest extends BaseCheckTestSupport
 
     @Test
     public void testMethodParametersTypeAnnotation()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
                 createCheckConfig(MemberNameCheck.class);
         final String[] expected = {};
@@ -85,8 +81,7 @@ public class AnnotationTest extends BaseCheckTestSupport
 
     @Test
     public void testAnnotationInThrows()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
                 createCheckConfig(MemberNameCheck.class);
         final String[] expected = {};
@@ -99,8 +94,7 @@ public class AnnotationTest extends BaseCheckTestSupport
 
     @Test
     public void testAnnotationInGeneric()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
                 createCheckConfig(MemberNameCheck.class);
         final String[] expected = {};
@@ -113,8 +107,7 @@ public class AnnotationTest extends BaseCheckTestSupport
 
     @Test
     public void testAnnotationOnConstructorCall()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
                 createCheckConfig(MemberNameCheck.class);
         final String[] expected = {};
@@ -127,8 +120,7 @@ public class AnnotationTest extends BaseCheckTestSupport
 
     @Test
     public void testAnnotationNestedCall()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
                 createCheckConfig(MemberNameCheck.class);
         final String[] expected = {};
@@ -141,8 +133,7 @@ public class AnnotationTest extends BaseCheckTestSupport
 
     @Test
     public void testAnnotationOnWildcards()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
                 createCheckConfig(MemberNameCheck.class);
         final String[] expected = {};
@@ -155,8 +146,7 @@ public class AnnotationTest extends BaseCheckTestSupport
 
     @Test
     public void testAnnotationInCatchParameters()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
                 createCheckConfig(MemberNameCheck.class);
         final String[] expected = {};

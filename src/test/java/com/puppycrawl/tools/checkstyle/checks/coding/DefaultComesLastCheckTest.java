@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
 import java.io.File;
@@ -27,11 +28,9 @@ import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 
 import static com.puppycrawl.tools.checkstyle.checks.coding.DefaultComesLastCheck.MSG_KEY;
 
-public class DefaultComesLastCheckTest extends BaseCheckTestSupport
-{
+public class DefaultComesLastCheckTest extends BaseCheckTestSupport {
     @Test
-    public void testIt() throws Exception
-    {
+    public void testIt() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(DefaultComesLastCheck.class);
         final String[] expected = {
@@ -44,8 +43,7 @@ public class DefaultComesLastCheckTest extends BaseCheckTestSupport
 
     @Test
     public void testDefaultMethodsInJava8()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
                 createCheckConfig(DefaultComesLastCheck.class);
         final String[] expected = {

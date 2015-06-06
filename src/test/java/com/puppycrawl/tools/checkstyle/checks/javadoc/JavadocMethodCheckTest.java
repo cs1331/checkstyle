@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.javadoc;
 
 import static com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck.MSG_DUPLICATE_TAG;
@@ -35,20 +36,17 @@ import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.api.Scope;
 
-public class JavadocMethodCheckTest extends BaseCheckTestSupport
-{
+public class JavadocMethodCheckTest extends BaseCheckTestSupport {
     private DefaultConfiguration checkConfig;
 
     @Before
-    public void setUp()
-    {
+    public void setUp() {
         checkConfig = createCheckConfig(JavadocMethodCheck.class);
         checkConfig.addAttribute("validateThrows", "true");
     }
 
     @Test
-    public void extendAnnotationTest() throws Exception
-    {
+    public void extendAnnotationTest() throws Exception {
         DefaultConfiguration config = createCheckConfig(JavadocMethodCheck.class);
         config.addAttribute("allowedAnnotations", "MyAnnotation, Override");
         config.addAttribute("minLineCount", "2");
@@ -59,8 +57,7 @@ public class JavadocMethodCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void newTest() throws Exception
-    {
+    public void newTest() throws Exception {
         DefaultConfiguration config = createCheckConfig(JavadocMethodCheck.class);
         config.addAttribute("allowedAnnotations", "MyAnnotation, Override");
         config.addAttribute("minLineCount", "2");
@@ -71,8 +68,16 @@ public class JavadocMethodCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testTags() throws Exception
-    {
+    public void allowedAnnotationsTest() throws Exception {
+
+        DefaultConfiguration config = createCheckConfig(JavadocMethodCheck.class);
+        config.addAttribute("allowedAnnotations", "Override,ThisIsOk, \t\n\t ThisIsOkToo");
+        final String[] expected = {};
+        verify(config, getPath("javadoc/AllowedAnnotations.java"), expected);
+    }
+
+    @Test
+    public void testTags() throws Exception {
         final String[] expected = {
             "14:5: " + getCheckMessage(MSG_JAVADOC_MISSING),
             "18:9: " + getCheckMessage(MSG_UNUSED_TAG, "@param", "unused"),
@@ -105,12 +110,11 @@ public class JavadocMethodCheckTest extends BaseCheckTestSupport
             "333: " + getCheckMessage(MSG_UNUSED_TAG_GENERAL),
         };
 
-        verify(checkConfig, getSrcPath("checks/javadoc/InputTags.java"), expected);
+        verify(checkConfig, getPath("checks/javadoc/InputTags.java"), expected);
     }
 
     @Test
-    public void testTagsWithResolver() throws Exception
-    {
+    public void testTagsWithResolver() throws Exception {
         checkConfig.addAttribute("allowUndeclaredRTE", "true");
         final String[] expected = {
             "14:5: " + getCheckMessage(MSG_JAVADOC_MISSING),
@@ -139,12 +143,11 @@ public class JavadocMethodCheckTest extends BaseCheckTestSupport
             "320:9: " + getCheckMessage(MSG_JAVADOC_MISSING),
             "329:5: " + getCheckMessage(MSG_JAVADOC_MISSING),
             "333: " + getCheckMessage(MSG_UNUSED_TAG_GENERAL), };
-        verify(checkConfig, getSrcPath("checks/javadoc/InputTags.java"), expected);
+        verify(checkConfig, getPath("checks/javadoc/InputTags.java"), expected);
     }
 
     @Test
-    public void testStrictJavadoc() throws Exception
-    {
+    public void testStrictJavadoc() throws Exception {
         final String[] expected = {
             "12:9: " + getCheckMessage(MSG_JAVADOC_MISSING),
             "18:13: " + getCheckMessage(MSG_JAVADOC_MISSING),
@@ -164,8 +167,7 @@ public class JavadocMethodCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testNoJavadoc() throws Exception
-    {
+    public void testNoJavadoc() throws Exception {
         checkConfig.addAttribute("scope", Scope.NOTHING.getName());
         final String[] expected = {};
         verify(checkConfig, getPath("InputPublicOnly.java"), expected);
@@ -173,8 +175,7 @@ public class JavadocMethodCheckTest extends BaseCheckTestSupport
 
     // pre 1.4 relaxed mode is roughly equivalent with check=protected
     @Test
-    public void testRelaxedJavadoc() throws Exception
-    {
+    public void testRelaxedJavadoc() throws Exception {
         checkConfig.addAttribute("scope", Scope.PROTECTED.getName());
         final String[] expected = {
             "59:5: " + getCheckMessage(MSG_JAVADOC_MISSING),
@@ -186,8 +187,7 @@ public class JavadocMethodCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testScopeInnerInterfacesPublic() throws Exception
-    {
+    public void testScopeInnerInterfacesPublic() throws Exception {
         checkConfig.addAttribute("scope", Scope.PUBLIC.getName());
         final String[] expected = {
             "43:9: " + getCheckMessage(MSG_JAVADOC_MISSING),
@@ -197,16 +197,14 @@ public class JavadocMethodCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testScopeAnonInnerPrivate() throws Exception
-    {
+    public void testScopeAnonInnerPrivate() throws Exception {
         checkConfig.addAttribute("scope", Scope.PRIVATE.getName());
         final String[] expected = {};
         verify(checkConfig, getPath("InputScopeAnonInner.java"), expected);
     }
 
     @Test
-    public void testScopeAnonInnerAnonInner() throws Exception
-    {
+    public void testScopeAnonInnerAnonInner() throws Exception {
         checkConfig.addAttribute("scope", Scope.ANONINNER.getName());
         final String[] expected = {
             "26:9: " + getCheckMessage(MSG_JAVADOC_MISSING),
@@ -216,16 +214,14 @@ public class JavadocMethodCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testScopeAnonInnerWithResolver() throws Exception
-    {
+    public void testScopeAnonInnerWithResolver() throws Exception {
         checkConfig.addAttribute("allowUndeclaredRTE", "true");
         final String[] expected = {};
         verify(checkConfig, getPath("InputScopeAnonInner.java"), expected);
     }
 
     @Test
-    public void testTagsWithSubclassesAllowed() throws Exception
-    {
+    public void testTagsWithSubclassesAllowed() throws Exception {
         checkConfig.addAttribute("allowThrowsTagsForSubclasses", "true");
         final String[] expected = {
             "14:5: " + getCheckMessage(MSG_JAVADOC_MISSING),
@@ -254,12 +250,11 @@ public class JavadocMethodCheckTest extends BaseCheckTestSupport
             "320:9: " + getCheckMessage(MSG_JAVADOC_MISSING),
             "329:5: " + getCheckMessage(MSG_JAVADOC_MISSING),
             "333: " + getCheckMessage(MSG_UNUSED_TAG_GENERAL), };
-        verify(checkConfig, getSrcPath("checks/javadoc/InputTags.java"), expected);
+        verify(checkConfig, getPath("checks/javadoc/InputTags.java"), expected);
     }
 
     @Test
-    public void testScopes() throws Exception
-    {
+    public void testScopes() throws Exception {
         final String[] expected = {
             "10:5: " + getCheckMessage(MSG_JAVADOC_MISSING),
             "11:5: " + getCheckMessage(MSG_JAVADOC_MISSING),
@@ -302,8 +297,7 @@ public class JavadocMethodCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testScopes2() throws Exception
-    {
+    public void testScopes2() throws Exception {
         checkConfig.addAttribute("scope", Scope.PROTECTED.getName());
         final String[] expected = {
             "10:5: " + getCheckMessage(MSG_JAVADOC_MISSING),
@@ -315,8 +309,7 @@ public class JavadocMethodCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testExcludeScope() throws Exception
-    {
+    public void testExcludeScope() throws Exception {
         checkConfig.addAttribute("scope", Scope.PRIVATE.getName());
         checkConfig.addAttribute("excludeScope", Scope.PROTECTED.getName());
         final String[] expected = {
@@ -357,8 +350,7 @@ public class JavadocMethodCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testAllowMissingJavadoc() throws Exception
-    {
+    public void testAllowMissingJavadoc() throws Exception {
         checkConfig.addAttribute("allowMissingJavadoc", "true");
         final String[] expected = {};
         verify(checkConfig, getPath("javadoc" + File.separator
@@ -366,8 +358,7 @@ public class JavadocMethodCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testSetterGetterOff() throws Exception
-    {
+    public void testSetterGetterOff() throws Exception {
         final String[] expected = {
             "7:5: " + getCheckMessage(MSG_JAVADOC_MISSING),
             "12:5: " + getCheckMessage(MSG_JAVADOC_MISSING),
@@ -384,8 +375,7 @@ public class JavadocMethodCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testSetterGetterOn() throws Exception
-    {
+    public void testSetterGetterOn() throws Exception {
         checkConfig.addAttribute("allowMissingPropertyJavadoc", "true");
         final String[] expected = {
             "17:5: " + getCheckMessage(MSG_JAVADOC_MISSING),
@@ -400,8 +390,7 @@ public class JavadocMethodCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testTypeParamsTags() throws Exception
-    {
+    public void testTypeParamsTags() throws Exception {
         final String[] expected = {
             "26:8: " + getCheckMessage(MSG_UNUSED_TAG, "@param", "<BB>"),
             "28:13: " + getCheckMessage(MSG_EXCPECTED_TAG, "@param", "<Z>"), };
@@ -409,22 +398,19 @@ public class JavadocMethodCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void test_1168408_1() throws Exception
-    {
+    public void test_1168408_1() throws Exception {
         final String[] expected = {};
         verify(checkConfig, getSrcPath("checks/javadoc/Input_01.java"), expected);
     }
 
     @Test
-    public void test_1168408_2() throws Exception
-    {
+    public void test_1168408_2() throws Exception {
         final String[] expected = {};
         verify(checkConfig, getSrcPath("checks/javadoc/Input_02.java"), expected);
     }
 
     @Test
-    public void test_1168408_3() throws Exception
-    {
+    public void test_1168408_3() throws Exception {
         checkConfig.addAttribute("allowThrowsTagsForSubclasses", "true");
         checkConfig.addAttribute("allowUndeclaredRTE", "true");
         final String[] expected = {};
@@ -432,8 +418,7 @@ public class JavadocMethodCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void test_generics_1() throws Exception
-    {
+    public void test_generics_1() throws Exception {
         checkConfig.addAttribute("allowThrowsTagsForSubclasses", "true");
         checkConfig.addAttribute("allowUndeclaredRTE", "true");
         final String[] expected = {
@@ -447,8 +432,7 @@ public class JavadocMethodCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void test_generics_2() throws Exception
-    {
+    public void test_generics_2() throws Exception {
         checkConfig.addAttribute("allowThrowsTagsForSubclasses", "true");
         final String[] expected = {
             "17:34: " + getCheckMessage(MSG_EXCPECTED_TAG, "@throws", "RE"),
@@ -461,8 +445,7 @@ public class JavadocMethodCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void test_generics_3() throws Exception
-    {
+    public void test_generics_3() throws Exception {
         final String[] expected = {
             "8:8: " + getCheckMessage(MSG_UNUSED_TAG, "@throws", "RE"),
             "17:34: " + getCheckMessage(MSG_EXCPECTED_TAG, "@throws", "RE"),
@@ -475,8 +458,7 @@ public class JavadocMethodCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void test_1379666() throws Exception
-    {
+    public void test_1379666() throws Exception {
         checkConfig.addAttribute("allowThrowsTagsForSubclasses", "true");
         checkConfig.addAttribute("allowUndeclaredRTE", "true");
         final String[] expected = {};
@@ -484,8 +466,7 @@ public class JavadocMethodCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testInheritDoc() throws Exception
-    {
+    public void testInheritDoc() throws Exception {
         final String[] expected = {
             "6:5: " + getCheckMessage(MSG_INVALID_INHERIT_DOC),
             "11:5: " + getCheckMessage(MSG_INVALID_INHERIT_DOC),
@@ -498,8 +479,7 @@ public class JavadocMethodCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testSkipCertainMethods() throws Exception
-    {
+    public void testSkipCertainMethods() throws Exception {
         checkConfig.addAttribute("ignoreMethodNamesRegex", "^foo.*$");
         String[] expected = {
 

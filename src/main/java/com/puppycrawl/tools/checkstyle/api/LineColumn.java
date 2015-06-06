@@ -16,15 +16,17 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.api;
+
+import java.util.Objects;
 
 /**
  * Immutable line and column numbers.
  *
  * @author Martin von Gagern
  */
-public class LineColumn implements Comparable<LineColumn>
-{
+public class LineColumn implements Comparable<LineColumn> {
 
     /** The one-based line number */
     private final int line;
@@ -37,30 +39,46 @@ public class LineColumn implements Comparable<LineColumn>
      * @param line the one-based line number
      * @param col the zero-based column number
      */
-    public LineColumn(int line, int col)
-    {
+    public LineColumn(int line, int col) {
         this.line = line;
         this.col = col;
     }
 
     /** @return the one-based line number */
-    public int getLine()
-    {
+    public int getLine() {
         return line;
     }
 
     /** @return the zero-based column number */
-    public int getColumn()
-    {
+    public int getColumn() {
         return col;
     }
 
     /** {@inheritDoc} */
     @Override
-    public int compareTo(LineColumn lineColumn)
-    {
+    public int compareTo(LineColumn lineColumn) {
         return this.getLine() != lineColumn.getLine()
             ? this.getLine() - lineColumn.getLine()
             : this.getColumn() - lineColumn.getColumn();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        final LineColumn that = (LineColumn) o;
+        return Objects.equals(line, that.line)
+                && Objects.equals(col, that.col);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public int hashCode() {
+        return Objects.hash(line, col);
     }
 }

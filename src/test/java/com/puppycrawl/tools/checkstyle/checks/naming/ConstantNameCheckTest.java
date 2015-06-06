@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.naming;
 
 import static org.junit.Assert.fail;
@@ -28,12 +29,10 @@ import org.junit.Test;
 import static com.puppycrawl.tools.checkstyle.checks.naming.AbstractNameCheck.MSG_INVALID_PATTERN;
 
 public class ConstantNameCheckTest
-    extends BaseCheckTestSupport
-{
+    extends BaseCheckTestSupport {
     @Test
     public void testIllegalRegexp()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(ConstantNameCheck.class);
         checkConfig.addAttribute("format", "\\");
@@ -48,8 +47,7 @@ public class ConstantNameCheckTest
 
     @Test
     public void testDefault()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(ConstantNameCheck.class);
 
@@ -64,8 +62,7 @@ public class ConstantNameCheckTest
 
     @Test
     public void testAccessControlTuning()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(ConstantNameCheck.class);
         checkConfig.addAttribute("applyToPublic", "false");
@@ -82,8 +79,7 @@ public class ConstantNameCheckTest
 
     @Test
     public void testInterfaceAndAnnotation()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(ConstantNameCheck.class);
 
@@ -98,8 +94,7 @@ public class ConstantNameCheckTest
 
     @Test
     public void testDefault1()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(ConstantNameCheck.class);
         final String[] expected = {
@@ -108,8 +103,7 @@ public class ConstantNameCheckTest
     }
 
     @Test
-    public void testIntoInterface() throws Exception
-    {
+    public void testIntoInterface() throws Exception {
         final DefaultConfiguration checkConfig =
                 createCheckConfig(ConstantNameCheck.class);
 
@@ -130,8 +124,7 @@ public class ConstantNameCheckTest
 
     @Test
     public void testStaticMethodInInterface()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
                 createCheckConfig(ConstantNameCheck.class);
         final String[] expected = {

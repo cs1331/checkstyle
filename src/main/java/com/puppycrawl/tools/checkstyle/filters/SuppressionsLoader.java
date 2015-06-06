@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.filters;
 
 import java.io.File;
@@ -44,8 +45,7 @@ import com.puppycrawl.tools.checkstyle.api.FilterSet;
  * @author Rick Giles
  */
 public final class SuppressionsLoader
-    extends AbstractLoader
-{
+    extends AbstractLoader {
     /** the public ID for the configuration dtd */
     private static final String DTD_PUBLIC_ID_1_0 =
         "-//Puppy Crawl//DTD Suppressions 1.0//EN";
@@ -71,8 +71,7 @@ public final class SuppressionsLoader
      * @throws SAXException if an error occurs
      */
     private SuppressionsLoader()
-        throws ParserConfigurationException, SAXException
-    {
+        throws ParserConfigurationException, SAXException {
         super(createIdToResourceNameMap());
     }
 
@@ -80,8 +79,7 @@ public final class SuppressionsLoader
      * Returns the loaded filter chain.
      * @return the loaded filter chain.
      */
-    public FilterSet getFilterChain()
-    {
+    public FilterSet getFilterChain() {
         return filterChain;
     }
 
@@ -90,8 +88,7 @@ public final class SuppressionsLoader
                              String localName,
                              String qName,
                              Attributes atts)
-        throws SAXException
-    {
+        throws SAXException {
         if ("suppress".equals(qName)) {
             //add SuppressElement filter to the filter chain
             final String files = atts.getValue("files");
@@ -135,48 +132,42 @@ public final class SuppressionsLoader
      * @throws CheckstyleException if an error occurs.
      */
     public static FilterSet loadSuppressions(String filename)
-        throws CheckstyleException
-    {
+        throws CheckstyleException {
+        // figure out if this is a File or a URL
+        URI uri;
         try {
-            // figure out if this is a File or a URL
-            URI uri;
-            try {
-                final URL url = new URL(filename);
-                uri = url.toURI();
+            final URL url = new URL(filename);
+            uri = url.toURI();
+        }
+        catch (final MalformedURLException ex) {
+            uri = null;
+        }
+        catch (final URISyntaxException ex) {
+            // URL violating RFC 2396
+            uri = null;
+        }
+        if (uri == null) {
+            final File file = new File(filename);
+            if (file.exists()) {
+                uri = file.toURI();
             }
-            catch (final MalformedURLException ex) {
-                uri = null;
-            }
-            catch (final URISyntaxException ex) {
-                // URL violating RFC 2396
-                uri = null;
-            }
-            if (uri == null) {
-                final File file = new File(filename);
-                if (file.exists()) {
-                    uri = file.toURI();
+            else {
+                // check to see if the file is in the classpath
+                try {
+                    final URL configUrl = SuppressionsLoader.class
+                            .getResource(filename);
+                    if (configUrl == null) {
+                        throw new CheckstyleException("unable to find " + filename);
+                    }
+                    uri = configUrl.toURI();
                 }
-                else {
-                    // check to see if the file is in the classpath
-                    try {
-                        final URL configUrl = SuppressionsLoader.class
-                                .getResource(filename);
-                        if (configUrl == null) {
-                            throw new FileNotFoundException(filename);
-                        }
-                        uri = configUrl.toURI();
-                    }
-                    catch (final URISyntaxException e) {
-                        throw new FileNotFoundException(filename);
-                    }
+                catch (final URISyntaxException e) {
+                    throw new CheckstyleException("unable to find " + filename);
                 }
             }
-            final InputSource source = new InputSource(uri.toString());
-            return loadSuppressions(source, filename);
         }
-        catch (final FileNotFoundException e) {
-            throw new CheckstyleException("unable to find " + filename, e);
-        }
+        final InputSource source = new InputSource(uri.toString());
+        return loadSuppressions(source, filename);
     }
 
     /**
@@ -188,8 +179,7 @@ public final class SuppressionsLoader
      */
     private static FilterSet loadSuppressions(
             InputSource source, String sourceName)
-        throws CheckstyleException
-    {
+        throws CheckstyleException {
         try {
             final SuppressionsLoader suppressionsLoader =
                 new SuppressionsLoader();
@@ -219,8 +209,7 @@ public final class SuppressionsLoader
      * Creates mapping between local resources and dtd ids.
      * @return map between local resources and dtd ids.
      */
-    private static Map<String, String> createIdToResourceNameMap()
-    {
+    private static Map<String, String> createIdToResourceNameMap() {
         final Map<String, String> map = Maps.newHashMap();
         map.put(DTD_PUBLIC_ID_1_0, DTD_RESOURCE_NAME_1_0);
         map.put(DTD_PUBLIC_ID_1_1, DTD_RESOURCE_NAME_1_1);

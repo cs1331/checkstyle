@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.naming;
 
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
@@ -26,12 +27,10 @@ import org.junit.Test;
 import static com.puppycrawl.tools.checkstyle.checks.naming.AbstractNameCheck.MSG_INVALID_PATTERN;
 
 public class MemberNameCheckTest
-    extends BaseCheckTestSupport
-{
+    extends BaseCheckTestSupport {
     @Test
     public void testSpecified()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(MemberNameCheck.class);
         checkConfig.addAttribute("format", "^m[A-Z][a-zA-Z0-9]*$");
@@ -47,8 +46,7 @@ public class MemberNameCheckTest
 
     @Test
     public void testInnerClass()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(MemberNameCheck.class);
 
@@ -61,8 +59,7 @@ public class MemberNameCheckTest
     }
 
     @Test
-    public void testDefaults() throws Exception
-    {
+    public void testDefaults() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(MemberNameCheck.class);
 
@@ -80,8 +77,7 @@ public class MemberNameCheckTest
     }
 
     @Test
-    public void testUnderlined() throws Exception
-    {
+    public void testUnderlined() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(MemberNameCheck.class);
         checkConfig.addAttribute("format", "^_[a-z]*$");
@@ -100,8 +96,7 @@ public class MemberNameCheckTest
     }
 
     @Test
-    public void testPublicOnly() throws Exception
-    {
+    public void testPublicOnly() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(MemberNameCheck.class);
         checkConfig.addAttribute("format", "^_[a-z]*$");
@@ -120,8 +115,7 @@ public class MemberNameCheckTest
     }
 
     @Test
-    public void testProtectedOnly() throws Exception
-    {
+    public void testProtectedOnly() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(MemberNameCheck.class);
         checkConfig.addAttribute("format", "^_[a-z]*$");
@@ -140,8 +134,7 @@ public class MemberNameCheckTest
     }
 
     @Test
-    public void testPackageOnly() throws Exception
-    {
+    public void testPackageOnly() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(MemberNameCheck.class);
         checkConfig.addAttribute("format", "^_[a-z]*$");
@@ -160,8 +153,7 @@ public class MemberNameCheckTest
     }
 
     @Test
-    public void testPrivateOnly() throws Exception
-    {
+    public void testPrivateOnly() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(MemberNameCheck.class);
         checkConfig.addAttribute("format", "^_[a-z]*$");
@@ -180,8 +172,7 @@ public class MemberNameCheckTest
     }
 
     @Test
-    public void testNotPrivate() throws Exception
-    {
+    public void testNotPrivate() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(MemberNameCheck.class);
         checkConfig.addAttribute("applyToPrivate", "false");
@@ -199,8 +190,7 @@ public class MemberNameCheckTest
     }
 
     @Test
-    public void memberNameExtended() throws Exception
-    {
+    public void memberNameExtended() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(MemberNameCheck.class);
         checkConfig.addAttribute("format", "^[a-z][a-z0-9][a-zA-Z0-9]*$");

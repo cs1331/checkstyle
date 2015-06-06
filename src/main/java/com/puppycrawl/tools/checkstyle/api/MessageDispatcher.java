@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.api;
 
 import java.util.SortedSet;
@@ -24,8 +25,7 @@ import java.util.SortedSet;
  * Used by FileSetChecks to distribute AuditEvents to AuditListeners.
  * @author lkuehne
  */
-public interface MessageDispatcher
-{
+public interface MessageDispatcher {
     /**
      * Notify all listeners about the beginning of a file audit.
      * @param fileName the file to be audited

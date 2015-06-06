@@ -16,17 +16,16 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.filters;
+
+import java.util.Objects;
 
 /**
  * This filter accepts an Integer in a range.
  * @author Rick Giles
  */
-class IntRangeFilter implements IntFilter
-{
-    /** hash function multiplicand */
-    private static final int HASH_MULT = 29;
-
+class IntRangeFilter implements IntFilter {
     /** lower bound of the range */
     private final Integer lowerBound;
 
@@ -39,41 +38,33 @@ class IntRangeFilter implements IntFilter
      * @param lowerBound the lower bound of the range.
      * @param upperBound the upper bound of the range.
      */
-    public IntRangeFilter(int lowerBound, int upperBound)
-    {
+    public IntRangeFilter(int lowerBound, int upperBound) {
         this.lowerBound = lowerBound;
         this.upperBound = upperBound;
     }
 
     /** {@inheritDoc} */
     @Override
-    public boolean accept(int intValue)
-    {
+    public boolean accept(int intValue) {
         return lowerBound.compareTo(intValue) <= 0
             && upperBound.compareTo(intValue) >= 0;
     }
 
     @Override
-    public int hashCode()
-    {
-        return HASH_MULT * lowerBound.intValue() + upperBound.intValue();
+    public int hashCode() {
+        return Objects.hash(lowerBound, upperBound);
     }
 
     @Override
-    public boolean equals(Object object)
-    {
-        if (object instanceof IntRangeFilter) {
-            final IntRangeFilter other = (IntRangeFilter) object;
-            return this.lowerBound.equals(other.lowerBound)
-                && this.upperBound.equals(other.upperBound);
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
         }
-        return false;
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        final IntRangeFilter that = (IntRangeFilter) o;
+        return Objects.equals(lowerBound, that.lowerBound)
+                && Objects.equals(upperBound, that.upperBound);
     }
-
-    @Override
-    public String toString()
-    {
-        return "IntRangeFilter[" + lowerBound + "," + upperBound + "]";
-    }
-
 }

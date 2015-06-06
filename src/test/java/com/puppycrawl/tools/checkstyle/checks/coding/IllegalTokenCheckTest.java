@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
@@ -25,14 +26,25 @@ import org.junit.Test;
 import static com.puppycrawl.tools.checkstyle.checks.coding.IllegalTokenCheck.MSG_KEY;
 
 public class IllegalTokenCheckTest
-    extends BaseCheckTestSupport
-{
+    extends BaseCheckTestSupport {
     @Test
-    public void testDefault()
-        throws Exception
-    {
+    public void testCheckWithDefaultSettings()
+        throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(IllegalTokenCheck.class);
+        final String[] expected = {
+            "29:14: " + getCheckMessage(MSG_KEY, "label:"),
+            "31:25: " + getCheckMessage(MSG_KEY, "anotherLabel:"),
+        };
+        verify(checkConfig, getPath("InputIllegalTokens.java"), expected);
+    }
+
+    @Test
+    public void testPreviouslyIllegalTokens()
+        throws Exception {
+        final DefaultConfiguration checkConfig =
+            createCheckConfig(IllegalTokenCheck.class);
+        checkConfig.addAttribute("tokens", "LITERAL_SWITCH,POST_INC,POST_DEC");
         final String[] expected = {
             "11:9: " + getCheckMessage(MSG_KEY, "switch"),
             "14:18: " + getCheckMessage(MSG_KEY, "--"),
@@ -42,8 +54,7 @@ public class IllegalTokenCheckTest
     }
 
     @Test
-    public void testNative() throws Exception
-    {
+    public void testNative() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(IllegalTokenCheck.class);
         checkConfig.addAttribute("tokens", "LITERAL_NATIVE");

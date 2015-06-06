@@ -16,16 +16,19 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.api;
+
+import java.util.Locale;
 
 /**
  * Represents a Java visibility scope.
  *
  * @author Lars Kühne
  * @author Travis Schneeberger
+ * @author Mehmet Can Cömert
  */
-public enum Scope
-{
+public enum Scope {
     /** nothing scope. */
     NOTHING,
     /** public scope. */
@@ -40,17 +43,15 @@ public enum Scope
     ANONINNER;
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return getName();
     }
 
     /**
      * @return the name of this severity level.
      */
-    public String getName()
-    {
-        return name().toLowerCase();
+    public String getName() {
+        return name().toLowerCase(Locale.ENGLISH);
     }
 
     /**
@@ -60,8 +61,7 @@ public enum Scope
      * @param scope a <code>Scope</code> value
      * @return if <code>this</code> is a subscope of <code>scope</code>.
      */
-    public boolean isIn(Scope scope)
-    {
+    public boolean isIn(Scope scope) {
         return compareTo(scope) <= 0;
     }
 
@@ -71,8 +71,7 @@ public enum Scope
      * @param scopeName scope name, such as "nothing", "public", etc.
      * @return the <code>Scope</code> associated with <code>scopeName</code>
      */
-    public static Scope getInstance(String scopeName)
-    {
-        return valueOf(Scope.class, scopeName.trim().toUpperCase());
+    public static Scope getInstance(String scopeName) {
+        return valueOf(Scope.class, scopeName.trim().toUpperCase(Locale.ENGLISH));
     }
 }

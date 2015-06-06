@@ -16,26 +16,25 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.api;
 
 import static com.puppycrawl.tools.checkstyle.TestUtils.assertUtilsClassHasPrivateConstructor;
 import static org.junit.Assert.assertEquals;
 
+import com.puppycrawl.tools.checkstyle.Utils;
 import org.junit.Test;
 
-public class TokenTypesTest
-{
+public class TokenTypesTest {
     @Test
-    public void testGetShortDescription()
-    {
+    public void testGetShortDescription() {
         assertEquals("short description for EQUAL",
-                "The <code>==</code> (equal) operator.", TokenTypes
+                "The <code>==</code> (equal) operator.", Utils
                         .getShortDescription("EQUAL"));
     }
 
     @Test
-    public void testIsProperUtilsClass() throws ReflectiveOperationException
-    {
+    public void testIsProperUtilsClass() throws ReflectiveOperationException {
         assertUtilsClassHasPrivateConstructor(TokenTypes.class);
     }
 }

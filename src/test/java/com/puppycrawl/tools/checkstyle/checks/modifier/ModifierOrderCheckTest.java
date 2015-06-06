@@ -16,10 +16,13 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.modifier;
 
 import java.io.File;
 
+import com.puppycrawl.tools.checkstyle.api.TokenTypes;
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
@@ -31,11 +34,9 @@ import static com.puppycrawl.tools.checkstyle.checks.modifier.ModifierOrderCheck
 .MSG_MODIFIER_ORDER;
 
 public class ModifierOrderCheckTest
-    extends BaseCheckTestSupport
-{
+    extends BaseCheckTestSupport {
     @Test
-    public void testIt() throws Exception
-    {
+    public void testIt() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(ModifierOrderCheck.class);
         final String[] expected = {
@@ -51,8 +52,7 @@ public class ModifierOrderCheckTest
 
     @Test
     public void testDefaultMethods()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
                 createCheckConfig(ModifierOrderCheck.class);
         final String[] expected = {
@@ -61,4 +61,35 @@ public class ModifierOrderCheckTest
                   + "/checkstyle/InputModifier2.java").getCanonicalPath(), expected);
     }
 
+    @Test
+    public void testGetDefaultTokens() {
+        ModifierOrderCheck modifierOrderCheckObj = new ModifierOrderCheck();
+        int[] actual = modifierOrderCheckObj.getDefaultTokens();
+        int[] expected = new int[] {TokenTypes.MODIFIERS};
+        int[] unexpectedEmptyArray = new int[] {};
+        int[] unexpectedArray = new int[] {
+            TokenTypes.MODIFIERS,
+            TokenTypes.OBJBLOCK,
+        };
+        Assert.assertArrayEquals(expected, actual);
+        Assert.assertNotSame(unexpectedEmptyArray, actual);
+        Assert.assertNotSame(unexpectedArray, actual);
+        Assert.assertNotNull(actual);
+    }
+
+    @Test
+    public void testGetAcceptableTokens() {
+        ModifierOrderCheck modifierOrderCheckObj = new ModifierOrderCheck();
+        int[] actual = modifierOrderCheckObj.getAcceptableTokens();
+        int[] expected = new int[] {TokenTypes.MODIFIERS};
+        int[] unexpectedEmptyArray = new int[] {};
+        int[] unexpectedArray = new int[] {
+            TokenTypes.MODIFIERS,
+            TokenTypes.OBJBLOCK,
+        };
+        Assert.assertArrayEquals(expected, actual);
+        Assert.assertNotSame(unexpectedEmptyArray, actual);
+        Assert.assertNotSame(unexpectedArray, actual);
+        Assert.assertNotNull(actual);
+    }
 }

@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.blocks;
 
 import org.junit.Test;
@@ -28,11 +29,9 @@ import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
  * @author <a href="mailto:nesterenko-aleksey@list.ru">Aleksey Nesterenko</a>
  *
  */
-public class EmptyCatchBlockCheckTest extends BaseCheckTestSupport
-{
+public class EmptyCatchBlockCheckTest extends BaseCheckTestSupport {
     @Test
-    public void testDefault() throws Exception
-    {
+    public void testDefault() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(EmptyCatchBlockCheck.class);
         final String[] expected = {
@@ -43,8 +42,7 @@ public class EmptyCatchBlockCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testWithUserSetValues() throws Exception
-    {
+    public void testWithUserSetValues() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(EmptyCatchBlockCheck.class);
         checkConfig.addAttribute("exceptionVariableName", "expected|ignore|myException");

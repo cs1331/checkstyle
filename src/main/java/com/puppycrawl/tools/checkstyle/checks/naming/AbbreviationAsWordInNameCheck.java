@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.naming;
 
 import java.util.Arrays;
@@ -78,8 +79,7 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  *
  * @author Roman Ivanov, Daniil Yaroslvtsev, Baratali Izmailov
  */
-public class AbbreviationAsWordInNameCheck extends Check
-{
+public class AbbreviationAsWordInNameCheck extends Check {
 
     /**
      * Warning message key.
@@ -117,8 +117,7 @@ public class AbbreviationAsWordInNameCheck extends Check
      * @param ignoreFinal
      *        Defines if ignore variables with 'final' modifier or not.
      */
-    public void setIgnoreFinal(boolean ignoreFinal)
-    {
+    public void setIgnoreFinal(boolean ignoreFinal) {
         this.ignoreFinal = ignoreFinal;
     }
 
@@ -127,8 +126,7 @@ public class AbbreviationAsWordInNameCheck extends Check
      * @param ignoreStatic
      *        Defines if ignore variables with 'static' modifier or not.
      */
-    public void setIgnoreStatic(boolean ignoreStatic)
-    {
+    public void setIgnoreStatic(boolean ignoreStatic) {
         this.ignoreStatic = ignoreStatic;
     }
 
@@ -137,8 +135,7 @@ public class AbbreviationAsWordInNameCheck extends Check
      * @param ignoreOverriddenMethods
      *        Defines if ignore methods with "@Override" annotation or not.
      */
-    public void setIgnoreOverriddenMethods(boolean ignoreOverriddenMethods)
-    {
+    public void setIgnoreOverriddenMethods(boolean ignoreOverriddenMethods) {
         this.ignoreOverriddenMethods = ignoreOverriddenMethods;
     }
 
@@ -147,8 +144,7 @@ public class AbbreviationAsWordInNameCheck extends Check
      * @param allowedAbbreviationLength
      *            amount of allowed capital letters in abbreviation.
      */
-    public void setAllowedAbbreviationLength(int allowedAbbreviationLength)
-    {
+    public void setAllowedAbbreviationLength(int allowedAbbreviationLength) {
         this.allowedAbbreviationLength = allowedAbbreviationLength;
     }
 
@@ -159,8 +155,7 @@ public class AbbreviationAsWordInNameCheck extends Check
      *        an string of abbreviations that must be skipped from checking,
      *        each abbreviation separated by comma.
      */
-    public void setAllowedAbbreviations(String allowedAbbreviations)
-    {
+    public void setAllowedAbbreviations(String allowedAbbreviations) {
         if (allowedAbbreviations != null) {
             this.allowedAbbreviations = new HashSet<>(
                     Arrays.asList(allowedAbbreviations.split(",")));
@@ -168,8 +163,7 @@ public class AbbreviationAsWordInNameCheck extends Check
     }
 
     @Override
-    public int[] getDefaultTokens()
-    {
+    public int[] getDefaultTokens() {
         return new int[] {
             TokenTypes.CLASS_DEF,
             TokenTypes.INTERFACE_DEF,
@@ -183,8 +177,7 @@ public class AbbreviationAsWordInNameCheck extends Check
     }
 
     @Override
-    public int[] getAcceptableTokens()
-    {
+    public int[] getAcceptableTokens() {
         return new int[] {
             TokenTypes.CLASS_DEF,
             TokenTypes.INTERFACE_DEF,
@@ -199,8 +192,7 @@ public class AbbreviationAsWordInNameCheck extends Check
     }
 
     @Override
-    public void visitToken(DetailAST ast)
-    {
+    public void visitToken(DetailAST ast) {
 
         if (!isIgnoreSituation(ast)) {
 
@@ -220,15 +212,13 @@ public class AbbreviationAsWordInNameCheck extends Check
      * @return true if it is an ignore situation found for given input DetailAST
      *         node.
      */
-    private boolean isIgnoreSituation(DetailAST ast)
-    {
+    private boolean isIgnoreSituation(DetailAST ast) {
         final DetailAST modifiers = ast.getFirstChild();
 
         boolean result = false;
         if (ast.getType() == TokenTypes.VARIABLE_DEF) {
             if ((ignoreFinal || ignoreStatic)
-                    && isInterfaceDeclaration(ast))
-            {
+                    && isInterfaceDeclaration(ast)) {
                 // field declarations in interface are static/final
                 result = true;
             }
@@ -252,15 +242,13 @@ public class AbbreviationAsWordInNameCheck extends Check
      * @return true if variable definition(variableDefAst) is in interface
      * definition.
      */
-    private static boolean isInterfaceDeclaration(DetailAST variableDefAst)
-    {
+    private static boolean isInterfaceDeclaration(DetailAST variableDefAst) {
         boolean result = false;
         final DetailAST astBlock = variableDefAst.getParent();
         if (astBlock != null) {
             final DetailAST astParent2 = astBlock.getParent();
             if (astParent2 != null
-                    && astParent2.getType() == TokenTypes.INTERFACE_DEF)
-            {
+                    && astParent2.getType() == TokenTypes.INTERFACE_DEF) {
                 result = true;
             }
         }
@@ -274,8 +262,7 @@ public class AbbreviationAsWordInNameCheck extends Check
      *        (MODIFIERS type).
      * @return true if method has "@Override" annotation.
      */
-    private static boolean hasOverrideAnnotation(DetailAST methodModifiersAST)
-    {
+    private static boolean hasOverrideAnnotation(DetailAST methodModifiersAST) {
         boolean result = false;
         for (DetailAST child : getChildren(methodModifiersAST)) {
             if (child.getType() == TokenTypes.ANNOTATION) {
@@ -296,8 +283,7 @@ public class AbbreviationAsWordInNameCheck extends Check
      * @return the disallowed abbreviation contained in given String as a
      *         separate String.
      */
-    private String getDisallowedAbbreviation(String str)
-    {
+    private String getDisallowedAbbreviation(String str) {
         int beginIndex = 0;
         boolean abbrStarted = false;
         String result = null;
@@ -351,8 +337,7 @@ public class AbbreviationAsWordInNameCheck extends Check
      *        Current parent node.
      * @return The list of children one level below on the current parent node.
      */
-    private static List<DetailAST> getChildren(final DetailAST node)
-    {
+    private static List<DetailAST> getChildren(final DetailAST node) {
         final List<DetailAST> result = new LinkedList<>();
         DetailAST curNode = node.getFirstChild();
         while (curNode != null) {

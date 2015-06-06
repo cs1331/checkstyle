@@ -16,17 +16,23 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.api;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+
+import java.util.Locale;
+
 import org.junit.Test;
 
-public class SeverityLevelTest
-{
+/**
+ * Test cases for {@link SeverityLevel} enumeration.
+ * @author Mehmet Can Cömert
+ */
+public class SeverityLevelTest {
     @Test(expected = IllegalArgumentException.class)
-    public void testMisc()
-    {
+    public void testMisc() {
         final SeverityLevel o = SeverityLevel.getInstance("info");
         assertNotNull(o);
         assertEquals("info", o.toString());
@@ -36,11 +42,25 @@ public class SeverityLevelTest
     }
 
     @Test
-    public void testMixedCaseSpaces()
-    {
+    public void testMixedCaseSpaces() {
         SeverityLevel.getInstance("IgnoRe ");
         SeverityLevel.getInstance(" iNfo");
         SeverityLevel.getInstance(" WarniNg");
         SeverityLevel.getInstance("    ERROR ");
+    }
+
+    @Test
+    public void testMixedCaseSpacesWithDifferentLocales() {
+        Locale[] differentLocales = new Locale[] {new Locale("TR", "tr") };
+        Locale defaultLocale = Locale.getDefault();
+        try {
+            for (Locale differentLocale : differentLocales) {
+                Locale.setDefault(differentLocale);
+                testMixedCaseSpaces();
+            }
+        }
+        finally {
+            Locale.setDefault(defaultLocale);
+        }
     }
 }

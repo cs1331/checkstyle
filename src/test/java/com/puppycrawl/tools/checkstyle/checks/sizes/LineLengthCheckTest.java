@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.sizes;
 
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
@@ -24,12 +25,10 @@ import org.junit.Test;
 
 import static com.puppycrawl.tools.checkstyle.checks.sizes.LineLengthCheck.MSG_KEY;
 
-public class LineLengthCheckTest extends BaseCheckTestSupport
-{
+public class LineLengthCheckTest extends BaseCheckTestSupport {
     @Test
     public void testSimple()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(LineLengthCheck.class);
         checkConfig.addAttribute("max", "80");
@@ -43,8 +42,7 @@ public class LineLengthCheckTest extends BaseCheckTestSupport
 
     @Test
     public void shouldLogActualLineLength()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(LineLengthCheck.class);
         checkConfig.addAttribute("max", "80");

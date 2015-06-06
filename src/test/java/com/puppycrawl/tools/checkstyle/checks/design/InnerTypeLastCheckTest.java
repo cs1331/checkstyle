@@ -16,21 +16,22 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.design;
 
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
+import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import org.junit.Test;
 
 import java.io.File;
 
 import static com.puppycrawl.tools.checkstyle.checks.design.InnerTypeLastCheck.MSG_KEY;
+import static org.junit.Assert.assertArrayEquals;
 
-public class InnerTypeLastCheckTest extends BaseCheckTestSupport
-{
+public class InnerTypeLastCheckTest extends BaseCheckTestSupport {
     @Test
-    public void testMembersBeforeInner() throws Exception
-    {
+    public void testMembersBeforeInner() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(InnerTypeLastCheck.class);
         final String[] expected = {
@@ -42,5 +43,12 @@ public class InnerTypeLastCheckTest extends BaseCheckTestSupport
         };
         verify(checkConfig, getPath("design" + File.separator
                                     + "InputInnerClassCheck.java"), expected);
+    }
+
+    @Test
+    public void testGetAcceptableTokens() {
+        InnerTypeLastCheck obj = new InnerTypeLastCheck();
+        int[] expected = {TokenTypes.CLASS_DEF, TokenTypes.INTERFACE_DEF};
+        assertArrayEquals(expected, obj.getAcceptableTokens());
     }
 }

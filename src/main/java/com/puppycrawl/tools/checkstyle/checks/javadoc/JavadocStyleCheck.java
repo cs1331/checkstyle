@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.javadoc;
 
 import com.google.common.collect.ImmutableSortedSet;
@@ -24,13 +25,15 @@ import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.FileContents;
 import com.puppycrawl.tools.checkstyle.api.JavadocTagInfo;
 import com.puppycrawl.tools.checkstyle.api.Scope;
-import com.puppycrawl.tools.checkstyle.api.ScopeUtils;
+import com.puppycrawl.tools.checkstyle.ScopeUtils;
 import com.puppycrawl.tools.checkstyle.api.TextBlock;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import com.puppycrawl.tools.checkstyle.checks.CheckUtils;
+
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -42,8 +45,7 @@ import java.util.regex.Pattern;
  * @author Travis Schneeberger
  */
 public class JavadocStyleCheck
-    extends Check
-{
+    extends Check {
 
     /** Message property key for the Unclosed HTML message. */
     public static final String JAVADOC_MISSING = "javadoc.missing";
@@ -96,21 +98,20 @@ public class JavadocStyleCheck
      * Indicates if the first sentence should be checked for proper end of
      * sentence punctuation.
      */
-    private boolean checkFirstSentence = true;
+    private boolean checkingFirstSentence = true;
 
     /**
      * Indicates if the HTML within the comment should be checked.
      */
-    private boolean checkHtml = true;
+    private boolean checkingHtml = true;
 
     /**
      * Indicates if empty javadoc statements should be checked.
      */
-    private boolean checkEmptyJavadoc;
+    private boolean checkingEmptyJavadoc;
 
     @Override
-    public int[] getDefaultTokens()
-    {
+    public int[] getDefaultTokens() {
         return new int[] {
             TokenTypes.INTERFACE_DEF,
             TokenTypes.CLASS_DEF,
@@ -126,8 +127,7 @@ public class JavadocStyleCheck
     }
 
     @Override
-    public int[] getAcceptableTokens()
-    {
+    public int[] getAcceptableTokens() {
         return new int[] {
             TokenTypes.INTERFACE_DEF,
             TokenTypes.CLASS_DEF,
@@ -143,8 +143,7 @@ public class JavadocStyleCheck
     }
 
     @Override
-    public void visitToken(DetailAST ast)
-    {
+    public void visitToken(DetailAST ast) {
         if (shouldCheck(ast)) {
             final FileContents contents = getFileContents();
             // Need to start searching for the comment before the annotations
@@ -162,8 +161,7 @@ public class JavadocStyleCheck
      * @param ast a given node.
      * @return whether we should check a given node.
      */
-    private boolean shouldCheck(final DetailAST ast)
-    {
+    private boolean shouldCheck(final DetailAST ast) {
         if (ast.getType() == TokenTypes.PACKAGE_DEF) {
             return getFileContents().inPackageInfo();
         }
@@ -203,8 +201,7 @@ public class JavadocStyleCheck
      * @see #checkFirstSentence(DetailAST, TextBlock)
      * @see #checkHtml(DetailAST, TextBlock)
      */
-    private void checkComment(final DetailAST ast, final TextBlock comment)
-    {
+    private void checkComment(final DetailAST ast, final TextBlock comment) {
         if (comment == null) {
             /*checking for missing docs in JavadocStyleCheck is not consistent
             with the rest of CheckStyle...  Even though, I didn't think it
@@ -216,15 +213,15 @@ public class JavadocStyleCheck
             return;
         }
 
-        if (checkFirstSentence) {
+        if (checkingFirstSentence) {
             checkFirstSentence(ast, comment);
         }
 
-        if (checkHtml) {
+        if (checkingHtml) {
             checkHtml(ast, comment);
         }
 
-        if (checkEmptyJavadoc) {
+        if (checkingEmptyJavadoc) {
             checkEmptyJavadoc(comment);
         }
     }
@@ -239,15 +236,13 @@ public class JavadocStyleCheck
      * @param ast the current node
      * @param comment the source lines that make up the Javadoc comment.
      */
-    private void checkFirstSentence(final DetailAST ast, TextBlock comment)
-    {
+    private void checkFirstSentence(final DetailAST ast, TextBlock comment) {
         final String commentText = getCommentText(comment.getText());
 
         if (commentText.length() != 0
             && !getEndOfSentencePattern().matcher(commentText).find()
             && !("{@inheritDoc}".equals(commentText)
-            && JavadocTagInfo.INHERIT_DOC.isValidOn(ast)))
-        {
+            && JavadocTagInfo.INHERIT_DOC.isValidOn(ast))) {
             log(comment.getStartLineNo(), NO_PERIOD);
         }
     }
@@ -257,8 +252,7 @@ public class JavadocStyleCheck
      *
      * @param comment the source lines that make up the Javadoc comment.
      */
-    private void checkEmptyJavadoc(TextBlock comment)
-    {
+    private void checkEmptyJavadoc(TextBlock comment) {
         final String commentText = getCommentText(comment.getText());
 
         if (commentText.length() == 0) {
@@ -271,8 +265,7 @@ public class JavadocStyleCheck
      * @param comments the lines of Javadoc.
      * @return a comment text String.
      */
-    private String getCommentText(String[] comments)
-    {
+    private String getCommentText(String... comments) {
         final StringBuffer buffer = new StringBuffer();
         for (final String line : comments) {
             final int textStart = findTextStart(line);
@@ -299,8 +292,7 @@ public class JavadocStyleCheck
      * @return the int index relative to 0 for the start of text
      *         or -1 if not found.
      */
-    private int findTextStart(String line)
-    {
+    private int findTextStart(String line) {
         int textStart = -1;
         for (int i = 0; i < line.length(); i++) {
             if (!Character.isWhitespace(line.charAt(i))) {
@@ -323,16 +315,14 @@ public class JavadocStyleCheck
      * Trims any trailing whitespace or the end of Javadoc comment string.
      * @param buffer the StringBuffer to trim.
      */
-    private void trimTail(StringBuffer buffer)
-    {
+    private void trimTail(StringBuffer buffer) {
         for (int i = buffer.length() - 1; i >= 0; i--) {
             if (Character.isWhitespace(buffer.charAt(i))) {
                 buffer.deleteCharAt(i);
             }
             else if (i > 0
                      && buffer.charAt(i - 1) == '*'
-                     && buffer.charAt(i) == '/')
-            {
+                     && buffer.charAt(i) == '/') {
                 buffer.deleteCharAt(i);
                 buffer.deleteCharAt(i - 1);
                 i--;
@@ -356,13 +346,10 @@ public class JavadocStyleCheck
      * @param comment the <code>TextBlock</code> which represents
      *                 the Javadoc comment.
      */
-    private void checkHtml(final DetailAST ast, final TextBlock comment)
-    {
+    private void checkHtml(final DetailAST ast, final TextBlock comment) {
         final int lineno = comment.getStartLineNo();
         final Deque<HtmlTag> htmlStack = new ArrayDeque<>();
         final String[] text = comment.getText();
-        final List<String> typeParameters =
-            CheckUtils.getTypeParameterNames(ast);
 
         TagParser parser = null;
         parser = new TagParser(text, lineno);
@@ -371,8 +358,8 @@ public class JavadocStyleCheck
             final HtmlTag tag = parser.nextTag();
 
             if (tag.isIncompleteTag()) {
-                log(tag.getLineno(), INCOMPLETE_TAG,
-                    text[tag.getLineno() - lineno]);
+                log(tag.getLineNo(), INCOMPLETE_TAG,
+                    text[tag.getLineNo() - lineno]);
                 return;
             }
             if (tag.isClosedTag()) {
@@ -389,7 +376,7 @@ public class JavadocStyleCheck
                 // We have found a close tag.
                 if (isExtraHtml(tag.getId(), htmlStack)) {
                     // No corresponding open tag was found on the stack.
-                    log(tag.getLineno(),
+                    log(tag.getLineNo(),
                         tag.getPosition(),
                         EXTRA_HTML,
                         tag);
@@ -404,12 +391,12 @@ public class JavadocStyleCheck
 
         // Identify any tags left on the stack.
         String lastFound = ""; // Skip multiples, like <b>...<b>
+        final List<String> typeParameters = CheckUtils.getTypeParameterNames(ast);
         for (final HtmlTag htag : htmlStack) {
             if (!isSingleTag(htag)
                 && !htag.getId().equals(lastFound)
-                && !typeParameters.contains(htag.getId()))
-            {
-                log(htag.getLineno(), htag.getPosition(), UNCLOSED_HTML, htag);
+                && !typeParameters.contains(htag.getId())) {
+                log(htag.getLineNo(), htag.getPosition(), UNCLOSED_HTML, htag);
                 lastFound = htag.getId();
             }
         }
@@ -424,8 +411,7 @@ public class JavadocStyleCheck
      * @param htmlStack the stack of opened HTML tags.
      * @param token the current HTML tag name that has been closed.
      */
-    private void checkUnclosedTags(Deque<HtmlTag> htmlStack, String token)
-    {
+    private void checkUnclosedTags(Deque<HtmlTag> htmlStack, String token) {
         final Deque<HtmlTag> unclosedTags = new ArrayDeque<>();
         HtmlTag lastOpenTag = htmlStack.pop();
         while (!token.equalsIgnoreCase(lastOpenTag.getId())) {
@@ -448,7 +434,7 @@ public class JavadocStyleCheck
                 continue;
             }
             lastFound = lastOpenTag.getId();
-            log(lastOpenTag.getLineno(),
+            log(lastOpenTag.getLineNo(),
                 lastOpenTag.getPosition(),
                 UNCLOSED_HTML,
                 lastOpenTag);
@@ -461,13 +447,12 @@ public class JavadocStyleCheck
      * @param tag the HtmlTag to check.
      * @return <code>true</code> if the HtmlTag is a single tag.
      */
-    private boolean isSingleTag(HtmlTag tag)
-    {
+    private boolean isSingleTag(HtmlTag tag) {
         // If its a singleton tag (<p>, <br>, etc.), ignore it
         // Can't simply not put them on the stack, since singletons
         // like <dt> and <dd> (unhappily) may either be terminated
         // or not terminated. Both options are legal.
-        return SINGLE_TAGS.contains(tag.getId().toLowerCase());
+        return SINGLE_TAGS.contains(tag.getId().toLowerCase(Locale.ENGLISH));
     }
 
     /**
@@ -476,9 +461,8 @@ public class JavadocStyleCheck
      * @param tag the HtmlTag to check.
      * @return <code>true</code> if the HtmlTag is an allowed html tag.
      */
-    private boolean isAllowedTag(HtmlTag tag)
-    {
-        return ALLOWED_TAGS.contains(tag.getId().toLowerCase());
+    private boolean isAllowedTag(HtmlTag tag) {
+        return ALLOWED_TAGS.contains(tag.getId().toLowerCase(Locale.ENGLISH));
     }
 
     /**
@@ -490,8 +474,7 @@ public class JavadocStyleCheck
      * @return <code>false</code> if a previous open tag was found
      *         for the token.
      */
-    private boolean isExtraHtml(String token, Deque<HtmlTag> htmlStack)
-    {
+    private boolean isExtraHtml(String token, Deque<HtmlTag> htmlStack) {
         boolean isExtra = true;
         for (final HtmlTag td : htmlStack) {
             // Loop, looking for tags that are closed.
@@ -511,8 +494,7 @@ public class JavadocStyleCheck
      * Sets the scope to check.
      * @param from string to get the scope from
      */
-    public void setScope(String from)
-    {
+    public void setScope(String from) {
         scope = Scope.getInstance(from);
     }
 
@@ -520,8 +502,7 @@ public class JavadocStyleCheck
      * Set the excludeScope.
      * @param scope a <code>String</code> value
      */
-    public void setExcludeScope(String scope)
-    {
+    public void setExcludeScope(String scope) {
         excludeScope = Scope.getInstance(scope);
     }
 
@@ -529,8 +510,7 @@ public class JavadocStyleCheck
      * Set the format for matching the end of a sentence.
      * @param format format for matching the end of a sentence.
      */
-    public void setEndOfSentenceFormat(String format)
-    {
+    public void setEndOfSentenceFormat(String format) {
         endOfSentenceFormat = format;
     }
 
@@ -539,8 +519,7 @@ public class JavadocStyleCheck
      *
      * @return a regular expression for matching the end of a sentence.
      */
-    private Pattern getEndOfSentencePattern()
-    {
+    private Pattern getEndOfSentencePattern() {
         if (endOfSentencePattern == null) {
             endOfSentencePattern = Pattern.compile(endOfSentenceFormat);
         }
@@ -552,26 +531,23 @@ public class JavadocStyleCheck
      * proper end of sentence punctuation.
      * @param flag <code>true</code> if the first sentence is to be checked
      */
-    public void setCheckFirstSentence(boolean flag)
-    {
-        checkFirstSentence = flag;
+    public void setCheckFirstSentence(boolean flag) {
+        checkingFirstSentence = flag;
     }
 
     /**
      * Sets the flag that determines if HTML checking is to be performed.
      * @param flag <code>true</code> if HTML checking is to be performed.
      */
-    public void setCheckHtml(boolean flag)
-    {
-        checkHtml = flag;
+    public void setCheckHtml(boolean flag) {
+        checkingHtml = flag;
     }
 
     /**
      * Sets the flag that determines if empty Javadoc checking should be done.
      * @param flag <code>true</code> if empty Javadoc checking should be done.
      */
-    public void setCheckEmptyJavadoc(boolean flag)
-    {
-        checkEmptyJavadoc = flag;
+    public void setCheckEmptyJavadoc(boolean flag) {
+        checkingEmptyJavadoc = flag;
     }
 }

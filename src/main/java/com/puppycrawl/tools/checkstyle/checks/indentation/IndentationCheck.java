@@ -16,40 +16,13 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.indentation;
 
 import com.puppycrawl.tools.checkstyle.api.Check;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import java.util.ArrayDeque;
 import java.util.Deque;
-
-// TODO: allow preset indentation styles (IE... GNU style, Sun style, etc...)?
-
-// TODO: optionally make imports (and other?) statements required to start
-//   line? -- but maybe this should be a different check
-
-// TODO: optionally allow array children, throws clause, etc...
-//   to be of any indentation > required, for emacs-style indentation
-
-// TODO: this is not illegal, but probably should be:
-//        myfunc3(11, 11, Integer.
-//            getInteger("mytest").intValue(),  // this should be in 4 more
-//            11);
-
-// TODO: any dot-based indentation doesn't work (at least not yet...) the
-//  problem is that we don't know which way an expression tree will be built
-//  and with dot trees, they are built backwards.  This means code like
-//
-//  org.blah.mystuff
-//      .myclass.getFactoryObject()
-//          .objFunc().otherMethod();
-// and
-//  return ((MethodCallHandler) parent)
-//      .findContainingMethodCall(this);
-//  is all checked at the level of the first line.  Simple dots are actually
-// checked but the method call handler will have to be changed drastically
-// to fix the above...
-
 
 /**
  * Checks correct indentation of Java Code.
@@ -105,8 +78,7 @@ import java.util.Deque;
  * @author Maikel Steneker
  * @author maxvetrenko
  */
-public class IndentationCheck extends Check
-{
+public class IndentationCheck extends Check {
     /** Default indentation amount - based on Sun */
     private static final int DEFAULT_INDENTATION = 4;
 
@@ -141,17 +113,11 @@ public class IndentationCheck extends Check
     /** factory from which handlers are distributed */
     private final HandlerFactory handlerFactory = new HandlerFactory();
 
-    /** Creates a new instance of IndentationCheck. */
-    public IndentationCheck()
-    {
-    }
-
     /**
      * Get forcing strict condition.
      * @return forceStrictCondition value.
      */
-    public boolean getForceStrictCondition()
-    {
+    public boolean isForceStrictCondition() {
         return forceStrictCondition;
     }
 
@@ -159,8 +125,7 @@ public class IndentationCheck extends Check
      * Set forcing strict condition.
      * @param value user's value of forceStrictCondition.
      */
-    public void setForceStrictCondition(boolean value)
-    {
+    public void setForceStrictCondition(boolean value) {
         forceStrictCondition = value;
     }
 
@@ -169,8 +134,7 @@ public class IndentationCheck extends Check
      *
      * @param basicOffset   the number of tabs or spaces to indent
      */
-    public void setBasicOffset(int basicOffset)
-    {
+    public void setBasicOffset(int basicOffset) {
         this.basicOffset = basicOffset;
     }
 
@@ -179,8 +143,7 @@ public class IndentationCheck extends Check
      *
      * @return the number of tabs or spaces to indent
      */
-    public int getBasicOffset()
-    {
+    public int getBasicOffset() {
         return basicOffset;
     }
 
@@ -189,8 +152,7 @@ public class IndentationCheck extends Check
      *
      * @param adjustmentAmount   the brace offset
      */
-    public void setBraceAdjustment(int adjustmentAmount)
-    {
+    public void setBraceAdjustment(int adjustmentAmount) {
         braceAdjustment = adjustmentAmount;
     }
 
@@ -199,8 +161,7 @@ public class IndentationCheck extends Check
      *
      * @return the positive offset to adjust braces
      */
-    public int getBraceAdjustement()
-    {
+    public int getBraceAdjustment() {
         return braceAdjustment;
     }
 
@@ -209,8 +170,7 @@ public class IndentationCheck extends Check
      *
      * @param amount   the case indentation level
      */
-    public void setCaseIndent(int amount)
-    {
+    public void setCaseIndent(int amount) {
         caseIndentationAmount = amount;
     }
 
@@ -219,8 +179,7 @@ public class IndentationCheck extends Check
      *
      * @return the case indentation level
      */
-    public int getCaseIndent()
-    {
+    public int getCaseIndent() {
         return caseIndentationAmount;
     }
 
@@ -229,8 +188,7 @@ public class IndentationCheck extends Check
      *
      * @param throwsIndent the throws indentation level
      */
-    public void setThrowsIndent(int throwsIndent)
-    {
+    public void setThrowsIndent(int throwsIndent) {
         throwsIndentationAmount = throwsIndent;
     }
 
@@ -239,8 +197,7 @@ public class IndentationCheck extends Check
      *
      * @return the throws indentation level
      */
-    public int getThrowsIndent()
-    {
+    public int getThrowsIndent() {
         return this.throwsIndentationAmount;
     }
 
@@ -249,8 +206,7 @@ public class IndentationCheck extends Check
      *
      * @param arrayInitIndent the array initialisation indentation level
      */
-    public void setArrayInitIndent(int arrayInitIndent)
-    {
+    public void setArrayInitIndent(int arrayInitIndent) {
         arrayInitIndentationAmount = arrayInitIndent;
     }
 
@@ -259,8 +215,7 @@ public class IndentationCheck extends Check
      *
      * @return the initialisation indentation level
      */
-    public int getArrayInitIndent()
-    {
+    public int getArrayInitIndent() {
         return this.arrayInitIndentationAmount;
     }
 
@@ -269,8 +224,7 @@ public class IndentationCheck extends Check
      *
      * @return the line-wrapping indentation level
      */
-    public int getLineWrappingIndentation()
-    {
+    public int getLineWrappingIndentation() {
         return lineWrappingIndentation;
     }
 
@@ -280,8 +234,7 @@ public class IndentationCheck extends Check
      *
      * @param lineWrappingIndentation the line-wrapping indentation level
      */
-    public void setLineWrappingIndentation(int lineWrappingIndentation)
-    {
+    public void setLineWrappingIndentation(int lineWrappingIndentation) {
         this.lineWrappingIndentation = lineWrappingIndentation;
     }
 
@@ -294,8 +247,7 @@ public class IndentationCheck extends Check
      *
      * @see java.text.MessageFormat
      */
-    public void indentationLog(int line, String key, Object... args)
-    {
+    public void indentationLog(int line, String key, Object... args) {
         super.log(line, key, args);
     }
 
@@ -304,28 +256,24 @@ public class IndentationCheck extends Check
      *
      * @return the width of a tab
      */
-    public int getIndentationTabWidth()
-    {
+    public int getIndentationTabWidth() {
         return getTabWidth();
     }
 
     @Override
-    public int[] getDefaultTokens()
-    {
+    public int[] getDefaultTokens() {
         return handlerFactory.getHandledTypes();
     }
 
     @Override
-    public void beginTree(DetailAST ast)
-    {
+    public void beginTree(DetailAST ast) {
         handlerFactory.clearCreatedHandlers();
         handlers.clear();
         handlers.push(new PrimordialHandler(this));
     }
 
     @Override
-    public void visitToken(DetailAST ast)
-    {
+    public void visitToken(DetailAST ast) {
         final ExpressionHandler handler = handlerFactory.getHandler(this, ast,
             handlers.peek());
         handlers.push(handler);
@@ -333,8 +281,7 @@ public class IndentationCheck extends Check
     }
 
     @Override
-    public void leaveToken(DetailAST ast)
-    {
+    public void leaveToken(DetailAST ast) {
         handlers.pop();
     }
 
@@ -343,8 +290,7 @@ public class IndentationCheck extends Check
      *
      * @return the handler factory
      */
-    final HandlerFactory getHandlerFactory()
-    {
+    final HandlerFactory getHandlerFactory() {
         return handlerFactory;
     }
 }

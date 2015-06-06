@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.blocks;
 
 /**
@@ -23,8 +24,7 @@ package com.puppycrawl.tools.checkstyle.checks.blocks;
  *
  * @author Oliver Burn
  */
-public enum LeftCurlyOption
-{
+public enum LeftCurlyOption {
     /**
      * Represents the policy for placing the brace at the end of line. For
      * example:

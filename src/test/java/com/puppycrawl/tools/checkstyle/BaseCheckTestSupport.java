@@ -14,6 +14,7 @@ import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -25,7 +26,7 @@ public abstract class BaseCheckTestSupport {
      */
     protected static class BriefLogger
             extends DefaultLogger {
-        public BriefLogger(OutputStream out) {
+        public BriefLogger(OutputStream out) throws UnsupportedEncodingException {
             super(out, true);
         }
 
@@ -56,9 +57,9 @@ public abstract class BaseCheckTestSupport {
             throws Exception {
         final DefaultConfiguration dc = createCheckerConfig(checkConfig);
         final Checker c = new Checker();
-        // make sure the tests always run with english error messages
-        // so the tests don't fail in supported locales like german
-        final Locale locale = Locale.ENGLISH;
+        // make sure the tests always run with default error messages (language-invariant)
+        // so the tests don't fail in supported locales like German
+        final Locale locale = Locale.ROOT;
         c.setLocaleCountry(locale.getCountry());
         c.setLocaleLanguage(locale.getLanguage());
         c.setModuleClassLoader(Thread.currentThread().getContextClassLoader());

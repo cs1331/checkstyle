@@ -16,20 +16,21 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.design;
 
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
+import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import org.junit.Test;
 
 import static com.puppycrawl.tools.checkstyle.checks.design.FinalClassCheck.MSG_KEY;
+import static org.junit.Assert.assertArrayEquals;
 
 public class FinalClassCheckTest
-    extends BaseCheckTestSupport
-{
+    extends BaseCheckTestSupport {
     @Test
-    public void testFianlClass() throws Exception
-    {
+    public void testFianlClass() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(FinalClassCheck.class);
         final String[] expected = {
@@ -38,5 +39,12 @@ public class FinalClassCheckTest
             "109: " + getCheckMessage(MSG_KEY, "someinnerClass"),
         };
         verify(checkConfig, getPath("InputFinalClass.java"), expected);
+    }
+
+    @Test
+    public void testGetAcceptableTokens() {
+        FinalClassCheck obj = new FinalClassCheck();
+        int[] expected = {TokenTypes.CLASS_DEF, TokenTypes.CTOR_DEF};
+        assertArrayEquals(expected, obj.getAcceptableTokens());
     }
 }

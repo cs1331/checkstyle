@@ -16,20 +16,22 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
-package com.puppycrawl.tools.checkstyle.checks.sizes;
 
-import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
-import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
-import org.junit.Test;
+package com.puppycrawl.tools.checkstyle.checks.sizes;
 
 import static com.puppycrawl.tools.checkstyle.checks.sizes.ExecutableStatementCountCheck.MSG_KEY;
 
+import antlr.CommonHiddenStreamToken;
+import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
+import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
+import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import com.puppycrawl.tools.checkstyle.api.TokenTypes;
+import org.junit.Test;
+
 public class ExecutableStatementCountCheckTest
-    extends BaseCheckTestSupport
-{
+    extends BaseCheckTestSupport {
     @Test
-    public void testMaxZero() throws Exception
-    {
+    public void testMaxZero() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(ExecutableStatementCountCheck.class);
 
@@ -48,12 +50,11 @@ public class ExecutableStatementCountCheckTest
             "79:13: " + getCheckMessage(MSG_KEY, 1, 0),
         };
 
-        verify(checkConfig, getPath("ComplexityCheckTestInput.java"), expected);
+        verify(checkConfig, getPath("ExecutableStatementCountInput.java"), expected);
     }
 
     @Test
-    public void testMethodDef() throws Exception
-    {
+    public void testMethodDef() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(ExecutableStatementCountCheck.class);
 
@@ -69,12 +70,11 @@ public class ExecutableStatementCountCheckTest
             "79:13: " + getCheckMessage(MSG_KEY, 1, 0),
         };
 
-        verify(checkConfig, getPath("ComplexityCheckTestInput.java"), expected);
+        verify(checkConfig, getPath("ExecutableStatementCountInput.java"), expected);
     }
 
     @Test
-    public void testCtorDef() throws Exception
-    {
+    public void testCtorDef() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(ExecutableStatementCountCheck.class);
 
@@ -86,12 +86,11 @@ public class ExecutableStatementCountCheckTest
             "76:5: " + getCheckMessage(MSG_KEY, 2, 0),
         };
 
-        verify(checkConfig, getPath("ComplexityCheckTestInput.java"), expected);
+        verify(checkConfig, getPath("ExecutableStatementCountInput.java"), expected);
     }
 
     @Test
-    public void testStaticInit() throws Exception
-    {
+    public void testStaticInit() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(ExecutableStatementCountCheck.class);
 
@@ -102,12 +101,11 @@ public class ExecutableStatementCountCheckTest
             "58:5: " + getCheckMessage(MSG_KEY, 2, 0),
         };
 
-        verify(checkConfig, getPath("ComplexityCheckTestInput.java"), expected);
+        verify(checkConfig, getPath("ExecutableStatementCountInput.java"), expected);
     }
 
     @Test
-    public void testInstanceInit() throws Exception
-    {
+    public void testInstanceInit() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(ExecutableStatementCountCheck.class);
 
@@ -118,6 +116,26 @@ public class ExecutableStatementCountCheckTest
             "67:5: " + getCheckMessage(MSG_KEY, 2, 0),
         };
 
-        verify(checkConfig, getPath("ComplexityCheckTestInput.java"), expected);
+        verify(checkConfig, getPath("ExecutableStatementCountInput.java"), expected);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void testVisitTokenWhithWrongTokenType() {
+        ExecutableStatementCountCheck checkObj =
+            new ExecutableStatementCountCheck();
+        DetailAST ast = new DetailAST();
+        ast.initialize(
+            new CommonHiddenStreamToken(TokenTypes.ENUM, "ENUM"));
+        checkObj.visitToken(ast);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void testLeaveTokenWithWrongTokenType() {
+        ExecutableStatementCountCheck checkObj =
+            new ExecutableStatementCountCheck();
+        DetailAST ast = new DetailAST();
+        ast.initialize(
+            new CommonHiddenStreamToken(TokenTypes.ENUM, "ENUM"));
+        checkObj.leaveToken(ast);
     }
 }

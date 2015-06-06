@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.indentation;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
@@ -26,8 +27,7 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  *
  * @author jrichard
  */
-public class CaseHandler extends ExpressionHandler
-{
+public class CaseHandler extends ExpressionHandler {
     /**
      * The child elements of a case expression.
      */
@@ -45,14 +45,12 @@ public class CaseHandler extends ExpressionHandler
      * @param parent        the parent handler
      */
     public CaseHandler(IndentationCheck indentCheck,
-        DetailAST expr, ExpressionHandler parent)
-    {
+        DetailAST expr, ExpressionHandler parent) {
         super(indentCheck, "case", expr, parent);
     }
 
     @Override
-    protected IndentLevel getLevelImpl()
-    {
+    protected IndentLevel getLevelImpl() {
         return new IndentLevel(getParent().getLevel(),
                                getIndentCheck().getCaseIndent());
     }
@@ -60,20 +58,17 @@ public class CaseHandler extends ExpressionHandler
     /**
      * Check the indentation of the case statement.
      */
-    private void checkCase()
-    {
+    private void checkCase() {
         checkChildren(getMainAst(), CASE_CHILDREN, getLevel(), true, false);
     }
 
     @Override
-    public IndentLevel suggestedChildLevel(ExpressionHandler child)
-    {
+    public IndentLevel suggestedChildLevel(ExpressionHandler child) {
         return getLevel();
     }
 
     @Override
-    public void checkIndentation()
-    {
+    public void checkIndentation() {
         checkCase();
     }
 }

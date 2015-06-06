@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.blocks;
 
 import java.io.File;
@@ -27,11 +28,9 @@ import org.junit.Test;
 
 import static com.puppycrawl.tools.checkstyle.checks.blocks.NeedBracesCheck.MSG_KEY_NEED_BRACES;
 
-public class NeedBracesCheckTest extends BaseCheckTestSupport
-{
+public class NeedBracesCheckTest extends BaseCheckTestSupport {
     @Test
-    public void testIt() throws Exception
-    {
+    public void testIt() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(NeedBracesCheck.class);
         final String[] expected = {
@@ -57,8 +56,7 @@ public class NeedBracesCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testSigleLineStatements() throws Exception
-    {
+    public void testSigleLineStatements() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(NeedBracesCheck.class);
         checkConfig.addAttribute("allowSingleLineStatement", "true");
@@ -69,13 +67,14 @@ public class NeedBracesCheckTest extends BaseCheckTestSupport
             "46: " + getCheckMessage(MSG_KEY_NEED_BRACES, "while"),
             "53: " + getCheckMessage(MSG_KEY_NEED_BRACES, "do"),
             "59: " + getCheckMessage(MSG_KEY_NEED_BRACES, "for"),
+            "88: " + getCheckMessage(MSG_KEY_NEED_BRACES, "if"),
+            "92: " + getCheckMessage(MSG_KEY_NEED_BRACES, "else"),
         };
         verify(checkConfig, getPath("InputBracesSingleLineStatements.java"), expected);
     }
 
     @Test
-    public void testSigleLineLambda() throws Exception
-    {
+    public void testSigleLineLambda() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(NeedBracesCheck.class);
         checkConfig.addAttribute("tokens", "LAMBDA");
@@ -88,8 +87,7 @@ public class NeedBracesCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testSigleLineCaseDefault() throws Exception
-    {
+    public void testSigleLineCaseDefault() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(NeedBracesCheck.class);
         checkConfig.addAttribute("tokens", "LITERAL_CASE, LITERAL_DEFAULT");

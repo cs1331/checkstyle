@@ -16,11 +16,12 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.design;
 
 import com.puppycrawl.tools.checkstyle.api.Check;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import com.puppycrawl.tools.checkstyle.api.ScopeUtils;
+import com.puppycrawl.tools.checkstyle.ScopeUtils;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
 /**
@@ -31,8 +32,7 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  *
  * @author <a href="mailto:ryly@mail.ru">Ruslan Dyachenko</a>
  */
-public class InnerTypeLastCheck extends Check
-{
+public class InnerTypeLastCheck extends Check {
 
     /**
      * A key is pointing to the warning message text in "messages.properties"
@@ -40,24 +40,21 @@ public class InnerTypeLastCheck extends Check
      */
     public static final String MSG_KEY = "arrangement.members.before.inner";
 
-    @Override
-    public int[] getDefaultTokens()
-    {
-        return new int[] {TokenTypes.CLASS_DEF, TokenTypes.INTERFACE_DEF};
-    }
-
-    @Override
-    public int[] getAcceptableTokens()
-    {
-        return new int[] {TokenTypes.CLASS_DEF, TokenTypes.INTERFACE_DEF};
-    }
-
     /** Meet a root class. */
     private boolean rootClass = true;
 
     @Override
-    public void visitToken(DetailAST ast)
-    {
+    public int[] getDefaultTokens() {
+        return new int[] {TokenTypes.CLASS_DEF, TokenTypes.INTERFACE_DEF};
+    }
+
+    @Override
+    public int[] getAcceptableTokens() {
+        return new int[] {TokenTypes.CLASS_DEF, TokenTypes.INTERFACE_DEF};
+    }
+
+    @Override
+    public void visitToken(DetailAST ast) {
         /** First root class */
         if (rootClass) {
             rootClass = false;
@@ -67,8 +64,7 @@ public class InnerTypeLastCheck extends Check
             while (null != nextSibling) {
                 if (!ScopeUtils.inCodeBlock(ast)
                     && (nextSibling.getType() == TokenTypes.VARIABLE_DEF
-                        || nextSibling.getType() == TokenTypes.METHOD_DEF))
-                {
+                        || nextSibling.getType() == TokenTypes.METHOD_DEF)) {
                     log(nextSibling.getLineNo(), nextSibling.getColumnNo(),
                         MSG_KEY);
                 }
@@ -78,8 +74,7 @@ public class InnerTypeLastCheck extends Check
     }
 
     @Override
-    public void leaveToken(DetailAST ast)
-    {
+    public void leaveToken(DetailAST ast) {
         /** Is this a root class */
         if (null == ast.getParent()) {
             rootClass = true;

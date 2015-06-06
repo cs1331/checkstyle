@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.whitespace;
 
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
@@ -30,12 +31,10 @@ import static com.puppycrawl.tools.checkstyle.checks.whitespace.AbstractParenPad
 .WS_NOT_PRECEDED;
 
 public class TypecastParenPadCheckTest
-    extends BaseCheckTestSupport
-{
+    extends BaseCheckTestSupport {
     @Test
     public void testDefault()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(TypecastParenPadCheck.class);
         final String[] expected = {
@@ -47,8 +46,7 @@ public class TypecastParenPadCheckTest
 
     @Test
     public void testSpace()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(TypecastParenPadCheck.class);
         checkConfig.addAttribute("option", PadOption.SPACE.toString());
@@ -66,8 +64,7 @@ public class TypecastParenPadCheckTest
     }
 
     @Test
-    public void test1322879() throws Exception
-    {
+    public void test1322879() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(TypecastParenPadCheck.class);
         checkConfig.addAttribute("option", PadOption.SPACE.toString());

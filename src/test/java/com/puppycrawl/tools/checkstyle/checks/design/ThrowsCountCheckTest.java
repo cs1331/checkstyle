@@ -16,34 +16,43 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.design;
+
+import antlr.CommonHiddenStreamToken;
 
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
+
 import java.io.File;
+
+import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import com.puppycrawl.tools.checkstyle.api.TokenTypes;
+
 import org.junit.Test;
 
 import static com.puppycrawl.tools.checkstyle.checks.design.ThrowsCountCheck.MSG_KEY;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-public class ThrowsCountCheckTest extends BaseCheckTestSupport
-{
+public class ThrowsCountCheckTest extends BaseCheckTestSupport {
     @Test
-    public void testDefault() throws Exception
-    {
+    public void testDefault() throws Exception {
         DefaultConfiguration checkConfig = createCheckConfig(ThrowsCountCheck.class);
 
         String[] expected = {
             "14:20: " + getCheckMessage(MSG_KEY, 2, 1),
             "18:20: " + getCheckMessage(MSG_KEY, 2, 1),
             "22:20: " + getCheckMessage(MSG_KEY, 3, 1),
+            "48:43: " + getCheckMessage(MSG_KEY, 2, 1),
         };
 
         verify(checkConfig, getPath("design" + File.separator + "InputThrowsCount.java"), expected);
     }
 
     @Test
-    public void testMax() throws Exception
-    {
+    public void testMax() throws Exception {
         DefaultConfiguration checkConfig = createCheckConfig(ThrowsCountCheck.class);
         checkConfig.addAttribute("max", "2");
 
@@ -51,6 +60,48 @@ public class ThrowsCountCheckTest extends BaseCheckTestSupport
             "22:20: " + getCheckMessage(MSG_KEY, 3, 2),
         };
 
+        verify(checkConfig, getPath("design" + File.separator + "InputThrowsCount.java"), expected);
+    }
+
+    @Test
+    public void testGetAcceptableTokens() {
+        ThrowsCountCheck obj = new ThrowsCountCheck();
+        int[] expected = {TokenTypes.LITERAL_THROWS};
+        assertArrayEquals(expected, obj.getAcceptableTokens());
+    }
+
+    @Test
+    public void testGetRequiredTokens() {
+        ThrowsCountCheck obj = new ThrowsCountCheck();
+        int[] expected = {TokenTypes.LITERAL_THROWS};
+        assertArrayEquals(expected, obj.getRequiredTokens());
+    }
+
+    @Test
+    public void testWrongTokenType() {
+        ThrowsCountCheck obj = new ThrowsCountCheck();
+        DetailAST ast = new DetailAST();
+        ast.initialize(new CommonHiddenStreamToken(TokenTypes.CLASS_DEF, "class"));
+        try {
+            obj.visitToken(ast);
+            fail();
+        }
+        catch (IllegalStateException e) {
+            assertEquals(ast.toString(), e.getMessage());
+        }
+    }
+
+    @Test
+    public void testNotIgnorePrivateMethod() throws Exception {
+        DefaultConfiguration checkConfig = createCheckConfig(ThrowsCountCheck.class);
+        checkConfig.addAttribute("ignorePrivateMethods", "false");
+        String[] expected = {
+            "14:20: " + getCheckMessage(MSG_KEY, 2, 1),
+            "18:20: " + getCheckMessage(MSG_KEY, 2, 1),
+            "22:20: " + getCheckMessage(MSG_KEY, 3, 1),
+            "29:28: " + getCheckMessage(MSG_KEY, 3, 1),
+            "48:43: " + getCheckMessage(MSG_KEY, 2, 1),
+        };
         verify(checkConfig, getPath("design" + File.separator + "InputThrowsCount.java"), expected);
     }
 }

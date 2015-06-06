@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.indentation;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
@@ -26,8 +27,7 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  *
  * @author jrichard
  */
-public class PackageDefHandler extends ExpressionHandler
-{
+public class PackageDefHandler extends ExpressionHandler {
     /**
      * Construct an instance of this handler with the given indentation check,
      * abstract syntax tree, and parent handler.
@@ -37,14 +37,12 @@ public class PackageDefHandler extends ExpressionHandler
      * @param parent        the parent handler
      */
     public PackageDefHandler(IndentationCheck indentCheck,
-            DetailAST ast, ExpressionHandler parent)
-    {
+            DetailAST ast, ExpressionHandler parent) {
         super(indentCheck, "package def", ast, parent);
     }
 
     @Override
-    public void checkIndentation()
-    {
+    public void checkIndentation() {
         final int columnNo = expandedTabsColumnNo(getMainAst());
         if (!getLevel().accept(columnNo)) {
             logError(getMainAst(), "", columnNo);

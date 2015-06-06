@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.sizes;
 
 import com.puppycrawl.tools.checkstyle.api.Check;
@@ -53,8 +54,7 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  * </pre>
  * @author Lars Kühne
  */
-public class MethodLengthCheck extends Check
-{
+public class MethodLengthCheck extends Check {
 
     /**
      * A key is pointing to the warning message text in "messages.properties"
@@ -62,30 +62,27 @@ public class MethodLengthCheck extends Check
      */
     public static final String MSG_KEY = "maxLen.method";
 
-    /** whether to ignore empty lines and single line comments */
-    private boolean countEmpty = true;
-
     /** default maximum number of lines */
     private static final int DEFAULT_MAX_LINES = 150;
+
+    /** whether to ignore empty lines and single line comments */
+    private boolean countEmpty = true;
 
     /** the maximum number of lines */
     private int max = DEFAULT_MAX_LINES;
 
     @Override
-    public int[] getDefaultTokens()
-    {
+    public int[] getDefaultTokens() {
         return new int[] {TokenTypes.METHOD_DEF, TokenTypes.CTOR_DEF};
     }
 
     @Override
-    public int[] getAcceptableTokens()
-    {
+    public int[] getAcceptableTokens() {
         return new int[] {TokenTypes.METHOD_DEF, TokenTypes.CTOR_DEF};
     }
 
     @Override
-    public void visitToken(DetailAST ast)
-    {
+    public void visitToken(DetailAST ast) {
         final DetailAST openingBrace = ast.findFirstToken(TokenTypes.SLIST);
         if (openingBrace != null) {
             final DetailAST closingBrace =
@@ -112,8 +109,7 @@ public class MethodLengthCheck extends Check
     /**
      * @param length the maximum length of a method.
      */
-    public void setMax(int length)
-    {
+    public void setMax(int length) {
         max = length;
     }
 
@@ -121,8 +117,7 @@ public class MethodLengthCheck extends Check
      * @param countEmpty whether to count empty and single line comments
      * of the form //.
      */
-    public void setCountEmpty(boolean countEmpty)
-    {
+    public void setCountEmpty(boolean countEmpty) {
         this.countEmpty = countEmpty;
     }
 }

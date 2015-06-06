@@ -16,24 +16,33 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.sizes;
 
+import static com.puppycrawl.tools.checkstyle.checks.sizes.AnonInnerLengthCheck.MSG_KEY;
+import static org.junit.Assert.assertArrayEquals;
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
+import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import org.junit.Test;
-
-import static com.puppycrawl.tools.checkstyle.checks.sizes.AnonInnerLengthCheck.MSG_KEY;
 
 /**
  * @author Rob Worth
  * @author Lars Kühne
  */
-public class AnonInnerLengthCheckTest extends BaseCheckTestSupport
-{
+public class AnonInnerLengthCheckTest extends BaseCheckTestSupport {
+    @Test
+    public void testGetAcceptableTokens() {
+        AnonInnerLengthCheck anonInnerLengthCheckObj =
+                new AnonInnerLengthCheck();
+        int[] actual = anonInnerLengthCheckObj.getAcceptableTokens();
+        int[] expected = new int[]{TokenTypes.LITERAL_NEW};
+
+        assertArrayEquals(expected, actual);
+    }
 
     @Test
-    public void testDefault() throws Exception
-    {
+    public void testDefault() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(AnonInnerLengthCheck.class);
         final String[] expected = {
@@ -43,8 +52,7 @@ public class AnonInnerLengthCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testNonDefault() throws Exception
-    {
+    public void testNonDefault() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(AnonInnerLengthCheck.class);
         checkConfig.addAttribute("max", "6");

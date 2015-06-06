@@ -19,6 +19,7 @@
 
 package com.puppycrawl.tools.checkstyle.gui;
 
+import java.awt.*;
 import java.io.File;
 
 import javax.swing.JFrame;
@@ -28,12 +29,16 @@ import com.puppycrawl.tools.checkstyle.api.DetailAST;
 /**
  * Entry point for starting the checkstyle GUI.
  */
-public class Main
-{
+public class Main {
+    /**
+     * Main frame
+     */
     static JFrame frame;
 
-    public static void main(String[] args)
-    {
+    /**
+     * Entry point
+     */
+    public static void main(String... args) {
         frame = new JFrame("CheckStyle");
         final ParseTreeInfoPanel panel = new ParseTreeInfoPanel();
         frame.getContentPane().add(panel);
@@ -41,13 +46,17 @@ public class Main
             final File f = new File(args[0]);
             panel.openFile(f, frame);
         }
-        frame.pack();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setVisible(true);
+
+        Runnable runner = new FrameShower(frame);
+        EventQueue.invokeLater(runner);
     }
 
-    public static void displayAst(DetailAST ast)
-    {
+    /**
+     * Method is used for testing inthe past
+     * @param ast
+     */
+    public static void displayAst(DetailAST ast) {
         JFrame frame = new JFrame("CheckStyle");
         final ParseTreeInfoPanel panel = new ParseTreeInfoPanel();
         frame.getContentPane().add(panel);
@@ -55,5 +64,30 @@ public class Main
         frame.setSize(1500, 800);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
+    }
+
+    /**
+     * http://findbugs.sourceforge.net/bugDescriptions.html#SW_SWING_METHODS_INVOKED_IN_SWING_THREAD
+     */
+    private static class FrameShower implements Runnable {
+        /**
+         * frame
+         */
+        final JFrame frame;
+
+        /**
+         * contstructor
+         */
+        public FrameShower(JFrame frame) {
+            this.frame = frame;
+        }
+
+        /**
+         * display a frame
+         */
+        public void run() {
+            frame.pack();
+            frame.setVisible(true);
+        }
     }
 }

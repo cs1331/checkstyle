@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
@@ -25,11 +26,9 @@ import org.junit.Test;
 
 import static com.puppycrawl.tools.checkstyle.checks.coding.MultipleStringLiteralsCheck.MSG_KEY;
 
-public class MultipleStringLiteralsCheckTest extends BaseCheckTestSupport
-{
+public class MultipleStringLiteralsCheckTest extends BaseCheckTestSupport {
     @Test
-    public void testIt() throws Exception
-    {
+    public void testIt() throws Exception {
         DefaultConfiguration checkConfig =
             createCheckConfig(MultipleStringLiteralsCheck.class);
         checkConfig.addAttribute("allowedDuplicates", "2");
@@ -47,8 +46,7 @@ public class MultipleStringLiteralsCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testItIgnoreEmpty() throws Exception
-    {
+    public void testItIgnoreEmpty() throws Exception {
         DefaultConfiguration checkConfig =
             createCheckConfig(MultipleStringLiteralsCheck.class);
         checkConfig.addAttribute("allowedDuplicates", "2");
@@ -64,8 +62,7 @@ public class MultipleStringLiteralsCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testItIgnoreEmptyAndComspace() throws Exception
-    {
+    public void testItIgnoreEmptyAndComspace() throws Exception {
         DefaultConfiguration checkConfig =
             createCheckConfig(MultipleStringLiteralsCheck.class);
         checkConfig.addAttribute("allowedDuplicates", "2");
@@ -81,8 +78,7 @@ public class MultipleStringLiteralsCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testItWithoutIgnoringAnnotations() throws Exception
-    {
+    public void testItWithoutIgnoringAnnotations() throws Exception {
         DefaultConfiguration checkConfig =
             createCheckConfig(MultipleStringLiteralsCheck.class);
         checkConfig.addAttribute("allowedDuplicates", "3");

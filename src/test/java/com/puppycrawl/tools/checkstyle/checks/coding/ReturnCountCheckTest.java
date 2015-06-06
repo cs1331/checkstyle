@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
@@ -25,11 +26,9 @@ import org.junit.Test;
 
 import static com.puppycrawl.tools.checkstyle.checks.coding.ReturnCountCheck.MSG_KEY;
 
-public class ReturnCountCheckTest extends BaseCheckTestSupport
-{
+public class ReturnCountCheckTest extends BaseCheckTestSupport {
     @Test
-    public void testDefault() throws Exception
-    {
+    public void testDefault() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(ReturnCountCheck.class);
         final String[] expected = {
@@ -40,8 +39,7 @@ public class ReturnCountCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testFormat() throws Exception
-    {
+    public void testFormat() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(ReturnCountCheck.class);
         checkConfig.addAttribute("format", "^$");
@@ -51,5 +49,55 @@ public class ReturnCountCheckTest extends BaseCheckTestSupport
             "35:17: " + getCheckMessage(MSG_KEY, 6, 2),
         };
         verify(checkConfig, getPath("coding" + File.separator + "InputReturnCount.java"), expected);
+    }
+
+    @Test
+    public void testMethodsAndLambdas() throws Exception {
+        final DefaultConfiguration checkConfig = createCheckConfig(ReturnCountCheck.class);
+        checkConfig.addAttribute("max", "1");
+        final String[] expected = {
+            "14:55: " + getCheckMessage(MSG_KEY, 2, 1),
+            "26:49: " + getCheckMessage(MSG_KEY, 2, 1),
+            "33:42: " + getCheckMessage(MSG_KEY, 3, 1),
+            "40:5: " + getCheckMessage(MSG_KEY, 2, 1),
+            "48:57: " + getCheckMessage(MSG_KEY, 2, 1),
+        };
+        verify(checkConfig, new File("src/test/resources-noncompilable/com/puppycrawl/tools/"
+            + "checkstyle/coding/InputReturnCountLambda.java").getCanonicalPath(), expected);
+    }
+
+    @Test
+    public void testLambdasOnly() throws Exception {
+        final DefaultConfiguration checkConfig = createCheckConfig(ReturnCountCheck.class);
+        checkConfig.addAttribute("tokens", "LAMBDA");
+        final String[] expected = {
+            "33:42: " + getCheckMessage(MSG_KEY, 3, 2),
+        };
+        verify(checkConfig, new File("src/test/resources-noncompilable/com/puppycrawl/tools/"
+            + "checkstyle/coding/InputReturnCountLambda.java").getCanonicalPath(), expected);
+    }
+
+    @Test
+    public void testMethodsOnly() throws Exception {
+        final DefaultConfiguration checkConfig = createCheckConfig(ReturnCountCheck.class);
+        checkConfig.addAttribute("tokens", "METHOD_DEF");
+        final String[] expected = {
+            "25:5: " + getCheckMessage(MSG_KEY, 3, 2),
+            "32:5: " + getCheckMessage(MSG_KEY, 4, 2),
+            "40:5: " + getCheckMessage(MSG_KEY, 4, 2),
+            "55:5: " + getCheckMessage(MSG_KEY, 3, 2),
+        };
+        verify(checkConfig, new File("src/test/resources-noncompilable/com/puppycrawl/tools/"
+            + "checkstyle/coding/InputReturnCountLambda.java").getCanonicalPath(), expected);
+    }
+
+    @Test
+    public void testWithReturnOnlyAsTokens() throws Exception {
+        final DefaultConfiguration checkConfig = createCheckConfig(ReturnCountCheck.class);
+        checkConfig.addAttribute("tokens", "LITERAL_RETURN");
+        final String[] expected = {
+        };
+        verify(checkConfig, new File("src/test/resources-noncompilable/com/puppycrawl/tools/"
+            + "checkstyle/coding/InputReturnCountLambda.java").getCanonicalPath(), expected);
     }
 }

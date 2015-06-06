@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.api;
 
 import java.util.EventObject;
@@ -39,21 +40,19 @@ import java.util.EventObject;
  * @see AuditListener
  */
 public final class AuditEvent
-    extends EventObject
-{
+    extends EventObject {
     /** Record a version. */
     private static final long serialVersionUID = -3774725606973812736L;
     /** filename event associated with **/
     private final String fileName;
     /** message associated with the event **/
-    private final transient LocalizedMessage message;
+    private final LocalizedMessage message;
 
     /**
      * Creates a new instance.
      * @param source the object that created the event
      */
-    public AuditEvent(Object source)
-    {
+    public AuditEvent(Object source) {
         this(source, null);
     }
 
@@ -62,8 +61,7 @@ public final class AuditEvent
      * @param src source of the event
      * @param fileName file associated with the event
      */
-    public AuditEvent(Object src, String fileName)
-    {
+    public AuditEvent(Object src, String fileName) {
         this(src, fileName, null);
     }
 
@@ -74,8 +72,7 @@ public final class AuditEvent
      * @param fileName file associated with the event
      * @param message the actual message
      */
-    public AuditEvent(Object src, String fileName, LocalizedMessage message)
-    {
+    public AuditEvent(Object src, String fileName, LocalizedMessage message) {
         super(src);
         this.fileName = fileName;
         this.message = message;
@@ -85,8 +82,7 @@ public final class AuditEvent
      * @return the file name currently being audited or null if there is
      * no relation to a file.
      */
-    public String getFileName()
-    {
+    public String getFileName() {
         return fileName;
     }
 
@@ -95,8 +91,7 @@ public final class AuditEvent
      * This may be 0 if there is no relation to a file content.
      * @return an integer representing the line number in the file source code.
      */
-    public int getLine()
-    {
+    public int getLine() {
         return message.getLineNo();
     }
 
@@ -104,20 +99,17 @@ public final class AuditEvent
      * return the message associated to the event.
      * @return the event message
      */
-    public String getMessage()
-    {
+    public String getMessage() {
         return message.getMessage();
     }
 
     /** @return the column associated with the message **/
-    public int getColumn()
-    {
+    public int getColumn() {
         return message.getColumnNo();
     }
 
     /** @return the audit event severity level **/
-    public SeverityLevel getSeverityLevel()
-    {
+    public SeverityLevel getSeverityLevel() {
         return message == null
             ? SeverityLevel.INFO
             : message.getSeverityLevel();
@@ -127,20 +119,17 @@ public final class AuditEvent
      * @return the identifier of the module that generated the event. Can return
      *         null.
      */
-    public String getModuleId()
-    {
+    public String getModuleId() {
         return message.getModuleId();
     }
 
     /** @return the name of the source for the message **/
-    public String getSourceName()
-    {
+    public String getSourceName() {
         return message.getSourceName();
     }
 
     /** @return the localized message **/
-    public LocalizedMessage getLocalizedMessage()
-    {
+    public LocalizedMessage getLocalizedMessage() {
         return message;
     }
 }

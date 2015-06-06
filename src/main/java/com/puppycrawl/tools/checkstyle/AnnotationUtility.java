@@ -16,22 +16,25 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
-package com.puppycrawl.tools.checkstyle.api;
 
+package com.puppycrawl.tools.checkstyle;
+
+import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import com.puppycrawl.tools.checkstyle.api.FullIdent;
+import com.puppycrawl.tools.checkstyle.api.TokenTypes;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Contains utility methods designed to work with annotations.
  *
  * @author Travis Schneeberger
  */
-public final class AnnotationUtility
-{
+public final class AnnotationUtility {
     /**
      * private utility constructor.
      * @throws UnsupportedOperationException if called
      */
-    private AnnotationUtility()
-    {
+    private AnnotationUtility() {
         throw new UnsupportedOperationException("do not instantiate.");
     }
 
@@ -59,8 +62,7 @@ public final class AnnotationUtility
      * annotation is null
      */
     public static boolean containsAnnotation(final DetailAST ast,
-        String annotation)
-    {
+        String annotation) {
         return AnnotationUtility.getAnnotation(ast, annotation) != null;
     }
 
@@ -72,8 +74,7 @@ public final class AnnotationUtility
      * @return true if contains an annotation
      * @throws NullPointerException if the ast is null
      */
-    public static boolean containsAnnotation(final DetailAST ast)
-    {
+    public static boolean containsAnnotation(final DetailAST ast) {
         final DetailAST holder = AnnotationUtility.getAnnotationHolder(ast);
         return holder != null && holder.branchContains(TokenTypes.ANNOTATION);
     }
@@ -87,17 +88,15 @@ public final class AnnotationUtility
      * @return the Annotation Holder
      * @throws NullPointerException if the ast is null
      */
-    public static DetailAST getAnnotationHolder(DetailAST ast)
-    {
+    public static DetailAST getAnnotationHolder(DetailAST ast) {
         if (ast == null) {
-            throw new NullPointerException("the ast is null");
+            throw new IllegalArgumentException("the ast is null");
         }
 
         final DetailAST annotationHolder;
 
         if (ast.getType() == TokenTypes.ENUM_CONSTANT_DEF
-            || ast.getType() == TokenTypes.PACKAGE_DEF)
-        {
+            || ast.getType() == TokenTypes.PACKAGE_DEF) {
             annotationHolder = ast.findFirstToken(TokenTypes.ANNOTATIONS);
         }
         else {
@@ -132,17 +131,16 @@ public final class AnnotationUtility
      * annotation is null
      */
     public static DetailAST getAnnotation(final DetailAST ast,
-        String annotation)
-    {
+        String annotation) {
         if (ast == null) {
-            throw new NullPointerException("the ast is null");
+            throw new IllegalArgumentException("the ast is null");
         }
 
         if (annotation == null) {
-            throw new NullPointerException("the annotation is null");
+            throw new IllegalArgumentException("the annotation is null");
         }
 
-        if (annotation.trim().length() == 0) {
+        if (StringUtils.isBlank(annotation)) {
             throw new IllegalArgumentException("the annotation"
                 + "is empty or spaces");
         }
@@ -150,8 +148,7 @@ public final class AnnotationUtility
         final DetailAST holder = AnnotationUtility.getAnnotationHolder(ast);
 
         for (DetailAST child = holder.getFirstChild();
-            child != null; child = child.getNextSibling())
-        {
+            child != null; child = child.getNextSibling()) {
             if (child.getType() == TokenTypes.ANNOTATION) {
                 final DetailAST at = child.getFirstChild();
                 final String name =
@@ -175,10 +172,9 @@ public final class AnnotationUtility
      * @throws IllegalArgumentException if the ast is not
      * an {@link TokenTypes#ANNOTATION}
      */
-    public static DetailAST annotatingWhat(DetailAST ast)
-    {
+    public static DetailAST annotatingWhat(DetailAST ast) {
         if (ast == null) {
-            throw new NullPointerException("the ast is null");
+            throw new IllegalArgumentException("the ast is null");
         }
 
         if (ast.getType() != TokenTypes.ANNOTATION) {
@@ -200,8 +196,7 @@ public final class AnnotationUtility
      * @throws IllegalArgumentException if the ast is not
      * an {@link TokenTypes#ANNOTATION}
      */
-    public static boolean isAnnotatingType(DetailAST ast, int tokenType)
-    {
+    public static boolean isAnnotatingType(DetailAST ast, int tokenType) {
         final DetailAST astNode = AnnotationUtility.annotatingWhat(ast);
         return astNode.getType() == tokenType;
     }

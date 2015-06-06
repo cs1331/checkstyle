@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
@@ -26,8 +27,8 @@ import java.util.Deque;
 
 /**
  * <p>
- * Restricts return statements to a specified count (default = 2).
- * Ignores specified methods (<code>equals()</code> by default).
+ * Restricts the number of return statements in methods, constructors and lambda expressions
+ * (2 by default). Ignores specified methods (<code>equals()</code> by default).
  * </p>
  * <p>
  * Rationale: Too many return points can be indication that code is
@@ -35,10 +36,8 @@ import java.util.Deque;
  * </p>
  *
  * @author <a href="mailto:simon@redhillconsulting.com.au">Simon Harris</a>
- * TODO: Test for inside a static block
  */
-public final class ReturnCountCheck extends AbstractFormatCheck
-{
+public final class ReturnCountCheck extends AbstractFormatCheck {
 
     /**
      * A key is pointing to the warning message text in "messages.properties"
@@ -57,37 +56,34 @@ public final class ReturnCountCheck extends AbstractFormatCheck
     private Context context;
 
     /** Creates new instance of the checks. */
-    public ReturnCountCheck()
-    {
+    public ReturnCountCheck() {
         super("^equals$");
         setMax(DEFAULT_MAX);
     }
 
     @Override
-    public int[] getDefaultTokens()
-    {
+    public int[] getDefaultTokens() {
         return new int[] {
             TokenTypes.CTOR_DEF,
             TokenTypes.METHOD_DEF,
+            TokenTypes.LAMBDA,
             TokenTypes.LITERAL_RETURN,
         };
     }
 
     @Override
-    public int[] getRequiredTokens()
-    {
+    public int[] getRequiredTokens() {
         return new int[]{
-            TokenTypes.CTOR_DEF,
-            TokenTypes.METHOD_DEF,
+            TokenTypes.LITERAL_RETURN,
         };
     }
 
     @Override
-    public int[] getAcceptableTokens()
-    {
+    public int[] getAcceptableTokens() {
         return new int[] {
             TokenTypes.CTOR_DEF,
             TokenTypes.METHOD_DEF,
+            TokenTypes.LAMBDA,
             TokenTypes.LITERAL_RETURN,
         };
     }
@@ -96,8 +92,7 @@ public final class ReturnCountCheck extends AbstractFormatCheck
      * Getter for max property.
      * @return maximum allowed number of return statements.
      */
-    public int getMax()
-    {
+    public int getMax() {
         return max;
     }
 
@@ -105,25 +100,25 @@ public final class ReturnCountCheck extends AbstractFormatCheck
      * Setter for max property.
      * @param max maximum allowed number of return statements.
      */
-    public void setMax(int max)
-    {
+    public void setMax(int max) {
         this.max = max;
     }
 
     @Override
-    public void beginTree(DetailAST rootAST)
-    {
+    public void beginTree(DetailAST rootAST) {
         context = new Context(false);
         contextStack.clear();
     }
 
     @Override
-    public void visitToken(DetailAST ast)
-    {
+    public void visitToken(DetailAST ast) {
         switch (ast.getType()) {
             case TokenTypes.CTOR_DEF:
             case TokenTypes.METHOD_DEF:
                 visitMethodDef(ast);
+                break;
+            case TokenTypes.LAMBDA:
+                visitLambda();
                 break;
             case TokenTypes.LITERAL_RETURN:
                 context.visitLiteralReturn();
@@ -134,12 +129,12 @@ public final class ReturnCountCheck extends AbstractFormatCheck
     }
 
     @Override
-    public void leaveToken(DetailAST ast)
-    {
+    public void leaveToken(DetailAST ast) {
         switch (ast.getType()) {
             case TokenTypes.CTOR_DEF:
             case TokenTypes.METHOD_DEF:
-                leaveMethodDef(ast);
+            case TokenTypes.LAMBDA:
+                leave(ast);
                 break;
             case TokenTypes.LITERAL_RETURN:
                 // Do nothing
@@ -153,8 +148,7 @@ public final class ReturnCountCheck extends AbstractFormatCheck
      * Creates new method context and places old one on the stack.
      * @param ast method definition for check.
      */
-    private void visitMethodDef(DetailAST ast)
-    {
+    private void visitMethodDef(DetailAST ast) {
         contextStack.push(context);
         final DetailAST methodNameAST = ast.findFirstToken(TokenTypes.IDENT);
         context =
@@ -162,22 +156,27 @@ public final class ReturnCountCheck extends AbstractFormatCheck
     }
 
     /**
-     * Checks number of return statements and restore
-     * previous method context.
-     * @param ast method def node.
+     * Checks number of return statements and restore previous context.
+     * @param ast node to leave.
      */
-    private void leaveMethodDef(DetailAST ast)
-    {
+    private void leave(DetailAST ast) {
         context.checkCount(ast);
         context = contextStack.pop();
+    }
+
+    /**
+     * Creates new lambda context and places old one on the stack.
+     */
+    private void visitLambda() {
+        contextStack.push(context);
+        context = new Context(true);
     }
 
     /**
      * Class to encapsulate information about one method.
      * @author <a href="mailto:simon@redhillconsulting.com.au">Simon Harris</a>
      */
-    private class Context
-    {
+    private class Context {
         /** Whether we should check this method or not. */
         private final boolean checking;
         /** Counter for return statements. */
@@ -187,15 +186,13 @@ public final class ReturnCountCheck extends AbstractFormatCheck
          * Creates new method context.
          * @param checking should we check this method or not.
          */
-        public Context(boolean checking)
-        {
+        public Context(boolean checking) {
             this.checking = checking;
             count = 0;
         }
 
         /** Increase number of return statements. */
-        public void visitLiteralReturn()
-        {
+        public void visitLiteralReturn() {
             ++count;
         }
 
@@ -204,8 +201,7 @@ public final class ReturnCountCheck extends AbstractFormatCheck
          * than allowed.
          * @param ast method def associated with this context.
          */
-        public void checkCount(DetailAST ast)
-        {
+        public void checkCount(DetailAST ast) {
             if (checking && count > getMax()) {
                 log(ast.getLineNo(), ast.getColumnNo(), MSG_KEY,
                     count, getMax());

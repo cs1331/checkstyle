@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.filters;
 
 import com.google.common.collect.Lists;
@@ -29,14 +30,15 @@ import com.puppycrawl.tools.checkstyle.checks.FileContentsHolder;
 import com.puppycrawl.tools.checkstyle.checks.coding.IllegalCatchCheck;
 import com.puppycrawl.tools.checkstyle.checks.naming.ConstantNameCheck;
 import com.puppycrawl.tools.checkstyle.checks.naming.MemberNameCheck;
+
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Locale;
 import org.junit.Test;
 
 public class SuppressionCommentFilterTest
-    extends BaseCheckTestSupport
-{
+    extends BaseCheckTestSupport {
     private static String[] sAllMessages = {
         "13:17: Name 'I' must match pattern '^[a-z][a-zA-Z0-9]*$'.",
         "16:17: Name 'J' must match pattern '^[a-z][a-zA-Z0-9]*$'.",
@@ -57,8 +59,7 @@ public class SuppressionCommentFilterTest
     };
 
     @Test
-    public void testNone() throws Exception
-    {
+    public void testNone() throws Exception {
         final DefaultConfiguration filterConfig = null;
         final String[] suppressed = {
         };
@@ -67,8 +68,7 @@ public class SuppressionCommentFilterTest
 
     //Suppress all checks between default comments
     @Test
-    public void testDefault() throws Exception
-    {
+    public void testDefault() throws Exception {
         final DefaultConfiguration filterConfig =
             createFilterConfig(SuppressionCommentFilter.class);
         final String[] suppressed = {
@@ -81,8 +81,7 @@ public class SuppressionCommentFilterTest
     }
 
     @Test
-    public void testCheckC() throws Exception
-    {
+    public void testCheckC() throws Exception {
         final DefaultConfiguration filterConfig =
             createFilterConfig(SuppressionCommentFilter.class);
         filterConfig.addAttribute("checkC", "false");
@@ -95,8 +94,7 @@ public class SuppressionCommentFilterTest
     }
 
     @Test
-    public void testCheckCPP() throws Exception
-    {
+    public void testCheckCPP() throws Exception {
         final DefaultConfiguration filterConfig =
             createFilterConfig(SuppressionCommentFilter.class);
         filterConfig.addAttribute("checkCPP", "false");
@@ -108,8 +106,7 @@ public class SuppressionCommentFilterTest
 
     //Suppress all checks between CS_OFF and CS_ON
     @Test
-    public void testOffFormat() throws Exception
-    {
+    public void testOffFormat() throws Exception {
         final DefaultConfiguration filterConfig =
             createFilterConfig(SuppressionCommentFilter.class);
         filterConfig.addAttribute("offCommentFormat", "CS_OFF");
@@ -126,8 +123,7 @@ public class SuppressionCommentFilterTest
     //Test suppression of checks of only one type
     //Suppress only ConstantNameCheck between CS_OFF and CS_ON
     @Test
-    public void testOffFormatCheck() throws Exception
-    {
+    public void testOffFormatCheck() throws Exception {
         final DefaultConfiguration filterConfig =
             createFilterConfig(SuppressionCommentFilter.class);
         filterConfig.addAttribute("offCommentFormat", "CS_OFF");
@@ -140,8 +136,7 @@ public class SuppressionCommentFilterTest
     }
 
     @Test
-    public void testArgumentSuppression() throws Exception
-    {
+    public void testArgumentSuppression() throws Exception {
         final DefaultConfiguration filterConfig =
             createFilterConfig(SuppressionCommentFilter.class);
         filterConfig.addAttribute("offCommentFormat", "IllegalCatchCheck OFF\\: (\\w+)");
@@ -155,8 +150,7 @@ public class SuppressionCommentFilterTest
     }
 
     @Test
-    public void testExpansion() throws Exception
-    {
+    public void testExpansion() throws Exception {
         final DefaultConfiguration filterConfig =
             createFilterConfig(SuppressionCommentFilter.class);
         filterConfig.addAttribute("offCommentFormat", "CSOFF\\: ([\\w\\|]+)");
@@ -171,8 +165,7 @@ public class SuppressionCommentFilterTest
     }
 
     @Test
-    public void testMessage() throws Exception
-    {
+    public void testMessage() throws Exception {
         final DefaultConfiguration filterConfig =
             createFilterConfig(SuppressionCommentFilter.class);
         filterConfig.addAttribute("onCommentFormat", "UNUSED ON\\: (\\w+)");
@@ -185,15 +178,13 @@ public class SuppressionCommentFilterTest
         verifySuppressed(filterConfig, suppressed);
     }
 
-    public static DefaultConfiguration createFilterConfig(Class<?> aClass)
-    {
+    public static DefaultConfiguration createFilterConfig(Class<?> aClass) {
         return new DefaultConfiguration(aClass.getName());
     }
 
     protected void verifySuppressed(Configuration aFilterConfig,
                                     String[] aSuppressed)
-        throws Exception
-    {
+        throws Exception {
         verify(createChecker(aFilterConfig),
                getPath("filters/InputSuppressionCommentFilter.java"),
                removeSuppressed(sAllMessages, aSuppressed));
@@ -201,8 +192,7 @@ public class SuppressionCommentFilterTest
 
     @Override
     protected Checker createChecker(Configuration aFilterConfig)
-        throws CheckstyleException
-    {
+            throws CheckstyleException, UnsupportedEncodingException {
         final DefaultConfiguration checkerConfig =
             new DefaultConfiguration("configuration");
         final DefaultConfiguration checksConfig = createCheckConfig(TreeWalker.class);
@@ -215,7 +205,7 @@ public class SuppressionCommentFilterTest
             checkerConfig.addChild(aFilterConfig);
         }
         final Checker checker = new Checker();
-        final Locale locale = Locale.ENGLISH;
+        final Locale locale = Locale.ROOT;
         checker.setLocaleCountry(locale.getCountry());
         checker.setLocaleLanguage(locale.getLanguage());
         checker.setModuleClassLoader(Thread.currentThread().getContextClassLoader());
@@ -224,8 +214,7 @@ public class SuppressionCommentFilterTest
         return checker;
     }
 
-    private String[] removeSuppressed(String[] from, String[] remove)
-    {
+    private String[] removeSuppressed(String[] from, String[] remove) {
         final Collection<String> coll =
             Lists.newArrayList(Arrays.asList(from));
         coll.removeAll(Arrays.asList(remove));

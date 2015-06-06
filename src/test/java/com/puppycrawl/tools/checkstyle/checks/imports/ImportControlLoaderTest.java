@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.imports;
 
 import static org.junit.Assert.assertNotNull;
@@ -24,11 +25,9 @@ import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 import java.io.File;
 import org.junit.Test;
 
-public class ImportControlLoaderTest
-{
+public class ImportControlLoaderTest {
     @Test
-    public void testLoad() throws CheckstyleException
-    {
+    public void testLoad() throws CheckstyleException {
         final PkgControl root =
                 ImportControlLoader.load(new File(
                         "src/test/resources/com/puppycrawl/tools/checkstyle/import-control_complete.xml").toURI());

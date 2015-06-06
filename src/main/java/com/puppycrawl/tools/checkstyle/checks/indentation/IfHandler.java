@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.indentation;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
@@ -26,8 +27,7 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  *
  * @author jrichard
  */
-public class IfHandler extends BlockParentHandler
-{
+public class IfHandler extends BlockParentHandler {
     /**
      * Construct an instance of this handler with the given indentation check,
      * abstract syntax tree, and parent handler.
@@ -37,14 +37,12 @@ public class IfHandler extends BlockParentHandler
      * @param parent        the parent handler
      */
     public IfHandler(IndentationCheck indentCheck,
-        DetailAST ast, ExpressionHandler parent)
-    {
+        DetailAST ast, ExpressionHandler parent) {
         super(indentCheck, "if", ast, parent);
     }
 
     @Override
-    public IndentLevel suggestedChildLevel(ExpressionHandler child)
-    {
+    public IndentLevel suggestedChildLevel(ExpressionHandler child) {
         if (child instanceof ElseHandler) {
             return getLevel();
         }
@@ -52,8 +50,7 @@ public class IfHandler extends BlockParentHandler
     }
 
     @Override
-    protected IndentLevel getLevelImpl()
-    {
+    protected IndentLevel getLevelImpl() {
         if (isIfAfterElse()) {
             return getParent().getLevel();
         }
@@ -66,8 +63,7 @@ public class IfHandler extends BlockParentHandler
      *
      * @return true if this 'if' is part of an 'else', false otherwise
      */
-    private boolean isIfAfterElse()
-    {
+    private boolean isIfAfterElse() {
         // check if there is an 'else' and an 'if' on the same line
         final DetailAST parent = getMainAst().getParent();
         return parent.getType() == TokenTypes.LITERAL_ELSE
@@ -75,8 +71,7 @@ public class IfHandler extends BlockParentHandler
     }
 
     @Override
-    protected void checkToplevelToken()
-    {
+    protected void checkToplevelToken() {
         if (isIfAfterElse()) {
             return;
         }
@@ -87,8 +82,7 @@ public class IfHandler extends BlockParentHandler
     /**
      * Check the indentation of the conditional expression.
      */
-    private void checkCondExpr()
-    {
+    private void checkCondExpr() {
         final DetailAST condAst = getMainAst().findFirstToken(TokenTypes.LPAREN)
             .getNextSibling();
         final IndentLevel expected =
@@ -97,8 +91,7 @@ public class IfHandler extends BlockParentHandler
     }
 
     @Override
-    public void checkIndentation()
-    {
+    public void checkIndentation() {
         super.checkIndentation();
         checkCondExpr();
         final LineWrappingHandler lineWrap =
@@ -113,8 +106,7 @@ public class IfHandler extends BlockParentHandler
      *          literal-if ast node(TokenTypes.LITERAL_IF)
      * @return right parenthesis of if statement.
      */
-    private static DetailAST getIfStatementRightParen(DetailAST literalIfAst)
-    {
+    private static DetailAST getIfStatementRightParen(DetailAST literalIfAst) {
         return literalIfAst.findFirstToken(TokenTypes.RPAREN);
     }
 }

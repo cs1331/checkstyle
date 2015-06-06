@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.sizes;
 
 import static org.junit.Assert.fail;
@@ -29,20 +30,17 @@ import org.junit.Test;
 import static com.puppycrawl.tools.checkstyle.checks.sizes.FileLengthCheck.MSG_KEY;
 
 public class FileLengthCheckTest
-    extends BaseCheckTestSupport
-{
+    extends BaseCheckTestSupport {
     @Override
     protected DefaultConfiguration createCheckerConfig(
-        Configuration aCheckConfig)
-    {
+        Configuration aCheckConfig) {
         DefaultConfiguration dc = new DefaultConfiguration("root");
         dc.addChild(aCheckConfig);
         return dc;
     }
 
     @Test
-    public void testAlarm() throws Exception
-    {
+    public void testAlarm() throws Exception {
         DefaultConfiguration checkConfig =
             createCheckConfig(FileLengthCheck.class);
         checkConfig.addAttribute("max", "20");
@@ -55,8 +53,7 @@ public class FileLengthCheckTest
     }
 
     @Test
-    public void testOK() throws Exception
-    {
+    public void testOK() throws Exception {
         DefaultConfiguration checkConfig =
             createCheckConfig(FileLengthCheck.class);
         checkConfig.addAttribute("max", "2000");
@@ -68,8 +65,7 @@ public class FileLengthCheckTest
     }
 
     @Test
-    public void testArgs() throws Exception
-    {
+    public void testArgs() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(FileLengthCheck.class);
         try {

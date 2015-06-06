@@ -16,29 +16,34 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle;
 
 import static com.puppycrawl.tools.checkstyle.TestUtils.assertUtilsClassHasPrivateConstructor;
 import static com.puppycrawl.tools.checkstyle.Utils.baseClassname;
+import static com.puppycrawl.tools.checkstyle.Utils.relativizeAndNormalizePath;
 import static com.puppycrawl.tools.checkstyle.Utils.fileExtensionMatches;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.apache.commons.beanutils.ConversionException;
 import org.junit.Test;
 
-public class UtilsTest
-{
+public class UtilsTest {
+
+    /** After appending to path produces equivalent, but denormalized path */
+    private static final String PATH_DENORMALIZER = "/levelDown/.././";
+
     /**
      * Test Utils.countCharInString.
      */
     @Test
     public void testLengthExpandedTabs()
-        throws Exception
-    {
+        throws Exception {
         final String s1 = "\t";
         assertEquals(8, Utils.lengthExpandedTabs(s1, s1.length(), 8));
 
@@ -58,43 +63,64 @@ public class UtilsTest
     }
 
     @Test(expected = ConversionException.class)
-    public void testBadRegex()
-    {
+    public void testBadRegex() {
         Utils.createPattern("[");
     }
 
     @Test
-    public void testFileExtensions()
-    {
+    public void testFileExtensions() {
         final String[] fileExtensions = {"java"};
         File file = new File("file.pdf");
         assertFalse(fileExtensionMatches(file, fileExtensions));
         assertTrue(fileExtensionMatches(file, null));
         file = new File("file.java");
         assertTrue(fileExtensionMatches(file, fileExtensions));
+        file = new File("file.");
+        assertTrue(fileExtensionMatches(file, ""));
     }
 
     @Test
-    public void testBaseClassnameForCanonicalName()
-    {
+    public void testBaseClassnameForCanonicalName() {
         assertEquals("List", baseClassname("java.util.List"));
     }
 
     @Test
-    public void testBaseClassnameForSimpleName()
-    {
+    public void testBaseClassnameForSimpleName() {
         assertEquals("Set", baseClassname("Set"));
     }
 
     @Test
-    public void testIsProperUtilsClass() throws ReflectiveOperationException
-    {
+    public void testRelativeNormalizedPath() {
+        final String relativePath = relativizeAndNormalizePath("/home", "/home/test");
+
+        assertEquals("test", relativePath);
+    }
+
+    @Test
+    public void testRelativeNormalizedPathWithNullBaseDirectory() {
+        final String relativePath = relativizeAndNormalizePath(null, "/tmp");
+
+        assertEquals("/tmp", relativePath);
+    }
+
+    @Test
+    public void testRelativeNormalizedPathWithDenormalizedBaseDirectory() throws IOException {
+        final String sampleAbsolutePath = new File("src/main/java").getCanonicalPath();
+        final String absoluteFilePath = sampleAbsolutePath + "/SampleFile.java";
+        final String basePath = sampleAbsolutePath + PATH_DENORMALIZER;
+
+        final String relativePath = relativizeAndNormalizePath(basePath, absoluteFilePath);
+
+        assertEquals("SampleFile.java", relativePath);
+    }
+
+    @Test
+    public void testIsProperUtilsClass() throws ReflectiveOperationException {
         assertUtilsClassHasPrivateConstructor(Utils.class);
     }
 
     @Test
-    public void testInvalidPattern()
-    {
+    public void testInvalidPattern() {
         boolean result = Utils.isPatternValid("some[invalidPattern");
         assertFalse(result);
     }

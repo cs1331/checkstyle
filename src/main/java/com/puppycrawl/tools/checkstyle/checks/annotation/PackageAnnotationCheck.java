@@ -16,9 +16,10 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.annotation;
 
-import com.puppycrawl.tools.checkstyle.api.AnnotationUtility;
+import com.puppycrawl.tools.checkstyle.AnnotationUtility;
 import com.puppycrawl.tools.checkstyle.api.Check;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
@@ -43,20 +44,17 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  * </p>
  * @author Travis Schneeberger
  */
-public class PackageAnnotationCheck extends Check
-{
+public class PackageAnnotationCheck extends Check {
 
     /** {@inheritDoc} */
     @Override
-    public int[] getDefaultTokens()
-    {
+    public int[] getDefaultTokens() {
         return this.getRequiredTokens();
     }
 
     /** {@inheritDoc} */
     @Override
-    public int[] getRequiredTokens()
-    {
+    public int[] getRequiredTokens() {
         return new int[] {
             TokenTypes.PACKAGE_DEF,
         };
@@ -64,15 +62,13 @@ public class PackageAnnotationCheck extends Check
 
     /** {@inheritDoc} */
     @Override
-    public int[] getAcceptableTokens()
-    {
+    public int[] getAcceptableTokens() {
         return this.getRequiredTokens();
     }
 
     /** {@inheritDoc} */
     @Override
-    public void visitToken(final DetailAST ast)
-    {
+    public void visitToken(final DetailAST ast) {
         final boolean containsAnnotation =
             AnnotationUtility.containsAnnotation(ast);
         final boolean inPackageInfo =

@@ -16,14 +16,18 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks;
 
 import com.google.common.io.Closeables;
 import com.puppycrawl.tools.checkstyle.api.AbstractFileSetCheck;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.List;
+import java.util.Locale;
+
 import org.apache.commons.beanutils.ConversionException;
 
 /**
@@ -48,15 +52,14 @@ import org.apache.commons.beanutils.ConversionException;
  * &lt;/module&gt;</pre>
  * <p>
  * Valid values for the 'lineSeparator' property are 'system' (system default),
- * 'crlf' (windows), 'cr' (mac) and 'lf' (unix).
+ * 'crlf' (windows), 'cr' (mac), 'lf' (unix) and 'lf_cr_crlf' (lf, cr or crlf).
  * </p>
  *
  * @author Christopher Lenz
  * @author lkuehne
  */
 public class NewlineAtEndOfFileCheck
-    extends AbstractFileSetCheck
-{
+    extends AbstractFileSetCheck {
 
     /**
      * A key is pointing to the warning message text in "messages.properties"
@@ -74,8 +77,7 @@ public class NewlineAtEndOfFileCheck
     private LineSeparatorOption lineSeparator = LineSeparatorOption.SYSTEM;
 
     @Override
-    protected void processFiltered(File file, List<String> lines)
-    {
+    protected void processFiltered(File file, List<String> lines) {
         // Cannot use lines as the line separators have been removed!
         RandomAccessFile randomAccessFile = null;
         try {
@@ -97,18 +99,17 @@ public class NewlineAtEndOfFileCheck
     }
 
     /**
-     * Sets the line separator to one of 'crlf', 'lf' or 'cr'.
+     * Sets the line separator to one of 'crlf', 'lf','cr', 'lf_cr_crlf' or 'system'.
      *
      * @param lineSeparatorParam The line separator to set
      * @throws IllegalArgumentException If the specified line separator is not
-     *         one of 'crlf', 'lf' or 'cr'
+     *         one of 'crlf', 'lf', 'cr', 'lf_cr_crlf' or 'system'
      */
-    public void setLineSeparator(String lineSeparatorParam)
-    {
+    public void setLineSeparator(String lineSeparatorParam) {
         try {
             lineSeparator =
                 Enum.valueOf(LineSeparatorOption.class, lineSeparatorParam.trim()
-                    .toUpperCase());
+                    .toUpperCase(Locale.ENGLISH));
         }
         catch (IllegalArgumentException iae) {
             throw new ConversionException("unable to parse " + lineSeparatorParam,
@@ -125,8 +126,7 @@ public class NewlineAtEndOfFileCheck
      *         provided reader
      */
     private boolean endsWithNewline(RandomAccessFile randomAccessFile)
-        throws IOException
-    {
+        throws IOException {
         final int len = lineSeparator.length();
         if (randomAccessFile.length() < len) {
             return false;

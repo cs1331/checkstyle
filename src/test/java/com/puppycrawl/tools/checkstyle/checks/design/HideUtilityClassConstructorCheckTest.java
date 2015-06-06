@@ -16,23 +16,25 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.design;
 
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import java.io.File;
+
+import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import org.junit.Test;
 
 import static com.puppycrawl.tools.checkstyle.checks.design.HideUtilityClassConstructorCheck
 .MSG_KEY;
+import static org.junit.Assert.assertArrayEquals;
 
 public class HideUtilityClassConstructorCheckTest
-    extends BaseCheckTestSupport
-{
+    extends BaseCheckTestSupport {
     /** only static methods and no constructor - default ctor is visible */
     @Test
-    public void testUtilClass() throws Exception
-    {
+    public void testUtilClass() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(HideUtilityClassConstructorCheck.class);
         final String[] expected = {
@@ -43,8 +45,7 @@ public class HideUtilityClassConstructorCheckTest
 
     /** nonstatic methods - always OK */
     @Test
-    public void testNonUtilClass() throws Exception
-    {
+    public void testNonUtilClass() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(HideUtilityClassConstructorCheck.class);
         final String[] expected = {
@@ -53,8 +54,7 @@ public class HideUtilityClassConstructorCheckTest
     }
 
     @Test
-    public void testDerivedNonUtilClass() throws Exception
-    {
+    public void testDerivedNonUtilClass() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(HideUtilityClassConstructorCheck.class);
         final String[] expected = {
@@ -63,8 +63,7 @@ public class HideUtilityClassConstructorCheckTest
     }
 
     @Test
-    public void testOnlyNonstaticFieldNonUtilClass() throws Exception
-    {
+    public void testOnlyNonstaticFieldNonUtilClass() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(HideUtilityClassConstructorCheck.class);
         final String[] expected = {
@@ -73,8 +72,7 @@ public class HideUtilityClassConstructorCheckTest
     }
 
     @Test
-    public void testEmptyAbstractClass() throws Exception
-    {
+    public void testEmptyAbstractClass() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(HideUtilityClassConstructorCheck.class);
         final String[] expected = {
@@ -83,8 +81,7 @@ public class HideUtilityClassConstructorCheckTest
     }
 
     @Test
-    public void testEmptyClassWithOnlyPrivateFields() throws Exception
-    {
+    public void testEmptyClassWithOnlyPrivateFields() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(HideUtilityClassConstructorCheck.class);
         final String[] expected = {
@@ -93,8 +90,7 @@ public class HideUtilityClassConstructorCheckTest
     }
 
     @Test
-    public void testClassWithStaticInnerClass() throws Exception
-    {
+    public void testClassWithStaticInnerClass() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(HideUtilityClassConstructorCheck.class);
         final String[] expected = {
@@ -102,4 +98,19 @@ public class HideUtilityClassConstructorCheckTest
         verify(checkConfig, getPath("design" + File.separator + "HideUtilityClassContructor3041574_3.java"), expected);
     }
 
+    @Test
+    public void testProtectedCtor() throws Exception {
+        final DefaultConfiguration checkConfig =
+            createCheckConfig(HideUtilityClassConstructorCheck.class);
+        final String[] expected = {
+        };
+        verify(checkConfig, getPath("design" + File.separator + "HideUtilityClassConstructor.java"), expected);
+    }
+
+    @Test
+    public void testGetAcceptableTokens() {
+        HideUtilityClassConstructorCheck obj = new HideUtilityClassConstructorCheck();
+        int[] expected = {TokenTypes.CLASS_DEF};
+        assertArrayEquals(expected, obj.getAcceptableTokens());
+    }
 }

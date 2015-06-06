@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.grammars.java8;
 
 import java.io.File;
@@ -26,13 +27,11 @@ import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.checks.naming.MemberNameCheck;
 
-public class LambdaTest extends BaseCheckTestSupport
-{
+public class LambdaTest extends BaseCheckTestSupport {
 
     @Test
     public void testLambdaInVariableInitialization()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
                 createCheckConfig(MemberNameCheck.class);
         final String[] expected = {};
@@ -44,8 +43,7 @@ public class LambdaTest extends BaseCheckTestSupport
 
     @Test
     public void testWithoutArgsOneLineLambdaBody()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
                 createCheckConfig(MemberNameCheck.class);
         final String[] expected = {};
@@ -57,8 +55,7 @@ public class LambdaTest extends BaseCheckTestSupport
 
     @Test
     public void testWithoutArgsFullLambdaBody()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
                 createCheckConfig(MemberNameCheck.class);
         final String[] expected = {};
@@ -70,8 +67,7 @@ public class LambdaTest extends BaseCheckTestSupport
 
     @Test
     public void testWithOneArgWithOneLineBody()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
                 createCheckConfig(MemberNameCheck.class);
         final String[] expected = {};
@@ -83,8 +79,7 @@ public class LambdaTest extends BaseCheckTestSupport
 
     @Test
     public void testWithOneArgWithFullBody()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
                 createCheckConfig(MemberNameCheck.class);
         final String[] expected = {};
@@ -96,8 +91,7 @@ public class LambdaTest extends BaseCheckTestSupport
 
     @Test
     public void testWithOneArgWIthoutTypeOneLineBody()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
                 createCheckConfig(MemberNameCheck.class);
         final String[] expected = {};
@@ -109,8 +103,7 @@ public class LambdaTest extends BaseCheckTestSupport
 
     @Test
     public void testWithOneArgWIthoutTypeFullBody()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
                 createCheckConfig(MemberNameCheck.class);
         final String[] expected = {};
@@ -122,8 +115,7 @@ public class LambdaTest extends BaseCheckTestSupport
 
     @Test
     public void testWithFewArgsWithoutTypeOneLineBody()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
                 createCheckConfig(MemberNameCheck.class);
         final String[] expected = {};
@@ -135,8 +127,7 @@ public class LambdaTest extends BaseCheckTestSupport
 
     @Test
     public void testWithFewArgsWithoutTypeFullBody()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
                 createCheckConfig(MemberNameCheck.class);
         final String[] expected = {};
@@ -148,8 +139,7 @@ public class LambdaTest extends BaseCheckTestSupport
 
     @Test
     public void testWithOneArgWIthoutParenthesesWithoutTypeOneLineBody()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
                 createCheckConfig(MemberNameCheck.class);
         final String[] expected = {};
@@ -161,8 +151,7 @@ public class LambdaTest extends BaseCheckTestSupport
 
     @Test
     public void testWithOneArgWIthoutParenthesesWithoutTypeFullBody()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
                 createCheckConfig(MemberNameCheck.class);
         final String[] expected = {};
@@ -174,8 +163,7 @@ public class LambdaTest extends BaseCheckTestSupport
 
     @Test
     public void testWithFewArgWIthTypeOneLine()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
                 createCheckConfig(MemberNameCheck.class);
         final String[] expected = {};
@@ -187,8 +175,7 @@ public class LambdaTest extends BaseCheckTestSupport
 
     @Test
     public void testWithFewArgWithTypeFullBody()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
                 createCheckConfig(MemberNameCheck.class);
         final String[] expected = {};
@@ -200,8 +187,7 @@ public class LambdaTest extends BaseCheckTestSupport
 
     @Test
     public void testWIthMultilineBody()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
                 createCheckConfig(MemberNameCheck.class);
         final String[] expected = {};
@@ -213,8 +199,7 @@ public class LambdaTest extends BaseCheckTestSupport
 
     @Test
     public void testCasesFromSpec()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
                 createCheckConfig(MemberNameCheck.class);
         final String[] expected = {};
@@ -226,8 +211,7 @@ public class LambdaTest extends BaseCheckTestSupport
 
     @Test
     public void testWithTypecast()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
                 createCheckConfig(MemberNameCheck.class);
         final String[] expected = {};
@@ -239,8 +223,7 @@ public class LambdaTest extends BaseCheckTestSupport
 
     @Test
     public void testInAssignment()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
                 createCheckConfig(MemberNameCheck.class);
         final String[] expected = {};
@@ -252,8 +235,7 @@ public class LambdaTest extends BaseCheckTestSupport
 
     @Test
     public void testInTernary()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
                 createCheckConfig(MemberNameCheck.class);
         final String[] expected = {};

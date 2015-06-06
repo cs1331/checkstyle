@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle;
 
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
@@ -30,8 +31,7 @@ import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
  *
  * @author lkuehne
  */
-public interface ModuleFactory
-{
+public interface ModuleFactory {
     /**
      * Creates a new instance of a class from a given name.
      * If the provided module name is a class name an instance of that class

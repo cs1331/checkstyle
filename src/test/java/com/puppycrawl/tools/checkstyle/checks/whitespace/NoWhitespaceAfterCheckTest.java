@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.whitespace;
 
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
@@ -26,19 +27,16 @@ import org.junit.Test;
 import static com.puppycrawl.tools.checkstyle.checks.whitespace.NoWhitespaceAfterCheck.MSG_KEY;
 
 public class NoWhitespaceAfterCheckTest
-    extends BaseCheckTestSupport
-{
+    extends BaseCheckTestSupport {
     private DefaultConfiguration checkConfig;
 
     @Before
-    public void setUp()
-    {
+    public void setUp() {
         checkConfig = createCheckConfig(NoWhitespaceAfterCheck.class);
     }
 
     @Test
-    public void testDefault() throws Exception
-    {
+    public void testDefault() throws Exception {
         checkConfig.addAttribute("allowLineBreaks", "false");
         final String[] expected = {
             "5:14: " + getCheckMessage(MSG_KEY, "."),
@@ -57,8 +55,7 @@ public class NoWhitespaceAfterCheckTest
     }
 
     @Test
-    public void testDotAllowLineBreaks() throws Exception
-    {
+    public void testDotAllowLineBreaks() throws Exception {
         checkConfig.addAttribute("tokens", "DOT");
         final String[] expected = {
             "5:14: " + getCheckMessage(MSG_KEY, "."),
@@ -69,8 +66,7 @@ public class NoWhitespaceAfterCheckTest
     }
 
     @Test
-    public void testTypecast() throws Exception
-    {
+    public void testTypecast() throws Exception {
         checkConfig.addAttribute("tokens", "TYPECAST");
         final String[] expected = {
             "87:28: " + getCheckMessage(MSG_KEY, ")"),
@@ -81,8 +77,7 @@ public class NoWhitespaceAfterCheckTest
     }
 
     @Test
-    public void testArrayDeclarations() throws Exception
-    {
+    public void testArrayDeclarations() throws Exception {
         checkConfig.addAttribute("tokens", "ARRAY_DECLARATOR");
         final String[] expected = {
             "6:11: " + getCheckMessage(MSG_KEY, "Object"),
@@ -106,8 +101,7 @@ public class NoWhitespaceAfterCheckTest
     }
 
     @Test
-    public void testNpe() throws Exception
-    {
+    public void testNpe() throws Exception {
         final String[] expected = {
 
         };

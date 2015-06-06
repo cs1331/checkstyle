@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.comments;
 
 import java.io.File;
@@ -31,35 +32,29 @@ import com.puppycrawl.tools.checkstyle.api.Check;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
-public class AllSinglelineCommentsTest extends BaseCheckTestSupport
-{
+public class AllSinglelineCommentsTest extends BaseCheckTestSupport {
     protected static final Set<String> allComments = Sets.newLinkedHashSet();
 
     private static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
-    public static class SinglelineCommentListenerCheck extends Check
-    {
+    public static class SinglelineCommentListenerCheck extends Check {
         @Override
-        public boolean isCommentNodesRequired()
-        {
+        public boolean isCommentNodesRequired() {
             return true;
         }
 
         @Override
-        public int[] getDefaultTokens()
-        {
+        public int[] getDefaultTokens() {
             return new int[] {TokenTypes.SINGLE_LINE_COMMENT};
         }
 
         @Override
-        public int[] getAcceptableTokens()
-        {
+        public int[] getAcceptableTokens() {
             return new int[] {TokenTypes.SINGLE_LINE_COMMENT};
         }
 
         @Override
-        public void init()
-        {
+        public void init() {
             int lines = 63;
             for (int i = 0; i < lines; i++) {
                 allComments.add(i + LINE_SEPARATOR);
@@ -68,8 +63,7 @@ public class AllSinglelineCommentsTest extends BaseCheckTestSupport
         }
 
         @Override
-        public void visitToken(DetailAST aAST)
-        {
+        public void visitToken(DetailAST aAST) {
             String commentContent = aAST.getFirstChild().getText();
             if (!allComments.remove(commentContent)) {
                 Assert.fail("Unexpected comment: " + commentContent);
@@ -79,8 +73,7 @@ public class AllSinglelineCommentsTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testAllBlockComments() throws Exception
-    {
+    public void testAllBlockComments() throws Exception {
         DefaultConfiguration checkConfig = createCheckConfig(SinglelineCommentListenerCheck.class);
         final String[] expected = {};
         verify(checkConfig, getPath("comments" + File.separator

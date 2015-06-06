@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.api;
 
 import com.google.common.collect.Lists;
@@ -46,8 +47,7 @@ import org.apache.commons.beanutils.converters.ShortConverter;
  * @author lkuehne
  */
 public class AutomaticBean
-    implements Configurable, Contextualizable
-{
+    implements Configurable, Contextualizable {
     /** the configuration of this bean */
     private Configuration configuration;
 
@@ -60,10 +60,9 @@ public class AutomaticBean
      *
      * @return a configured BeanUtilsBean
      */
-    private static BeanUtilsBean createBeanUtilsBean()
-    {
+    private static BeanUtilsBean createBeanUtilsBean() {
         final ConvertUtilsBean cub = new ConvertUtilsBean();
-        // TODO: is there a smarter way to tell beanutils not to use defaults?
+
         cub.register(new BooleanConverter(), Boolean.TYPE);
         cub.register(new BooleanConverter(), Boolean.class);
         cub.register(new ArrayConverter(
@@ -121,13 +120,11 @@ public class AutomaticBean
      */
     @Override
     public final void configure(Configuration configuration)
-        throws CheckstyleException
-    {
+        throws CheckstyleException {
         this.configuration = configuration;
 
         final BeanUtilsBean beanUtils = createBeanUtilsBean();
 
-        // TODO: debug log messages
         final String[] attributes = configuration.getAttributeNames();
 
         for (final String key : attributes) {
@@ -183,11 +180,9 @@ public class AutomaticBean
      */
     @Override
     public final void contextualize(Context context)
-        throws CheckstyleException
-    {
+        throws CheckstyleException {
         final BeanUtilsBean beanUtils = createBeanUtilsBean();
 
-        // TODO: debug log messages
         final Collection<String> attributes = context.getAttributeNames();
 
         for (final String key : attributes) {
@@ -197,8 +192,6 @@ public class AutomaticBean
                 beanUtils.copyProperty(this, key, value);
             }
             catch (final InvocationTargetException e) {
-                // TODO: log.debug("The bean " + this.getClass()
-                // + " is not interested in " + value)
                 throw new CheckstyleException("cannot set property "
                     + key + " to value " + value + " in bean "
                     + this.getClass().getName(), e);
@@ -220,8 +213,7 @@ public class AutomaticBean
      * Returns the configuration that was used to configure this component.
      * @return the configuration that was used to configure this component.
      */
-    protected final Configuration getConfiguration()
-    {
+    protected final Configuration getConfiguration() {
         return configuration;
     }
 
@@ -233,8 +225,7 @@ public class AutomaticBean
      * </p>
      * @throws CheckstyleException if there is a configuration error.
      */
-    protected void finishLocalSetup() throws CheckstyleException
-    {
+    protected void finishLocalSetup() throws CheckstyleException {
     }
 
     /**
@@ -247,8 +238,7 @@ public class AutomaticBean
      * @see Configuration#getChildren
      */
     protected void setupChild(Configuration childConf)
-        throws CheckstyleException
-    {
+        throws CheckstyleException {
     }
 
     /**
@@ -256,13 +246,11 @@ public class AutomaticBean
      * characters like '*' or '_'. The normal ArrayConverter class has problems
      * with this characters.
      */
-    private static class RelaxedStringArrayConverter implements Converter
-    {
+    private static class RelaxedStringArrayConverter implements Converter {
         /** {@inheritDoc} */
         @Override
         public Object convert(@SuppressWarnings("rawtypes") Class type,
-            Object value)
-        {
+            Object value) {
             if (null == type) {
                 throw new ConversionException("Cannot convert from null.");
             }

@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.api;
 
 import com.google.common.collect.ImmutableCollection;
@@ -27,8 +28,7 @@ import com.google.common.collect.ImmutableCollection;
  * @author lkuehne
  * @see Contextualizable
  */
-public interface Context
-{
+public interface Context {
     /**
      * Searches for the value with the specified attribute key in this context.
      * @param key the attribute key.

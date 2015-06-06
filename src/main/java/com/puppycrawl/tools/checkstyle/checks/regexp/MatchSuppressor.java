@@ -16,14 +16,14 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.regexp;
 
 /**
  * Represents a suppressor for matches.
  * @author oliver
  */
-interface MatchSuppressor
-{
+interface MatchSuppressor {
     /**
      * Checks if the specified selection should be suppressed.
      * @param startLineNo the starting line number

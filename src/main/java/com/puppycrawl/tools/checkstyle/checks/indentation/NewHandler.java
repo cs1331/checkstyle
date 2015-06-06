@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.indentation;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
@@ -26,8 +27,7 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  * @author o_sukhodolsky
  * @author Ilja Dubinin
  */
-public class NewHandler extends ExpressionHandler
-{
+public class NewHandler extends ExpressionHandler {
     /**
      * Construct an instance of this handler with the given indentation check,
      * abstract syntax tree, and parent handler.
@@ -38,14 +38,12 @@ public class NewHandler extends ExpressionHandler
      */
     public NewHandler(IndentationCheck indentCheck,
                       DetailAST ast,
-                      ExpressionHandler parent)
-    {
+                      ExpressionHandler parent) {
         super(indentCheck, "operator new", ast, parent);
     }
 
     @Override
-    public void checkIndentation()
-    {
+    public void checkIndentation() {
         final DetailAST type = getMainAst().getFirstChild();
         if (type != null) {
             checkExpressionSubtree(type, getLevel(), false, false);
@@ -56,8 +54,7 @@ public class NewHandler extends ExpressionHandler
         checkLParen(lparen);
 
         if (rparen == null || lparen == null
-            || rparen.getLineNo() == lparen.getLineNo())
-        {
+            || rparen.getLineNo() == lparen.getLineNo()) {
             return;
         }
 
@@ -84,8 +81,7 @@ public class NewHandler extends ExpressionHandler
     }
 
     @Override
-    protected IndentLevel getLevelImpl()
-    {
+    protected IndentLevel getLevelImpl() {
         // if our expression isn't first on the line, just use the start
         // of the line
         if (getLineStart(getMainAst()) != getMainAst().getColumnNo()) {
@@ -95,8 +91,7 @@ public class NewHandler extends ExpressionHandler
     }
 
     @Override
-    protected boolean shouldIncreaseIndent()
-    {
+    protected boolean shouldIncreaseIndent() {
         return false;
     }
 }

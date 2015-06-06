@@ -16,9 +16,12 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.javadoc;
 
 import com.puppycrawl.tools.checkstyle.api.DetailNode;
+
+import java.util.Arrays;
 
 /**
  *
@@ -27,8 +30,7 @@ import com.puppycrawl.tools.checkstyle.api.DetailNode;
  * @author Baratali Izmailov
  *
  */
-public class JavadocNodeImpl implements DetailNode
-{
+public class JavadocNodeImpl implements DetailNode {
     /**
      * Node index among parent's children
      */
@@ -65,85 +67,75 @@ public class JavadocNodeImpl implements DetailNode
     private DetailNode parent;
 
     @Override
-    public int getType()
-    {
+    public int getType() {
         return type;
     }
 
     @Override
-    public String getText()
-    {
+    public String getText() {
         return text;
     }
 
     @Override
-    public int getLineNumber()
-    {
+    public int getLineNumber() {
         return lineNumber;
     }
 
     @Override
-    public int getColumnNumber()
-    {
+    public int getColumnNumber() {
         return columnNumber;
     }
 
     @Override
-    public DetailNode[] getChildren()
-    {
-        return children;
+    public DetailNode[] getChildren() {
+        if (children == null) {
+            return new DetailNode[0];
+        }
+        else {
+            return Arrays.copyOf(children, children.length);
+        }
     }
 
     @Override
-    public DetailNode getParent()
-    {
+    public DetailNode getParent() {
         return parent;
     }
 
     @Override
-    public int getIndex()
-    {
+    public int getIndex() {
         return index;
     }
 
-    public void setType(int type)
-    {
+    public void setType(int type) {
         this.type = type;
     }
 
-    public void setText(String text)
-    {
+    public void setText(String text) {
         this.text = text;
     }
 
-    public void setLineNumber(int lineNumber)
-    {
+    public void setLineNumber(int lineNumber) {
         this.lineNumber = lineNumber;
     }
 
-    public void setColumnNumber(int columnNumber)
-    {
+    public void setColumnNumber(int columnNumber) {
         this.columnNumber = columnNumber;
     }
 
-    public void setChildren(DetailNode[] children)
-    {
-        this.children = children;
+    public void setChildren(DetailNode... children) {
+        this.children = Arrays.copyOf(children, children.length);
     }
 
-    public void setParent(DetailNode parent)
-    {
+    public void setParent(DetailNode parent) {
         this.parent = parent;
     }
 
-    public void setIndex(int index)
-    {
+    public void setIndex(int index) {
         this.index = index;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return JavadocUtils.getTokenName(getType())
                 + "[" + getLineNumber() + "x" + getColumnNumber() + "]";
     }

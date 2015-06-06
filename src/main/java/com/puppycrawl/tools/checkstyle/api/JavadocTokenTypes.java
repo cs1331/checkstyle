@@ -16,17 +16,17 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.api;
 
 import com.puppycrawl.tools.checkstyle.grammars.javadoc.JavadocParser;
 
 /**
+ * @author Baratali Izmailov
  * @see <a href="http://docs.oracle.com/javase/8/docs/technotes/tools/unix/javadoc.html">
  * javadoc - The Java API Documentation Generator</a>
- * @author Baratali Izmailov
  */
-public final class JavadocTokenTypes
-{
+public final class JavadocTokenTypes {
     private static final int RULE_TYPES_OFFSET = 10000;
 
     /**
@@ -570,10 +570,9 @@ public final class JavadocTokenTypes
      * <p>
      * Such Javadoc inline tag can have one argument - {@link #REFERENCE}
      * </p>
-     * <p>
-     * <b>Example:</b>
+     * <p><b>Example:</b></p>
      * <pre><code>{&#64;link org.apache.utils.Lists.Comparator#compare(Object)}</code></pre>
-     * <b>Tree:</b></p>
+     * <p><b>Tree:</b></p>
      * <code>
      * <pre>|--JAVADOC_INLINE_TAG[1x0] : [{&#64;link org.apache.utils.Lists.Comparator#compare(Object)}]
      *       |--JAVADOC_INLINE_TAG_START[1x0] : [{]
@@ -1386,8 +1385,7 @@ public final class JavadocTokenTypes
 
 
 
-    private JavadocTokenTypes()
-    {
+    private JavadocTokenTypes() {
     }
 
 }

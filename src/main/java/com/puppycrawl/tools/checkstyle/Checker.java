@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle;
 
 import com.google.common.collect.Lists;
@@ -26,7 +27,6 @@ import com.puppycrawl.tools.checkstyle.api.AutomaticBean;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 import com.puppycrawl.tools.checkstyle.api.Configuration;
 import com.puppycrawl.tools.checkstyle.api.Context;
-import com.puppycrawl.tools.checkstyle.api.FastStack;
 import com.puppycrawl.tools.checkstyle.api.FileSetCheck;
 import com.puppycrawl.tools.checkstyle.api.FileText;
 import com.puppycrawl.tools.checkstyle.api.Filter;
@@ -35,6 +35,8 @@ import com.puppycrawl.tools.checkstyle.api.LocalizedMessage;
 import com.puppycrawl.tools.checkstyle.api.MessageDispatcher;
 import com.puppycrawl.tools.checkstyle.api.SeverityLevel;
 import com.puppycrawl.tools.checkstyle.api.SeverityLevelCounter;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -45,9 +47,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.SortedSet;
-import java.util.StringTokenizer;
-
-import static com.puppycrawl.tools.checkstyle.Utils.fileExtensionMatches;
 
 /**
  * This class provides the functionality to check a set of files.
@@ -55,8 +54,10 @@ import static com.puppycrawl.tools.checkstyle.Utils.fileExtensionMatches;
  * @author <a href="mailto:stephane.bailliez@wanadoo.fr">Stephane Bailliez</a>
  * @author lkuehne
  */
-public class Checker extends AutomaticBean implements MessageDispatcher
-{
+public class Checker extends AutomaticBean implements MessageDispatcher {
+    /** Logger for Checker */
+    private static final Log LOG = LogFactory.getLog(Checker.class);
+
     /** maintains error count */
     private final SeverityLevelCounter counter = new SeverityLevelCounter(
             SeverityLevel.ERROR);
@@ -115,14 +116,12 @@ public class Checker extends AutomaticBean implements MessageDispatcher
      *
      * @throws CheckstyleException if an error occurs
      */
-    public Checker() throws CheckstyleException
-    {
+    public Checker() throws CheckstyleException {
         addListener(counter);
     }
 
     @Override
-    public void finishLocalSetup() throws CheckstyleException
-    {
+    public void finishLocalSetup() throws CheckstyleException {
         final Locale locale = new Locale(localeLanguage, localeCountry);
         LocalizedMessage.setLocale(locale);
 
@@ -151,8 +150,7 @@ public class Checker extends AutomaticBean implements MessageDispatcher
 
     @Override
     protected void setupChild(Configuration childConf)
-        throws CheckstyleException
-    {
+        throws CheckstyleException {
         final String name = childConf.getName();
         try {
             final Object child = moduleFactory.createModule(name);
@@ -179,7 +177,6 @@ public class Checker extends AutomaticBean implements MessageDispatcher
             }
         }
         catch (final Exception ex) {
-            // TODO i18n
             throw new CheckstyleException("cannot initialize module " + name
                     + " - " + ex.getMessage(), ex);
         }
@@ -190,8 +187,7 @@ public class Checker extends AutomaticBean implements MessageDispatcher
      * that is executed in process().
      * @param fileSetCheck the additional FileSetCheck
      */
-    public void addFileSetCheck(FileSetCheck fileSetCheck)
-    {
+    public void addFileSetCheck(FileSetCheck fileSetCheck) {
         fileSetCheck.setMessageDispatcher(this);
         fileSetChecks.add(fileSetCheck);
     }
@@ -200,8 +196,7 @@ public class Checker extends AutomaticBean implements MessageDispatcher
      * Adds a filter to the end of the audit event filter chain.
      * @param filter the additional filter
      */
-    public void addFilter(Filter filter)
-    {
+    public void addFilter(Filter filter) {
         filters.addFilter(filter);
     }
 
@@ -209,14 +204,12 @@ public class Checker extends AutomaticBean implements MessageDispatcher
      * Removes filter.
      * @param filter filter to remove.
      */
-    public void removeFilter(Filter filter)
-    {
+    public void removeFilter(Filter filter) {
         filters.removeFilter(filter);
     }
 
     /** Cleans up the object. **/
-    public void destroy()
-    {
+    public void destroy() {
         listeners.clear();
         filters.clear();
     }
@@ -225,8 +218,7 @@ public class Checker extends AutomaticBean implements MessageDispatcher
      * Add the listener that will be used to receive events from the audit.
      * @param listener the nosy thing
      */
-    public final void addListener(AuditListener listener)
-    {
+    public final void addListener(AuditListener listener) {
         listeners.add(listener);
     }
 
@@ -234,8 +226,7 @@ public class Checker extends AutomaticBean implements MessageDispatcher
      * Removes a given listener.
      * @param listener a listener to remove
      */
-    public void removeListener(AuditListener listener)
-    {
+    public void removeListener(AuditListener listener) {
         listeners.remove(listener);
     }
 
@@ -247,8 +238,7 @@ public class Checker extends AutomaticBean implements MessageDispatcher
      * @return the total number of errors found
      * @see #destroy()
      */
-    public int process(List<File> files)
-    {
+    public int process(List<File> files) {
         // Prepare to start
         fireAuditStarted();
         for (final FileSetCheck fsc : fileSetChecks) {
@@ -257,7 +247,7 @@ public class Checker extends AutomaticBean implements MessageDispatcher
 
         // Process each file
         for (final File f : files) {
-            if (!fileExtensionMatches(f, fileExtensions)) {
+            if (!Utils.fileExtensionMatches(f, fileExtensions)) {
                 continue;
             }
             final String fileName = f.getAbsolutePath();
@@ -271,16 +261,15 @@ public class Checker extends AutomaticBean implements MessageDispatcher
                 }
             }
             catch (final FileNotFoundException fnfe) {
-                Utils.getExceptionLogger().debug(
-                        "FileNotFoundException occured.", fnfe);
+                LOG.debug("FileNotFoundException occured.", fnfe);
                 fileMessages.add(new LocalizedMessage(0,
-                        Defn.CHECKSTYLE_BUNDLE, "general.fileNotFound", null,
+                        Definitions.CHECKSTYLE_BUNDLE, "general.fileNotFound", null,
                         null, this.getClass(), null));
             }
             catch (final IOException ioe) {
-                Utils.getExceptionLogger().debug("IOException occured.", ioe);
+                LOG.debug("IOException occured.", ioe);
                 fileMessages.add(new LocalizedMessage(0,
-                        Defn.CHECKSTYLE_BUNDLE, "general.exception",
+                        Definitions.CHECKSTYLE_BUNDLE, "general.exception",
                         new String[] {ioe.getMessage()}, null, this.getClass(),
                         null));
             }
@@ -304,169 +293,13 @@ public class Checker extends AutomaticBean implements MessageDispatcher
         return errorCount;
     }
 
-    /**
-     * Create a stripped down version of a filename.
-     * @param fileName the original filename
-     * @return the filename where an initial prefix of basedir is stripped
-     */
-    private String getStrippedFileName(final String fileName)
-    {
-        return Utils.getStrippedFileName(basedir, fileName);
-    }
-
     /** @param basedir the base directory to strip off in filenames */
-    public void setBasedir(String basedir)
-    {
-        // we use getAbsolutePath() instead of getCanonicalPath()
-        // because normalize() removes all . and .. so path
-        // will be canonical by default.
-        this.basedir = normalize(basedir);
-    }
-
-    /**
-     * &quot;normalize&quot; the given absolute path.
-     *
-     * <p>This includes:
-     * <ul>
-     *   <li>Uppercase the drive letter if there is one.</li>
-     *   <li>Remove redundant slashes after the drive spec.</li>
-     *   <li>resolve all ./, .\, ../ and ..\ sequences.</li>
-     *   <li>DOS style paths that start with a drive letter will have
-     *     \ as the separator.</li>
-     * </ul>
-     * <p>
-     *
-     * @param normalizingPath a path for &quot;normalizing&quot;
-     * @return &quot;normalized&quot; file name
-     * @throws java.lang.NullPointerException if the file path is
-     * equal to null.
-     */
-    public String normalize(String normalizingPath)
-    {
-
-        if (normalizingPath == null) {
-            return normalizingPath;
-        }
-
-        final String osName = System.getProperty("os.name").toLowerCase(
-                Locale.US);
-        final boolean onNetWare = osName.indexOf("netware") > -1;
-
-        String path = normalizingPath.replace('/', File.separatorChar).replace('\\',
-            File.separatorChar);
-
-        // make sure we are dealing with an absolute path
-        final int colon = path.indexOf(":");
-
-        if (!onNetWare) {
-            if (!path.startsWith(File.separator)
-                && !(path.length() >= 2
-                     && Character.isLetter(path.charAt(0)) && colon == 1))
-            {
-                final String msg = path + " is not an absolute path";
-                throw new IllegalArgumentException(msg);
-            }
-        }
-        else {
-            if (!path.startsWith(File.separator) && colon == -1) {
-                final String msg = path + " is not an absolute path";
-                throw new IllegalArgumentException(msg);
-            }
-        }
-
-        boolean dosWithDrive = false;
-        String root = null;
-        // Eliminate consecutive slashes after the drive spec
-        if (!onNetWare && path.length() >= 2
-             && Character.isLetter(path.charAt(0)) && path.charAt(1) == ':'
-            || onNetWare && colon > -1)
-        {
-
-            dosWithDrive = true;
-
-            final char[] ca = path.replace('/', '\\').toCharArray();
-            final StringBuilder sbRoot = new StringBuilder();
-            for (int i = 0; i < colon; i++) {
-                sbRoot.append(Character.toUpperCase(ca[i]));
-            }
-            sbRoot.append(':');
-            if (colon + 1 < path.length()) {
-                sbRoot.append(File.separatorChar);
-            }
-            root = sbRoot.toString();
-
-            // Eliminate consecutive slashes after the drive spec
-            final StringBuilder sbPath = new StringBuilder();
-            for (int i = colon + 1; i < ca.length; i++) {
-                if (ca[i] != '\\' || ca[i] == '\\' && ca[i - 1] != '\\') {
-                    sbPath.append(ca[i]);
-                }
-            }
-            path = sbPath.toString().replace('\\', File.separatorChar);
-
-        }
-        else {
-            if (path.length() == 1) {
-                root = File.separator;
-                path = "";
-            }
-            else if (path.charAt(1) == File.separatorChar) {
-                // UNC drive
-                root = File.separator + File.separator;
-                path = path.substring(2);
-            }
-            else {
-                root = File.separator;
-                path = path.substring(1);
-            }
-        }
-
-        final FastStack<String> s = FastStack.newInstance();
-        s.push(root);
-        final StringTokenizer tok = new StringTokenizer(path, File.separator);
-        while (tok.hasMoreTokens()) {
-            final String thisToken = tok.nextToken();
-            if (".".equals(thisToken)) {
-                continue;
-            }
-            else if ("..".equals(thisToken)) {
-                if (s.size() < 2) {
-                    throw new IllegalArgumentException("Cannot resolve path "
-                            + path);
-                }
-                s.pop();
-            }
-            else { // plain component
-                s.push(thisToken);
-            }
-        }
-
-        final StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < s.size(); i++) {
-            if (i > 1) {
-                // not before the filesystem root and not after it, since root
-                // already contains one
-                sb.append(File.separatorChar);
-            }
-            sb.append(s.peek(i));
-        }
-
-        path = sb.toString();
-        if (dosWithDrive) {
-            path = path.replace('/', '\\');
-        }
-        return path;
-    }
-
-    /** @return the base directory property used in unit-test. */
-    public final String getBasedir()
-    {
-        return basedir;
+    public void setBasedir(String basedir) {
+        this.basedir = basedir;
     }
 
     /** notify all listeners about the audit start */
-    protected void fireAuditStarted()
-    {
+    protected void fireAuditStarted() {
         final AuditEvent evt = new AuditEvent(this);
         for (final AuditListener listener : listeners) {
             listener.auditStarted(evt);
@@ -474,8 +307,7 @@ public class Checker extends AutomaticBean implements MessageDispatcher
     }
 
     /** notify all listeners about the audit end */
-    protected void fireAuditFinished()
-    {
+    protected void fireAuditFinished() {
         final AuditEvent evt = new AuditEvent(this);
         for (final AuditListener listener : listeners) {
             listener.auditFinished(evt);
@@ -489,9 +321,8 @@ public class Checker extends AutomaticBean implements MessageDispatcher
      *            the file to be audited
      */
     @Override
-    public void fireFileStarted(String fileName)
-    {
-        final String stripped = getStrippedFileName(fileName);
+    public void fireFileStarted(String fileName) {
+        final String stripped = Utils.relativizeAndNormalizePath(basedir, fileName);
         final AuditEvent evt = new AuditEvent(this, stripped);
         for (final AuditListener listener : listeners) {
             listener.fileStarted(evt);
@@ -505,9 +336,8 @@ public class Checker extends AutomaticBean implements MessageDispatcher
      *            the audited file
      */
     @Override
-    public void fireFileFinished(String fileName)
-    {
-        final String stripped = getStrippedFileName(fileName);
+    public void fireFileFinished(String fileName) {
+        final String stripped = Utils.relativizeAndNormalizePath(basedir, fileName);
         final AuditEvent evt = new AuditEvent(this, stripped);
         for (final AuditListener listener : listeners) {
             listener.fileFinished(evt);
@@ -521,10 +351,8 @@ public class Checker extends AutomaticBean implements MessageDispatcher
      * @param errors the audit errors from the file
      */
     @Override
-    public void fireErrors(String fileName,
-        SortedSet<LocalizedMessage> errors)
-    {
-        final String stripped = getStrippedFileName(fileName);
+    public void fireErrors(String fileName, SortedSet<LocalizedMessage> errors) {
+        final String stripped = Utils.relativizeAndNormalizePath(basedir, fileName);
         for (final LocalizedMessage element : errors) {
             final AuditEvent evt = new AuditEvent(this, stripped, element);
             if (filters.accept(evt)) {
@@ -541,8 +369,7 @@ public class Checker extends AutomaticBean implements MessageDispatcher
      * @param extensions the set of file extensions. A missing
      * initial '.' character of an extension is automatically added.
      */
-    public final void setFileExtensions(String[] extensions)
-    {
+    public final void setFileExtensions(String... extensions) {
         if (extensions == null) {
             fileExtensions = null;
             return;
@@ -551,7 +378,7 @@ public class Checker extends AutomaticBean implements MessageDispatcher
         fileExtensions = new String[extensions.length];
         for (int i = 0; i < extensions.length; i++) {
             final String extension = extensions[i];
-            if (extension.startsWith(".")) {
+            if (Utils.startsWithChar(extension, '.')) {
                 fileExtensions[i] = extension;
             }
             else {
@@ -565,20 +392,17 @@ public class Checker extends AutomaticBean implements MessageDispatcher
      *
      * @param moduleFactory the factory for creating FileSetChecks
      */
-    public void setModuleFactory(ModuleFactory moduleFactory)
-    {
+    public void setModuleFactory(ModuleFactory moduleFactory) {
         this.moduleFactory = moduleFactory;
     }
 
     /** @param localeCountry the country to report messages  **/
-    public void setLocaleCountry(String localeCountry)
-    {
+    public void setLocaleCountry(String localeCountry) {
         this.localeCountry = localeCountry;
     }
 
     /** @param localeLanguage the language to report messages  **/
-    public void setLocaleLanguage(String localeLanguage)
-    {
+    public void setLocaleLanguage(String localeLanguage) {
         this.localeLanguage = localeLanguage;
     }
 
@@ -589,8 +413,7 @@ public class Checker extends AutomaticBean implements MessageDispatcher
      * @param severity  The new severity level
      * @see SeverityLevel
      */
-    public final void setSeverity(String severity)
-    {
+    public final void setSeverity(String severity) {
         severityLevel = SeverityLevel.getInstance(severity);
     }
 
@@ -601,9 +424,21 @@ public class Checker extends AutomaticBean implements MessageDispatcher
      * reflection.
      * @param loader the new classloader
      */
-    public final void setClassloader(ClassLoader loader)
-    {
+    public final void setClassLoader(ClassLoader loader) {
         this.loader = loader;
+    }
+
+    /**
+     * Sets the classloader that is used to contextualize filesetchecks.
+     * Some Check implementations will use that classloader to improve the
+     * quality of their reports, e.g. to load a class and then analyze it via
+     * reflection.
+     * @param loader the new classloader
+     * @deprecated use {@link #setClassLoader(ClassLoader loader)} instead.
+     */
+    @Deprecated
+    public final void setClassloader(ClassLoader loader) {
+        setClassLoader(loader);
     }
 
     /**
@@ -613,8 +448,7 @@ public class Checker extends AutomaticBean implements MessageDispatcher
      * this module classloader must be specified.
      * @param moduleClassLoader the classloader used to load module classes
      */
-    public final void setModuleClassLoader(ClassLoader moduleClassLoader)
-    {
+    public final void setModuleClassLoader(ClassLoader moduleClassLoader) {
         this.moduleClassLoader = moduleClassLoader;
     }
 
@@ -624,8 +458,7 @@ public class Checker extends AutomaticBean implements MessageDispatcher
      * @throws UnsupportedEncodingException if charset is unsupported.
      */
     public void setCharset(String charset)
-        throws UnsupportedEncodingException
-    {
+        throws UnsupportedEncodingException {
         if (!Charset.isSupported(charset)) {
             final String message = "unsupported charset: '" + charset + "'";
             throw new UnsupportedEncodingException(message);

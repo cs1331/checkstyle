@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
 import com.puppycrawl.tools.checkstyle.api.Check;
@@ -26,8 +27,7 @@ import com.puppycrawl.tools.checkstyle.api.DetailAST;
  *
  * @author <a href="mailto:simon@redhillconsulting.com.au">Simon Harris</a>
  */
-public abstract class AbstractNestedDepthCheck extends Check
-{
+public abstract class AbstractNestedDepthCheck extends Check {
     /** maximum allowed nesting depth */
     private int max;
     /** current nesting depth */
@@ -37,20 +37,17 @@ public abstract class AbstractNestedDepthCheck extends Check
      * Creates new instance of checks.
      * @param max default allowed nesting depth.
      */
-    public AbstractNestedDepthCheck(int max)
-    {
+    public AbstractNestedDepthCheck(int max) {
         setMax(max);
     }
 
     @Override
-    public final int[] getRequiredTokens()
-    {
+    public final int[] getRequiredTokens() {
         return getDefaultTokens();
     }
 
     @Override
-    public void beginTree(DetailAST rootAST)
-    {
+    public void beginTree(DetailAST rootAST) {
         depth = 0;
     }
 
@@ -58,8 +55,7 @@ public abstract class AbstractNestedDepthCheck extends Check
      * Getter for maximum allowed nesting depth.
      * @return maximum allowed nesting depth.
      */
-    public final int getMax()
-    {
+    public final int getMax() {
         return max;
     }
 
@@ -67,8 +63,7 @@ public abstract class AbstractNestedDepthCheck extends Check
      * Setter for maximum allowed nesting depth.
      * @param max maximum allowed nesting depth.
      */
-    public final void setMax(int max)
-    {
+    public final void setMax(int max) {
         this.max = max;
     }
 
@@ -77,8 +72,7 @@ public abstract class AbstractNestedDepthCheck extends Check
      * @param ast note which increases nesting.
      * @param messageId message id for logging error.
      */
-    protected final void nestIn(DetailAST ast, String messageId)
-    {
+    protected final void nestIn(DetailAST ast, String messageId) {
         if (depth > max) {
             log(ast, messageId, depth, max);
         }
@@ -86,8 +80,7 @@ public abstract class AbstractNestedDepthCheck extends Check
     }
 
     /** Decreasing current nesting depth */
-    protected final void nestOut()
-    {
+    protected final void nestOut() {
         --depth;
     }
 }

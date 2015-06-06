@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks;
 
 import java.io.File;
@@ -37,8 +38,7 @@ import com.puppycrawl.tools.checkstyle.api.AbstractFileSetCheck;
  *
  * @author Pavel Baranchikov
  */
-public class UniquePropertiesCheck extends AbstractFileSetCheck
-{
+public class UniquePropertiesCheck extends AbstractFileSetCheck {
 
     /**
      * Localization key for check violation.
@@ -52,15 +52,12 @@ public class UniquePropertiesCheck extends AbstractFileSetCheck
     /**
      * Construct the check with default values.
      */
-    public UniquePropertiesCheck()
-    {
-        super.setFileExtensions(new String[]
-        {"properties"});
+    public UniquePropertiesCheck() {
+        super.setFileExtensions("properties");
     }
 
     @Override
-    protected void processFiltered(File file, List<String> lines)
-    {
+    protected void processFiltered(File file, List<String> lines) {
         final UniqueProperties properties = new UniqueProperties();
 
         try {
@@ -79,8 +76,7 @@ public class UniquePropertiesCheck extends AbstractFileSetCheck
         }
 
         for (Entry<String> duplication : properties
-                .getDuplicatedStrings().entrySet())
-        {
+                .getDuplicatedStrings().entrySet()) {
             final String keyName = duplication.getElement();
             final int lineNumber = getLineNumber(lines, keyName);
             // Number of occurrences is number of duplications + 1
@@ -99,8 +95,7 @@ public class UniquePropertiesCheck extends AbstractFileSetCheck
      * @return line number of first occurrence. If no key found in properties
      *         file, 0 is returned
      */
-    protected int getLineNumber(List<String> lines, String keyName)
-    {
+    protected int getLineNumber(List<String> lines, String keyName) {
         final String keyPatternString =
                 "^" + keyName.replace(" ", "\\\\ ") + "[\\s:=].*$";
         final Pattern keyPattern = Pattern.compile(keyPatternString);
@@ -124,8 +119,7 @@ public class UniquePropertiesCheck extends AbstractFileSetCheck
      *
      * @author Pavel Baranchikov
      */
-    private static class UniqueProperties extends Properties
-    {
+    private static class UniqueProperties extends Properties {
         /**
          * Default serial version id.
          */
@@ -138,18 +132,18 @@ public class UniquePropertiesCheck extends AbstractFileSetCheck
                 .create();
 
         @Override
-        public synchronized Object put(Object key, Object value)
-        {
-            final Object oldValue = super.put(key, value);
-            if (oldValue != null && key instanceof String) {
-                final String keyString = (String) key;
-                duplicatedStrings.add(keyString);
+        public Object put(Object key, Object value) {
+            synchronized (this) {
+                final Object oldValue = super.put(key, value);
+                if (oldValue != null && key instanceof String) {
+                    final String keyString = (String) key;
+                    duplicatedStrings.add(keyString);
+                }
+                return oldValue;
             }
-            return oldValue;
         }
 
-        public Multiset<String> getDuplicatedStrings()
-        {
+        public Multiset<String> getDuplicatedStrings() {
             return duplicatedStrings;
         }
     }

@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.metrics;
 
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
@@ -28,8 +29,7 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  * @author o_sukhodolsky
  */
 public final class ClassDataAbstractionCouplingCheck
-    extends AbstractClassCouplingCheck
-{
+    extends AbstractClassCouplingCheck {
 
     /**
      * A key is pointing to the warning message text in "messages.properties"
@@ -41,15 +41,13 @@ public final class ClassDataAbstractionCouplingCheck
     private static final int DEFAULT_MAX = 7;
 
     /** Creates bew instance of the check. */
-    public ClassDataAbstractionCouplingCheck()
-    {
+    public ClassDataAbstractionCouplingCheck() {
         super(DEFAULT_MAX);
-        setTokens(new String[] {"LITERAL_NEW"});
+        setTokens("LITERAL_NEW");
     }
 
     @Override
-    public int[] getRequiredTokens()
-    {
+    public int[] getRequiredTokens() {
         return new int[] {
             TokenTypes.PACKAGE_DEF,
             TokenTypes.CLASS_DEF,
@@ -60,8 +58,7 @@ public final class ClassDataAbstractionCouplingCheck
     }
 
     @Override
-    public int[] getAcceptableTokens()
-    {
+    public int[] getAcceptableTokens() {
         return new int[] {
             TokenTypes.PACKAGE_DEF,
             TokenTypes.CLASS_DEF,
@@ -72,8 +69,7 @@ public final class ClassDataAbstractionCouplingCheck
     }
 
     @Override
-    protected String getLogMessageId()
-    {
+    protected String getLogMessageId() {
         return MSG_KEY;
     }
 }

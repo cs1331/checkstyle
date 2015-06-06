@@ -16,13 +16,16 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.doclets;
 
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.io.Writer;
 import java.util.Arrays;
 import java.util.Comparator;
 import com.sun.javadoc.ClassDoc;
@@ -38,14 +41,12 @@ import com.sun.javadoc.Tag;
  * master branch till completed.
  * @author lkuehne
  */
-public final class CheckDocsDoclet
-{
+public final class CheckDocsDoclet {
     /** javadoc command line option for dest dir. */
     private static final String DEST_DIR_OPT = "-d";
 
     /** Stop instances being created. */
-    private CheckDocsDoclet()
-    {
+    private CheckDocsDoclet() {
     }
 
     /**
@@ -53,14 +54,12 @@ public final class CheckDocsDoclet
      * by their check name.
      */
     private static class ClassDocByCheckNameComparator implements
-        Comparator<ClassDoc>, Serializable
-    {
+        Comparator<ClassDoc>, Serializable {
         /** Serialization version. */
         private static final long serialVersionUID = 1731995210294871881L;
 
         /** {@inheritDoc} */
-        public int compare(ClassDoc object1, ClassDoc object2)
-        {
+        public int compare(ClassDoc object1, ClassDoc object2) {
             final String checkName1 = getCheckName(object1);
             final String checkName2 = getCheckName(object2);
             return checkName1.compareTo(checkName2);
@@ -73,8 +72,7 @@ public final class CheckDocsDoclet
      * @param classDoc class doc of the check, e.g. EmptyStatement
      * @return The first sentence of the check description.
      */
-    private static String getDescription(final ClassDoc classDoc)
-    {
+    private static String getDescription(final ClassDoc classDoc) {
         final Tag[] tags = classDoc.firstSentenceTags();
         final StringBuffer buf = new StringBuffer();
         if (tags.length > 0) {
@@ -88,13 +86,11 @@ public final class CheckDocsDoclet
      * Removes an opening p tag from a StringBuffer.
      * @param text the text to process
      */
-    private static void removeOpeningParagraphTag(final StringBuffer text)
-    {
+    private static void removeOpeningParagraphTag(final StringBuffer text) {
         final String openTag = "<p>";
         final int tagLen = openTag.length();
         if (text.length() > tagLen
-                && text.substring(0, tagLen).equals(openTag))
-        {
+                && text.substring(0, tagLen).equals(openTag)) {
             text.delete(0, tagLen);
         }
     }
@@ -106,8 +102,7 @@ public final class CheckDocsDoclet
      * @return the check name, e.g. "IllegalImport" for
      * the "c.p.t.c.c.i.IllegalImportCheck" class.
      */
-    private static String getCheckName(final ClassDoc classDoc)
-    {
+    private static String getCheckName(final ClassDoc classDoc) {
         final String strippedClassName = classDoc.typeName();
         final String checkName;
         if (strippedClassName.endsWith("Check")) {
@@ -127,8 +122,7 @@ public final class CheckDocsDoclet
      */
     private static void writeXdocsHeader(
             final PrintWriter printWriter,
-            final String title)
-    {
+            final String title) {
         printWriter.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
         printWriter.println("<document>");
         printWriter.println("<properties>");
@@ -145,8 +139,7 @@ public final class CheckDocsDoclet
      * Writes the closing tags of an xdoc document.
      * @param printWriter you guessed it ... the target to print to :)
      */
-    private static void writeXdocsFooter(final PrintWriter printWriter)
-    {
+    private static void writeXdocsFooter(final PrintWriter printWriter) {
         printWriter.println("</body>");
         printWriter.println("</document>");
         printWriter.flush();
@@ -155,18 +148,18 @@ public final class CheckDocsDoclet
     /**
      * Doclet entry point.
      * @param root parsed javadoc of all java files passed to the javadoc task
-     * @return true (TODO: semantics of the return value is not clear to me)
+     * @return boolean value
      * @throws IOException if there are problems writing output
      */
-    public static boolean start(RootDoc root) throws IOException
-    {
+    public static boolean start(RootDoc root) throws IOException {
         final ClassDoc[] classDocs = root.classes();
 
         final File destDir = new File(getDestDir(root.options()));
 
         final File checksIndexFile = new File(destDir, "checks.xml");
-        final PrintWriter fileWriter = new PrintWriter(
-                new FileWriter(checksIndexFile));
+        final Writer writer =
+                new OutputStreamWriter(new FileOutputStream(checksIndexFile), "UTF-8");
+        final PrintWriter fileWriter = new PrintWriter(writer);
         writeXdocsHeader(fileWriter, "Available Checks");
 
         fileWriter.println("<p>Checkstyle provides many checks that you can"
@@ -179,11 +172,8 @@ public final class CheckDocsDoclet
 
         for (final ClassDoc classDoc : classDocs) {
 
-            // TODO: introduce a "CheckstyleModule" interface
-            // so we can do better in the next line...
             if (classDoc.typeName().endsWith("Check")
-                    && !classDoc.isAbstract())
-            {
+                    && !classDoc.isAbstract()) {
                 String pageName = getPageName(classDoc);
 
                 // allow checks to override pageName when
@@ -218,8 +208,7 @@ public final class CheckDocsDoclet
      * @param classDoc the doc page.
      * @return the human readable page name for the doc page.
      */
-    private static String getPageName(ClassDoc classDoc)
-    {
+    private static String getPageName(ClassDoc classDoc) {
         final String packageName = classDoc.containingPackage().name();
         final String pageName =
                 packageName.substring(packageName.lastIndexOf('.') + 1);
@@ -234,14 +223,13 @@ public final class CheckDocsDoclet
      * @param options Javadoc commandline options
      * @return the dest dir specified on the command line (or ant task)
      */
-    public static String getDestDir(String[][] options)
-    {
+    public static String getDestDir(String[]... options) {
         for (final String[] opt : options) {
             if (DEST_DIR_OPT.equalsIgnoreCase(opt[0])) {
                 return opt[1];
             }
         }
-        return null; // TODO: throw exception here ???
+        return null;
     }
 
     /**
@@ -249,8 +237,7 @@ public final class CheckDocsDoclet
      * @param option option name to process
      * @return option length (how many parts are in option).
      */
-    public static int optionLength(String option)
-    {
+    public static int optionLength(String option) {
         if (DEST_DIR_OPT.equals(option)) {
             return 2;
         }

@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
 import com.puppycrawl.tools.checkstyle.api.Check;
@@ -27,8 +28,7 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  * @author Alexander Jesse
  * @author Oliver Burn
  */
-public final class OneStatementPerLineCheck extends Check
-{
+public final class OneStatementPerLineCheck extends Check {
 
     /**
      * A key is pointing to the warning message text in "messages.properties"
@@ -47,8 +47,7 @@ public final class OneStatementPerLineCheck extends Check
     private boolean inForHeader;
 
     @Override
-    public int[] getDefaultTokens()
-    {
+    public int[] getDefaultTokens() {
         return new int[] {
             TokenTypes.EXPR, TokenTypes.SEMI, TokenTypes.FOR_INIT,
             TokenTypes.FOR_ITERATOR,
@@ -56,8 +55,7 @@ public final class OneStatementPerLineCheck extends Check
     }
 
     @Override
-    public int[] getAcceptableTokens()
-    {
+    public int[] getAcceptableTokens() {
         return new int[] {
             TokenTypes.EXPR, TokenTypes.SEMI, TokenTypes.FOR_INIT,
             TokenTypes.FOR_ITERATOR,
@@ -65,16 +63,14 @@ public final class OneStatementPerLineCheck extends Check
     }
 
     @Override
-    public void beginTree(DetailAST rootAST)
-    {
+    public void beginTree(DetailAST rootAST) {
         exprDepth = 0;
         inForHeader = false;
         lastStatementEnd = -1;
     }
 
     @Override
-    public void visitToken(DetailAST ast)
-    {
+    public void visitToken(DetailAST ast) {
         switch (ast.getType()) {
             case TokenTypes.EXPR:
                 visitExpr(ast);
@@ -91,8 +87,7 @@ public final class OneStatementPerLineCheck extends Check
     }
 
     @Override
-    public void leaveToken(DetailAST ast)
-    {
+    public void leaveToken(DetailAST ast) {
         switch (ast.getType()) {
             case TokenTypes.FOR_ITERATOR:
                 inForHeader = false;
@@ -112,13 +107,11 @@ public final class OneStatementPerLineCheck extends Check
      * not within a for-statement, then the rule is violated.
      * @param ast token for the {@link TokenTypes#EXPR}.
      */
-    private void visitExpr(DetailAST ast)
-    {
+    private void visitExpr(DetailAST ast) {
         exprDepth++;
         if (exprDepth == 1
                 && !inForHeader
-                && lastStatementEnd == ast.getLineNo())
-        {
+                && lastStatementEnd == ast.getLineNo()) {
             log(ast, MSG_KEY);
         }
     }
@@ -128,8 +121,7 @@ public final class OneStatementPerLineCheck extends Check
      * line of the last statement.
      * @param ast for the {@link TokenTypes#SEMI}.
      */
-    private void visitSemi(DetailAST ast)
-    {
+    private void visitSemi(DetailAST ast) {
         if (exprDepth == 0) {
             lastStatementEnd = ast.getLineNo();
         }

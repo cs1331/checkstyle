@@ -23,9 +23,10 @@ import antlr.collections.AST;
 import com.google.common.collect.Lists;
 import com.puppycrawl.tools.checkstyle.api.Check;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import com.puppycrawl.tools.checkstyle.api.ScopeUtils;
+import com.puppycrawl.tools.checkstyle.ScopeUtils;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import java.util.LinkedList;
+
+import java.util.Deque;
 
 /**
  * <p>
@@ -35,8 +36,7 @@ import java.util.LinkedList;
  * @author Rick Giles
  */
 public abstract class AbstractSuperCheck
-        extends Check
-{
+        extends Check {
 
     /**
      * A key is pointing to the warning message text in "messages.properties"
@@ -49,30 +49,27 @@ public abstract class AbstractSuperCheck
      * whether the method has a call to the super method.
      * @author Rick Giles
      */
-    private static class MethodNode
-    {
+    private static class MethodNode {
         /** method definition */
         private final DetailAST method;
 
         /** true if the overriding method calls the super method */
-        private boolean callsSuper;
+        private boolean callingSuper;
 
         /**
          * Constructs a stack node for a method definition.
          * @param ast AST for the method definition.
          */
-        public MethodNode(DetailAST ast)
-        {
+        public MethodNode(DetailAST ast) {
             method = ast;
-            callsSuper = false;
+            callingSuper = false;
         }
 
         /**
          * Records that the overriding method has a call to the super method.
          */
-        public void setCallsSuper()
-        {
-            callsSuper = true;
+        public void setCallingSuper() {
+            callingSuper = true;
         }
 
         /**
@@ -81,27 +78,24 @@ public abstract class AbstractSuperCheck
          * @return true if the overriding method has a call to the super
          * method.
          */
-        public boolean getCallsSuper()
-        {
-            return callsSuper;
+        public boolean isCallingSuper() {
+            return callingSuper;
         }
 
         /**
          * Returns the overriding method definition AST.
          * @return the overriding method definition AST.
          */
-        public DetailAST getMethod()
-        {
+        public DetailAST getMethod() {
             return method;
         }
     }
 
     /** stack of methods */
-    private final LinkedList<MethodNode> methodStack = Lists.newLinkedList();
+    private final Deque<MethodNode> methodStack = Lists.newLinkedList();
 
     @Override
-    public int[] getDefaultTokens()
-    {
+    public int[] getDefaultTokens() {
         return new int[] {
             TokenTypes.METHOD_DEF,
             TokenTypes.LITERAL_SUPER,
@@ -109,8 +103,7 @@ public abstract class AbstractSuperCheck
     }
 
     @Override
-    public int[] getAcceptableTokens()
-    {
+    public int[] getAcceptableTokens() {
         return new int[] {
             TokenTypes.METHOD_DEF,
             TokenTypes.LITERAL_SUPER,
@@ -124,20 +117,18 @@ public abstract class AbstractSuperCheck
     protected abstract String getMethodName();
 
     @Override
-    public void beginTree(DetailAST rootAST)
-    {
+    public void beginTree(DetailAST rootAST) {
         methodStack.clear();
     }
 
     @Override
-    public void visitToken(DetailAST ast)
-    {
+    public void visitToken(DetailAST ast) {
         if (isOverridingMethod(ast)) {
             methodStack.add(new MethodNode(ast));
         }
         else if (isSuperCall(ast)) {
             final MethodNode methodNode = methodStack.getLast();
-            methodNode.setCallsSuper();
+            methodNode.setCallingSuper();
         }
     }
 
@@ -148,8 +139,7 @@ public abstract class AbstractSuperCheck
      * @return true if ast is a call to the super method
      * for this check.
      */
-    private boolean isSuperCall(DetailAST ast)
-    {
+    private boolean isSuperCall(DetailAST ast) {
         if (ast.getType() != TokenTypes.LITERAL_SUPER) {
             return false;
         }
@@ -163,8 +153,7 @@ public abstract class AbstractSuperCheck
         AST sibling = ast.getNextSibling();
         // ignore type parameters
         if (sibling != null
-            && sibling.getType() == TokenTypes.TYPE_ARGUMENTS)
-        {
+            && sibling.getType() == TokenTypes.TYPE_ARGUMENTS) {
             sibling = sibling.getNextSibling();
         }
         if (sibling == null || sibling.getType() != TokenTypes.IDENT) {
@@ -190,8 +179,7 @@ public abstract class AbstractSuperCheck
                 return isOverridingMethod(parent);
             }
             else if (parent.getType() == TokenTypes.CTOR_DEF
-                || parent.getType() == TokenTypes.INSTANCE_INIT)
-            {
+                || parent.getType() == TokenTypes.INSTANCE_INIT) {
                 return false;
             }
             parent = parent.getParent();
@@ -200,12 +188,11 @@ public abstract class AbstractSuperCheck
     }
 
     @Override
-    public void leaveToken(DetailAST ast)
-    {
+    public void leaveToken(DetailAST ast) {
         if (isOverridingMethod(ast)) {
             final MethodNode methodNode =
                 methodStack.removeLast();
-            if (!methodNode.getCallsSuper()) {
+            if (!methodNode.isCallingSuper()) {
                 final DetailAST methodAST = methodNode.getMethod();
                 final DetailAST nameAST =
                     methodAST.findFirstToken(TokenTypes.IDENT);
@@ -221,11 +208,9 @@ public abstract class AbstractSuperCheck
      * @param ast the method definition AST.
      * @return true if the method of ast is a method for this check.
      */
-    private boolean isOverridingMethod(DetailAST ast)
-    {
+    private boolean isOverridingMethod(DetailAST ast) {
         if (ast.getType() != TokenTypes.METHOD_DEF
-            || ScopeUtils.inInterfaceOrAnnotationBlock(ast))
-        {
+            || ScopeUtils.inInterfaceOrAnnotationBlock(ast)) {
             return false;
         }
         final DetailAST nameAST = ast.findFirstToken(TokenTypes.IDENT);

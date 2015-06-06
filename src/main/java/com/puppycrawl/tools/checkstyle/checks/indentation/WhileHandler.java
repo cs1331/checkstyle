@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.indentation;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
@@ -26,8 +27,7 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  *
  * @author jrichard
  */
-public class WhileHandler extends BlockParentHandler
-{
+public class WhileHandler extends BlockParentHandler {
     /**
      * Construct an instance of this handler with the given indentation check,
      * abstract syntax tree, and parent handler.
@@ -37,16 +37,14 @@ public class WhileHandler extends BlockParentHandler
      * @param parent        the parent handler
      */
     public WhileHandler(IndentationCheck indentCheck,
-        DetailAST ast, ExpressionHandler parent)
-    {
+        DetailAST ast, ExpressionHandler parent) {
         super(indentCheck, "while", ast, parent);
     }
 
     /**
      * Check the indentation of the conditional expression.
      */
-    private void checkCondExpr()
-    {
+    private void checkCondExpr() {
         final DetailAST condAst = getMainAst().findFirstToken(TokenTypes.EXPR);
         final IndentLevel expected =
             new IndentLevel(getLevel(), getBasicOffset());
@@ -54,8 +52,7 @@ public class WhileHandler extends BlockParentHandler
     }
 
     @Override
-    public void checkIndentation()
-    {
+    public void checkIndentation() {
         checkCondExpr();
         super.checkIndentation();
     }

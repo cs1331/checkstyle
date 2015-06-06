@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.javadoc;
 
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
@@ -24,12 +25,10 @@ import org.junit.Test;
 
 import static com.puppycrawl.tools.checkstyle.checks.javadoc.AtclauseOrderCheck.MSG_KEY;
 
-public class AtclauseOrderCheckTest extends BaseCheckTestSupport
-{
+public class AtclauseOrderCheckTest extends BaseCheckTestSupport {
 
     @Test
-    public void testCorrect() throws Exception
-    {
+    public void testCorrect() throws Exception {
         DefaultConfiguration checkConfig = createCheckConfig(AtclauseOrderCheck.class);
         final String[] expected = {};
 
@@ -37,8 +36,7 @@ public class AtclauseOrderCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testIncorrect() throws Exception
-    {
+    public void testIncorrect() throws Exception {
         final String tagOrder = "[@author, @version, @param, @return, @throws, @exception, @see,"
                 + " @since, @serial, @serialField, @serialData, @deprecated]";
         DefaultConfiguration checkConfig = createCheckConfig(AtclauseOrderCheck.class);
@@ -84,18 +82,18 @@ public class AtclauseOrderCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testIncorrectCustom() throws Exception
-    {
-        final String tagOrder = "[@author, @version, @param, @return, @throws, @exception, @see,"
-                + " @since, @serial, @serialField, @serialData, @deprecated]";
+    public void testIncorrectCustom() throws Exception {
+        final String tagOrder = "[@since, @version, @param, @return, @throws, @exception,"
+                + " @deprecated, @see, @serial, @serialField, @serialData, @author]";
+        final String customOrder = " @since,  @version, @param,@return,@throws, @exception,"
+                + "@deprecated, @see,@serial,   @serialField,  @serialData,@author";
+
         DefaultConfiguration checkConfig = createCheckConfig(AtclauseOrderCheck.class);
         checkConfig.addAttribute("target", "CLASS_DEF");
+        checkConfig.addAttribute("tagOrder", customOrder);
 
         final String[] expected = {
-            "9: " + getCheckMessage(MSG_KEY, tagOrder),
-            "11: " + getCheckMessage(MSG_KEY, tagOrder),
-            "12: " + getCheckMessage(MSG_KEY, tagOrder),
-            "115: " + getCheckMessage(MSG_KEY, tagOrder),
+            "113: " + getCheckMessage(MSG_KEY, tagOrder),
         };
         verify(checkConfig, getPath("javadoc/InputIncorrectAtClauseOrderCheck.java"), expected);
     }

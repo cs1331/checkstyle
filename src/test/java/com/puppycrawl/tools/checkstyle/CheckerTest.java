@@ -16,11 +16,11 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import com.google.common.collect.Sets;
@@ -31,49 +31,9 @@ import java.util.List;
 import java.util.TreeSet;
 import org.junit.Test;
 
-public class CheckerTest
-{
-
+public class CheckerTest {
     @Test
-    public void testNullBasedir() throws Exception
-    {
-        final Checker c = new Checker();
-
-        c.setBasedir("c:/a\\b/./c\\..\\d");
-        c.setBasedir(null);
-        assertNull(c.getBasedir());
-    }
-
-    @Test
-    public void testDosBasedir() throws Exception
-    {
-        final Checker c = new Checker();
-
-        c.setBasedir("c:/a\\b/./c\\..\\d");
-        assertEquals("C:\\a\\b\\d", c.getBasedir());
-    }
-
-    @Test
-    public void testOsBasedir() throws Exception
-    {
-        final Checker c = new Checker();
-
-        // we need something to create absolute path
-        // let's take testinputs.dir
-        String testinputs_dir = new File("src/test/resources/com/puppycrawl/tools/checkstyle/").getCanonicalPath();
-
-        if (!testinputs_dir.endsWith(File.separator)) {
-            testinputs_dir += File.separator;
-        }
-
-        final String instr = testinputs_dir + "indentation/./..\\coding\\";
-        c.setBasedir(instr);
-        assertTrue((testinputs_dir + "coding").equalsIgnoreCase(c.getBasedir()));
-    }
-
-    @Test
-    public void testDestroy() throws Exception
-    {
+    public void testDestroy() throws Exception {
         final DebugChecker c = new DebugChecker();
         final DebugAuditAdapter aa = new DebugAuditAdapter();
         c.addListener(aa);
@@ -98,8 +58,7 @@ public class CheckerTest
     }
 
     @Test
-    public void testAddListener() throws Exception
-    {
+    public void testAddListener() throws Exception {
         final DebugChecker c = new DebugChecker();
         final DebugAuditAdapter aa = new DebugAuditAdapter();
         c.addListener(aa);
@@ -129,8 +88,7 @@ public class CheckerTest
     }
 
     @Test
-    public void testRemoveListener() throws Exception
-    {
+    public void testRemoveListener() throws Exception {
         final DebugChecker c = new DebugChecker();
         final DebugAuditAdapter aa = new DebugAuditAdapter();
         final DebugAuditAdapter aa2 = new DebugAuditAdapter();
@@ -169,8 +127,7 @@ public class CheckerTest
     }
 
     @Test
-    public void testAddFilter() throws Exception
-    {
+    public void testAddFilter() throws Exception {
         final DebugChecker c = new DebugChecker();
         final DebugFilter f = new DebugFilter();
 
@@ -205,8 +162,7 @@ public class CheckerTest
     }
 
     @Test
-    public void testRemoveFilter() throws Exception
-    {
+    public void testRemoveFilter() throws Exception {
         final DebugChecker c = new DebugChecker();
         final DebugFilter f = new DebugFilter();
         final DebugFilter f2 = new DebugFilter();
@@ -249,8 +205,7 @@ public class CheckerTest
     }
 
     @Test
-    public void testFileExtensions() throws Exception
-    {
+    public void testFileExtensions() throws Exception {
         final Checker c = new Checker();
         final List<File> files = new ArrayList<>();
         File f = new File("file.pdf");

@@ -16,14 +16,16 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.filters;
 
+import com.puppycrawl.tools.checkstyle.Utils;
 import com.puppycrawl.tools.checkstyle.api.AuditEvent;
 import com.puppycrawl.tools.checkstyle.api.Filter;
-import com.puppycrawl.tools.checkstyle.Utils;
-import java.util.regex.Pattern;
-
 import org.apache.commons.beanutils.ConversionException;
+
+import java.util.Objects;
+import java.util.regex.Pattern;
 
 /**
  * This filter processes {@link com.puppycrawl.tools.checkstyle.api.AuditEvent}
@@ -39,19 +41,15 @@ import org.apache.commons.beanutils.ConversionException;
  * @author Rick Giles
  */
 public class SuppressElement
-    implements Filter
-{
-    /** hash function multiplicand */
-    private static final int HASH_MULT = 29;
-
+    implements Filter {
     /** the regexp to match file names against */
-    private final Pattern fileRegexp;
+    private final transient Pattern fileRegexp;
 
     /** the pattern for file names*/
     private final String filePattern;
 
     /** the regexp to match check names against */
-    private Pattern checkRegexp;
+    private transient Pattern checkRegexp;
 
     /** the pattern for check class names*/
     private String checkPattern;
@@ -60,13 +58,13 @@ public class SuppressElement
     private String moduleId;
 
     /** line number filter */
-    private CSVFilter lineFilter;
+    private transient CSVFilter lineFilter;
 
     /** CSV for line number filter */
     private String linesCSV;
 
     /** column number filter */
-    private CSVFilter columnFilter;
+    private transient CSVFilter columnFilter;
 
     /** CSV for column number filter */
     private String columnsCSV;
@@ -79,8 +77,7 @@ public class SuppressElement
      * @throws ConversionException if unable to create Pattern object.
      */
     public SuppressElement(String files)
-        throws ConversionException
-    {
+        throws ConversionException {
         filePattern = files;
         fileRegexp = Pattern.compile(files);
     }
@@ -91,8 +88,7 @@ public class SuppressElement
      * @throws ConversionException if unable to create Pattern object
      */
     public void setChecks(final String checks)
-        throws ConversionException
-    {
+        throws ConversionException {
         checkPattern = checks;
         checkRegexp = Utils.createPattern(checks);
     }
@@ -101,8 +97,7 @@ public class SuppressElement
      * Set the module id for filtering. Cannot be null.
      * @param moduleId the id
      */
-    public void setModuleId(final String moduleId)
-    {
+    public void setModuleId(final String moduleId) {
         this.moduleId = moduleId;
     }
     /**
@@ -110,8 +105,7 @@ public class SuppressElement
      * E.g. "1,7-15,18".
      * @param lines CSV values and ranges for line number filtering.
      */
-    public void setLines(String lines)
-    {
+    public void setLines(String lines) {
         linesCSV = lines;
         if (lines != null) {
             lineFilter = new CSVFilter(lines);
@@ -126,8 +120,7 @@ public class SuppressElement
      *  E.g. "1,7-15,18".
      * @param columns CSV values and ranges for column number filtering.
      */
-    public void setColumns(String columns)
-    {
+    public void setColumns(String columns) {
         columnsCSV = columns;
         if (columns != null) {
             columnFilter = new CSVFilter(columns);
@@ -139,8 +132,7 @@ public class SuppressElement
 
     /** {@inheritDoc} */
     @Override
-    public boolean accept(AuditEvent event)
-    {
+    public boolean accept(AuditEvent event) {
         // file and check match?
         if (event.getFileName() == null
                 || !fileRegexp.matcher(event.getFileName()).find()
@@ -148,8 +140,7 @@ public class SuppressElement
                 || moduleId != null && !moduleId.equals(event
                         .getModuleId())
                 || checkRegexp != null && !checkRegexp.matcher(
-                        event.getSourceName()).find())
-        {
+                        event.getSourceName()).find()) {
             return true;
         }
 
@@ -169,86 +160,23 @@ public class SuppressElement
     }
 
     @Override
-    public String toString()
-    {
-        return "SuppressElement[files=" + filePattern + ",checks="
-            + checkPattern + ",lines=" + linesCSV + ",columns="
-            + columnsCSV + "]";
+    public int hashCode() {
+        return Objects.hash(filePattern, checkPattern, moduleId, linesCSV, columnsCSV);
     }
 
     @Override
-    public int hashCode()
-    {
-        int result = HASH_MULT * filePattern.hashCode();
-        if (checkPattern != null) {
-            result = HASH_MULT * result + checkPattern.hashCode();
-        }
-        if (moduleId != null) {
-            result = HASH_MULT * result + moduleId.hashCode();
-        }
-        if (linesCSV != null) {
-            result = HASH_MULT * result + linesCSV.hashCode();
-        }
-        if (columnsCSV != null) {
-            result = HASH_MULT * result + columnsCSV.hashCode();
-        }
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object object)
-    {
-        if (object instanceof SuppressElement) {
-            final SuppressElement other = (SuppressElement) object;
-
-            // same file pattern?
-            if (!this.filePattern.equals(other.filePattern)) {
-                return false;
-            }
-
-            // same check pattern?
-            if (checkPattern != null) {
-                if (!checkPattern.equals(other.checkPattern)) {
-                    return false;
-                }
-            }
-            else if (other.checkPattern != null) {
-                return false;
-            }
-
-            // same module id?
-            if (moduleId != null) {
-                if (!moduleId.equals(other.moduleId)) {
-                    return false;
-                }
-            }
-            else if (other.moduleId != null) {
-                return false;
-            }
-
-            // same line number filter?
-            if (lineFilter != null) {
-                if (!lineFilter.equals(other.lineFilter)) {
-                    return false;
-                }
-            }
-            else if (other.lineFilter != null) {
-                return false;
-            }
-
-            // same column number filter?
-            if (columnFilter != null) {
-                if (!columnFilter.equals(other.columnFilter)) {
-                    return false;
-                }
-            }
-            else if (other.columnFilter != null) {
-                return false;
-            }
-
-            // everything is the same
+    public boolean equals(Object o) {
+        if (this == o) {
             return true;
         }
-        return false;
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        final SuppressElement that = (SuppressElement) o;
+        return Objects.equals(filePattern, that.filePattern)
+                && Objects.equals(checkPattern, that.checkPattern)
+                && Objects.equals(moduleId, that.moduleId)
+                && Objects.equals(linesCSV, that.linesCSV)
+                && Objects.equals(columnsCSV, that.columnsCSV);
     }
 }

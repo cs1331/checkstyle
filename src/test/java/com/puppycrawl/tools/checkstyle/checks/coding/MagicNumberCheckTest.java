@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
@@ -25,12 +26,10 @@ import org.junit.Test;
 import static com.puppycrawl.tools.checkstyle.checks.coding.MagicNumberCheck.MSG_KEY;
 
 public class MagicNumberCheckTest
-    extends BaseCheckTestSupport
-{
+    extends BaseCheckTestSupport {
     @Test
     public void testDefault()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(MagicNumberCheck.class);
         final String[] expected = {
@@ -72,14 +71,16 @@ public class MagicNumberCheckTest
             "178:15: " + getCheckMessage(MSG_KEY, "37"),
             "182:15: " + getCheckMessage(MSG_KEY, "101"),
             "185:26: " + getCheckMessage(MSG_KEY, "42"),
+            "189:32: " + getCheckMessage(MSG_KEY, "43"),
+            "193:26: " + getCheckMessage(MSG_KEY, "-44"),
+            "197:32: " + getCheckMessage(MSG_KEY, "-45"),
         };
         verify(checkConfig, getPath("InputMagicNumber.java"), expected);
     }
 
     @Test
     public void testIgnoreSome()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(MagicNumberCheck.class);
         checkConfig.addAttribute("ignoreNumbers", "0, 1, 3.0, 8, 16, 3000");
@@ -125,8 +126,7 @@ public class MagicNumberCheckTest
 
     @Test
     public void testIgnoreNone()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(MagicNumberCheck.class);
         checkConfig.addAttribute("ignoreNumbers", "");
@@ -200,8 +200,7 @@ public class MagicNumberCheckTest
 
     @Test
     public void testIntegersOnly()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(MagicNumberCheck.class);
         checkConfig.addAttribute("tokens", "NUM_INT, NUM_LONG");
@@ -245,8 +244,7 @@ public class MagicNumberCheckTest
     }
 
     @Test
-    public void testIgnoreNegativeOctalHex() throws Exception
-    {
+    public void testIgnoreNegativeOctalHex() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(MagicNumberCheck.class);
         checkConfig.addAttribute("ignoreNumbers", "-9223372036854775808, -2147483648, -1, 0, 1, 2");
@@ -287,8 +285,7 @@ public class MagicNumberCheckTest
     }
 
     @Test
-    public void testIgnoreHashCodeMethod() throws Exception
-    {
+    public void testIgnoreHashCodeMethod() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(MagicNumberCheck.class);
         checkConfig.addAttribute("ignoreHashCodeMethod", "true");
@@ -330,6 +327,48 @@ public class MagicNumberCheckTest
             "174:15: " + getCheckMessage(MSG_KEY, "21"),
             "178:15: " + getCheckMessage(MSG_KEY, "37"),
             "182:15: " + getCheckMessage(MSG_KEY, "101"),
+        };
+        verify(checkConfig, getPath("InputMagicNumber.java"), expected);
+    }
+
+    @Test
+    public void testIgnoreFieldDeclaration()
+            throws Exception {
+        final DefaultConfiguration checkConfig =
+                createCheckConfig(MagicNumberCheck.class);
+        checkConfig.addAttribute("ignoreFieldDeclaration", "true");
+        final String[] expected = {
+            "41:26: " + getCheckMessage(MSG_KEY, "3_000"),
+            "42:32: " + getCheckMessage(MSG_KEY, "1.5_0"),
+            "43:27: " + getCheckMessage(MSG_KEY, "3"),
+            "43:31: " + getCheckMessage(MSG_KEY, "4"),
+            "45:29: " + getCheckMessage(MSG_KEY, "3"),
+            "47:23: " + getCheckMessage(MSG_KEY, "3"),
+            "48:26: " + getCheckMessage(MSG_KEY, "1.5"),
+            "50:22: " + getCheckMessage(MSG_KEY, "3"),
+            "50:29: " + getCheckMessage(MSG_KEY, "5"),
+            "50:37: " + getCheckMessage(MSG_KEY, "3"),
+            "54:26: " + getCheckMessage(MSG_KEY, "3"),
+            "55:39: " + getCheckMessage(MSG_KEY, "3"),
+            "60:25: " + getCheckMessage(MSG_KEY, "010"),
+            "61:25: " + getCheckMessage(MSG_KEY, "011"),
+            "63:30: " + getCheckMessage(MSG_KEY, "0_10L"),
+            "64:30: " + getCheckMessage(MSG_KEY, "011l"),
+            "68:24: " + getCheckMessage(MSG_KEY, "0x10"),
+            "69:24: " + getCheckMessage(MSG_KEY, "0X011"),
+            "71:29: " + getCheckMessage(MSG_KEY, "0x10L"),
+            "72:29: " + getCheckMessage(MSG_KEY, "0X11l"),
+            "131:20: " + getCheckMessage(MSG_KEY, "378"),
+            "160:16: " + getCheckMessage(MSG_KEY, "31"),
+            "165:16: " + getCheckMessage(MSG_KEY, "42"),
+            "170:16: " + getCheckMessage(MSG_KEY, "13"),
+            "174:15: " + getCheckMessage(MSG_KEY, "21"),
+            "178:15: " + getCheckMessage(MSG_KEY, "37"),
+            "182:15: " + getCheckMessage(MSG_KEY, "101"),
+            "185:26: " + getCheckMessage(MSG_KEY, "42"),
+            "189:32: " + getCheckMessage(MSG_KEY, "43"),
+            "193:26: " + getCheckMessage(MSG_KEY, "-44"),
+            "197:32: " + getCheckMessage(MSG_KEY, "-45"),
         };
         verify(checkConfig, getPath("InputMagicNumber.java"), expected);
     }

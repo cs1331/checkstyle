@@ -16,11 +16,13 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.doclets;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 
 import com.sun.javadoc.ClassDoc;
 import com.sun.javadoc.DocErrorReporter;
@@ -36,34 +38,33 @@ import com.sun.javadoc.RootDoc;
  * so they can use them in their configuration gui.
  * @author o_sukhodolsky
  */
-public final class TokenTypesDoclet
-{
+public final class TokenTypesDoclet {
     /** Command line option to specify file to write output of the doclet. */
     private static final String DEST_FILE_OPT = "-destfile";
 
     /** Stop instances being created. */
-    private TokenTypesDoclet()
-    {
+    private TokenTypesDoclet() {
     }
 
     /**
      * The doclet's starter method.
      * @param root <code>RootDoc</code> given to the doclet
+     * @return true if the given <code>RootDoc</code> is processed.
      * @exception FileNotFoundException will be thrown if the doclet
      *            will be unable to write to the specified file.
-     * @return true if the given <code>RootDoc</code> is processed.
+     * @exception UnsupportedEncodingException will be thrown if the doclet
+     *            will be unable to use UTF-8 encoding.
      */
-    public static boolean start(RootDoc root) throws FileNotFoundException
-    {
+    public static boolean start(RootDoc root)
+            throws FileNotFoundException, UnsupportedEncodingException {
         final String fileName = getDestFileName(root.options());
         final FileOutputStream fos = new FileOutputStream(fileName);
         PrintStream ps = null;
         try {
-            ps = new PrintStream(fos);
+            ps = new PrintStream(fos, false, "UTF-8");
             final ClassDoc[] classes = root.classes();
             if (classes.length != 1
-                || !"TokenTypes".equals(classes[0].name()))
-            {
+                || !"TokenTypes".equals(classes[0].name())) {
                 final String message =
                     "The doclet should be used for TokenTypes only";
                 throw new IllegalArgumentException(message);
@@ -72,8 +73,7 @@ public final class TokenTypesDoclet
             final FieldDoc[] fields = classes[0].fields();
             for (final FieldDoc field : fields) {
                 if (field.isStatic() && field.isPublic() && field.isFinal()
-                    && "int".equals(field.type().qualifiedTypeName()))
-                {
+                    && "int".equals(field.type().qualifiedTypeName())) {
                     if (field.firstSentenceTags().length != 1) {
                         final String message = "Should be only one tag.";
                         throw new IllegalArgumentException(message);
@@ -97,8 +97,7 @@ public final class TokenTypesDoclet
      * @param option option name to process
      * @return option length (how many parts are in option).
      */
-    public static int optionLength(String option)
-    {
+    public static int optionLength(String option) {
         if (DEST_FILE_OPT.equals(option)) {
             return 2;
         }
@@ -112,8 +111,7 @@ public final class TokenTypesDoclet
      * @return true if only valid options was specified
      */
     public static boolean validOptions(String[][] options,
-                                       DocErrorReporter reporter)
-    {
+                                       DocErrorReporter reporter) {
         boolean foundDestFileOption = false;
         for (final String[] opt : options) {
             if (DEST_FILE_OPT.equals(opt[0])) {
@@ -137,8 +135,7 @@ public final class TokenTypesDoclet
      * @param options all specified options.
      * @return destination file name
      */
-    private static String getDestFileName(String[][] options)
-    {
+    private static String getDestFileName(String[]... options) {
         String fileName = null;
         for (final String[] opt : options) {
             if (DEST_FILE_OPT.equals(opt[0])) {

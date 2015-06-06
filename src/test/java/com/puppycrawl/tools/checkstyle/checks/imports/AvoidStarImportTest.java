@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.imports;
 
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
@@ -26,12 +27,10 @@ import org.junit.Test;
 import static com.puppycrawl.tools.checkstyle.checks.imports.AvoidStarImportCheck.MSG_KEY;
 
 public class AvoidStarImportTest
-    extends BaseCheckTestSupport
-{
+    extends BaseCheckTestSupport {
     @Test
     public void testDefaultOperation()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(AvoidStarImportCheck.class);
         final String[] expected = {
@@ -49,8 +48,7 @@ public class AvoidStarImportTest
 
     @Test
     public void testExcludes()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(AvoidStarImportCheck.class);
         checkConfig.addAttribute("excludes",
@@ -65,8 +63,7 @@ public class AvoidStarImportTest
     }
 
     @Test
-    public void testAllowClassImports() throws Exception
-    {
+    public void testAllowClassImports() throws Exception {
         final DefaultConfiguration checkConfig = createCheckConfig(AvoidStarImportCheck.class);
         checkConfig.addAttribute("allowClassImports", "true");
         // allow all class star imports

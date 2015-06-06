@@ -16,15 +16,15 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.blocks;
 
 /**
  * Represents the policy for checking block statements.
- * @see com.puppycrawl.tools.checkstyle.checks.blocks.EmptyBlockCheck
  * @author Rick Giles
+ * @see com.puppycrawl.tools.checkstyle.checks.blocks.EmptyBlockCheck
  */
-public enum BlockOption
-{
+public enum BlockOption {
     /**
      * Represents the policy that there is some text in the block. For example:
      *

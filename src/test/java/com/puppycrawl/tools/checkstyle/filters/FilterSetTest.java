@@ -16,47 +16,76 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.filters;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
+import com.puppycrawl.tools.checkstyle.api.FilterSet;
+import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.Before;
 import org.junit.Test;
 
 /** Tests SuppressElementFilter */
-// TODO: this test should be removed/rewritten
-public class FilterSetTest
-{
+public class FilterSetTest {
     private CSVFilter filter;
 
     @Before
-    public void setUp()
-    {
+    public void setUp() {
         filter = new CSVFilter("");
     }
 
     @Test
-    public void testEmptyChain()
-    {
+    public void testEmptyChain() {
         assertFalse("0", filter.accept(Integer.valueOf(0)));
     }
 
     @Test
-    public void testOneFilter()
-    {
+    public void testOneFilter() {
         filter.addFilter(new IntMatchFilter(0));
         assertTrue("0", filter.accept(Integer.valueOf(0)));
         assertFalse("1", filter.accept(Integer.valueOf(1)));
     }
 
     @Test
-    public void testMultipleFilter()
-    {
+    public void testMultipleFilter() {
         filter.addFilter(new IntMatchFilter(0));
         filter.addFilter(new IntRangeFilter(0, 2));
         assertTrue("0", filter.accept(Integer.valueOf(0)));
         assertTrue("1", filter.accept(Integer.valueOf(1)));
         filter.addFilter(new IntRangeFilter(3, 4));
         assertTrue("0 is in [3,4]", filter.accept(Integer.valueOf(0)));
+    }
+
+    @Test
+    public void testEqualsAndHashCode() {
+        EqualsVerifier.forClass(FilterSet.class).usingGetClass().verify();
+    }
+
+    @Test
+    public void testGetFilters() {
+        filter.addFilter(new IntMatchFilter(0));
+        assertTrue("size is the same", filter.getFilters().size() == 1);
+    }
+
+    @Test
+    public void testToString() {
+        filter.addFilter(new IntMatchFilter(0));
+        assertTrue("toString works", filter.toString() != null);
+    }
+
+    @Test
+    public void testGetFilters2() {
+        FilterSet filterSet = new FilterSet();
+        filterSet.addFilter(new SeverityMatchFilter());
+        assertTrue("size is the same", filterSet.getFilters().size() == 1);
+    }
+
+    @Test
+    public void testToString2() {
+        FilterSet filterSet = new FilterSet();
+        filterSet.addFilter(new SeverityMatchFilter());
+        assertTrue("size is the same", filterSet.toString() != null);
     }
 }

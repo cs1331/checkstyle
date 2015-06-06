@@ -16,7 +16,13 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.api;
+
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Represents a full identifier, including dots, with associated
@@ -33,35 +39,30 @@ package com.puppycrawl.tools.checkstyle.api;
  * @see TokenTypes#DOT
  * @see TokenTypes#IDENT
  **/
-public final class FullIdent
-{
-    /** the string **/
-    private final StringBuffer buffer = new StringBuffer();
+public final class FullIdent {
+    /** the list holding subsequent elements of identifier **/
+    private final List<String> elements = new ArrayList<>();
     /** the line number **/
     private int lineNo;
     /** the column number **/
     private int colNo;
 
     /** hide default constructor */
-    private FullIdent()
-    {
+    private FullIdent() {
     }
 
     /** @return the text **/
-    public String getText()
-    {
-        return buffer.toString();
+    public String getText() {
+        return StringUtils.join(elements, "");
     }
 
     /** @return the line number **/
-    public int getLineNo()
-    {
+    public int getLineNo() {
         return lineNo;
     }
 
     /** @return the column number **/
-    public int getColumnNo()
-    {
+    public int getColumnNo() {
         return colNo;
     }
 
@@ -69,9 +70,8 @@ public final class FullIdent
      * Append the specified text.
      * @param text the text to append
      */
-    private void append(String text)
-    {
-        buffer.append(text);
+    private void append(String text) {
+        elements.add(text);
     }
 
     /**
@@ -79,16 +79,14 @@ public final class FullIdent
      * column.
      * @param ast the token to append
      */
-    private void append(DetailAST ast)
-    {
-        buffer.append(ast.getText());
+    private void append(DetailAST ast) {
+        elements.add(ast.getText());
         if (lineNo == 0) {
             lineNo = ast.getLineNo();
         }
         else if (ast.getLineNo() > 0) {
             lineNo = Math.min(lineNo, ast.getLineNo());
         }
-        // TODO: make a function
         if (colNo == 0) {
             colNo = ast.getColumnNo();
         }
@@ -102,8 +100,7 @@ public final class FullIdent
      * @param ast the node to start from
      * @return a <code>FullIdent</code> value
      */
-    public static FullIdent createFullIdent(DetailAST ast)
-    {
+    public static FullIdent createFullIdent(DetailAST ast) {
         final FullIdent fi = new FullIdent();
         extractFullIdent(fi, ast);
         return fi;
@@ -114,8 +111,7 @@ public final class FullIdent
      * @param ast the parent node from where to start from
      * @return a <code>FullIdent</code> value
      */
-    public static FullIdent createFullIdentBelow(DetailAST ast)
-    {
+    public static FullIdent createFullIdentBelow(DetailAST ast) {
         return createFullIdent(ast.getFirstChild());
     }
 
@@ -125,8 +121,7 @@ public final class FullIdent
      * @param full the FullIdent to add to
      * @param ast the node to recurse from
      */
-    private static void extractFullIdent(FullIdent full, DetailAST ast)
-    {
+    private static void extractFullIdent(FullIdent full, DetailAST ast) {
         if (ast == null) {
             return;
         }
@@ -143,8 +138,7 @@ public final class FullIdent
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return getText() + "[" + getLineNo() + "x" + getColumnNo() + "]";
     }
 

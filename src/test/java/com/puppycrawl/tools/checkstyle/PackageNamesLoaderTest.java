@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle;
 
 import static org.junit.Assert.assertEquals;
@@ -30,20 +31,17 @@ import org.junit.Test;
  * @author Rick Giles
  * @author lkuehne
  */
-public class PackageNamesLoaderTest
-{
+public class PackageNamesLoaderTest {
     @Test
     public void testDefault()
-        throws CheckstyleException
-    {
+        throws CheckstyleException {
         final Set<String> packageNames = PackageNamesLoader
                 .getPackageNames(Thread.currentThread()
                         .getContextClassLoader());
         validatePackageNames(packageNames);
     }
 
-    private void validatePackageNames(Set<String> pkgNames)
-    {
+    private void validatePackageNames(Set<String> pkgNames) {
         final String[] checkstylePackages = {
             "com.puppycrawl.tools.checkstyle.",
             "com.puppycrawl.tools.checkstyle.checks.",

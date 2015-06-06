@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
 import static com.puppycrawl.tools.checkstyle.checks.coding.VariableDeclarationUsageDistanceCheck.MSG_KEY;
@@ -27,11 +28,9 @@ import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 
 public class VariableDeclarationUsageDistanceCheckTest extends
-        BaseCheckTestSupport
-{
+        BaseCheckTestSupport {
     @Test
-    public void testGeneralLogic() throws Exception
-    {
+    public void testGeneralLogic() throws Exception {
         final DefaultConfiguration checkConfig = createCheckConfig(VariableDeclarationUsageDistanceCheck.class);
         checkConfig.addAttribute("allowedDistance", "1");
         checkConfig.addAttribute("ignoreVariablePattern", "");
@@ -72,8 +71,7 @@ public class VariableDeclarationUsageDistanceCheckTest extends
     }
 
     @Test
-    public void testDistance() throws Exception
-    {
+    public void testDistance() throws Exception {
         final DefaultConfiguration checkConfig = createCheckConfig(VariableDeclarationUsageDistanceCheck.class);
         checkConfig.addAttribute("allowedDistance", "3");
         checkConfig.addAttribute("ignoreVariablePattern", "");
@@ -90,8 +88,7 @@ public class VariableDeclarationUsageDistanceCheckTest extends
     }
 
     @Test
-    public void testVariableRegExp() throws Exception
-    {
+    public void testVariableRegExp() throws Exception {
         final DefaultConfiguration checkConfig = createCheckConfig(VariableDeclarationUsageDistanceCheck.class);
         checkConfig.addAttribute("allowedDistance", "1");
         checkConfig.addAttribute("ignoreVariablePattern",
@@ -129,8 +126,7 @@ public class VariableDeclarationUsageDistanceCheckTest extends
     }
 
     @Test
-    public void testValidateBetweenScopesOption() throws Exception
-    {
+    public void testValidateBetweenScopesOption() throws Exception {
         final DefaultConfiguration checkConfig = createCheckConfig(VariableDeclarationUsageDistanceCheck.class);
         checkConfig.addAttribute("allowedDistance", "1");
         checkConfig.addAttribute("ignoreVariablePattern", "");
@@ -163,8 +159,7 @@ public class VariableDeclarationUsageDistanceCheckTest extends
     }
 
     @Test
-    public void testIgnoreFinalOption() throws Exception
-    {
+    public void testIgnoreFinalOption() throws Exception {
         final DefaultConfiguration checkConfig = createCheckConfig(VariableDeclarationUsageDistanceCheck.class);
         checkConfig.addAttribute("allowedDistance", "1");
         checkConfig.addAttribute("ignoreVariablePattern", "");

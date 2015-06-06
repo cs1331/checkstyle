@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
@@ -26,8 +27,7 @@ import org.junit.Test;
 import static com.puppycrawl.tools.checkstyle.checks.coding.UnnecessaryParenthesesCheck.MSG_ASSIGN;
 import static com.puppycrawl.tools.checkstyle.checks.coding.UnnecessaryParenthesesCheck.MSG_EXPR;
 import static com.puppycrawl.tools.checkstyle.checks.coding.UnnecessaryParenthesesCheck.MSG_IDENT;
-import static com.puppycrawl.tools.checkstyle.checks.coding.UnnecessaryParenthesesCheck.
-MSG_LITERAL;
+import static com.puppycrawl.tools.checkstyle.checks.coding.UnnecessaryParenthesesCheck.MSG_LITERAL;
 import static com.puppycrawl.tools.checkstyle.checks.coding.UnnecessaryParenthesesCheck.MSG_RETURN;
 import static com.puppycrawl.tools.checkstyle.checks.coding.UnnecessaryParenthesesCheck.MSG_STRING;
 
@@ -36,14 +36,12 @@ import static com.puppycrawl.tools.checkstyle.checks.coding.UnnecessaryParenthes
  *
  * @author  Eric K. Roe
  */
-public class UnnecessaryParenthesesCheckTest extends BaseCheckTestSupport
-{
+public class UnnecessaryParenthesesCheckTest extends BaseCheckTestSupport {
     private static final String TEST_FILE = "coding" + File.separator
         + "InputUnnecessaryParentheses.java";
 
     @Test
-    public void testDefault() throws Exception
-    {
+    public void testDefault() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(UnnecessaryParenthesesCheck.class);
 
@@ -98,8 +96,7 @@ public class UnnecessaryParenthesesCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void test15Extensions() throws Exception
-    {
+    public void test15Extensions() throws Exception {
         final DefaultConfiguration checkConfig = createCheckConfig(UnnecessaryParenthesesCheck.class);
         final String[] expected = {};
         verify(checkConfig, getPath("Input15Extensions.java"), expected);

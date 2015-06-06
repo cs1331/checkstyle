@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
@@ -26,11 +27,9 @@ import org.junit.Test;
 import static com.puppycrawl.tools.checkstyle.checks.coding.RequireThisCheck.MSG_METHOD;
 import static com.puppycrawl.tools.checkstyle.checks.coding.RequireThisCheck.MSG_VARIABLE;
 
-public class RequireThisCheckTest extends BaseCheckTestSupport
-{
+public class RequireThisCheckTest extends BaseCheckTestSupport {
     @Test
-    public void testIt() throws Exception
-    {
+    public void testIt() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(RequireThisCheck.class);
         final String[] expected = {
@@ -46,8 +45,7 @@ public class RequireThisCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testMethodsOnly() throws Exception
-    {
+    public void testMethodsOnly() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(RequireThisCheck.class);
         checkConfig.addAttribute("checkFields", "false");
@@ -60,8 +58,7 @@ public class RequireThisCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testFieldsOnly() throws Exception
-    {
+    public void testFieldsOnly() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(RequireThisCheck.class);
         checkConfig.addAttribute("checkMethods", "false");
@@ -77,8 +74,7 @@ public class RequireThisCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testGenerics() throws Exception
-    {
+    public void testGenerics() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(RequireThisCheck.class);
         final String[] expected = {};
@@ -86,8 +82,7 @@ public class RequireThisCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testGithubIssue41() throws Exception
-    {
+    public void testGithubIssue41() throws Exception {
         final DefaultConfiguration checkConfig =
                 createCheckConfig(RequireThisCheck.class);
         final String[] expected = {

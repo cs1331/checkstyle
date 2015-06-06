@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.naming;
 
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
@@ -26,12 +27,10 @@ import static com.puppycrawl.tools.checkstyle.checks.naming.AbstractNameCheck.MS
 import static com.puppycrawl.tools.checkstyle.checks.naming.MethodNameCheck.MSG_KEY;
 
 public class MethodNameCheckTest
-    extends BaseCheckTestSupport
-{
+    extends BaseCheckTestSupport {
     @Test
     public void testDefault()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(MethodNameCheck.class);
 
@@ -44,8 +43,7 @@ public class MethodNameCheckTest
     }
 
     @Test
-    public void testMethodEqClass() throws Exception
-    {
+    public void testMethodEqClass() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(MethodNameCheck.class);
 
@@ -70,8 +68,7 @@ public class MethodNameCheckTest
     }
 
     @Test
-    public void testMethodEqClassAllow() throws Exception
-    {
+    public void testMethodEqClassAllow() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(MethodNameCheck.class);
         checkConfig.addAttribute("allowClassName", "true"); //allow method names and class names to equal
@@ -92,8 +89,7 @@ public class MethodNameCheckTest
     }
 
     @Test
-    public void testAccessTuning() throws Exception
-    {
+    public void testAccessTuning() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(MethodNameCheck.class);
         checkConfig.addAttribute("allowClassName", "true"); //allow method names and class names to equal
@@ -114,8 +110,7 @@ public class MethodNameCheckTest
     }
 
     @Test
-    public void testForNpe() throws Exception
-    {
+    public void testForNpe() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(MethodNameCheck.class);
 
@@ -126,8 +121,7 @@ public class MethodNameCheckTest
     }
 
     @Test
-    public void testOverridenMethods() throws Exception
-    {
+    public void testOverridenMethods() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(MethodNameCheck.class);
 

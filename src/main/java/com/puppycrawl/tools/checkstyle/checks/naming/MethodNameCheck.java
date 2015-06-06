@@ -16,9 +16,10 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.naming;
 
-import com.puppycrawl.tools.checkstyle.api.AnnotationUtility;
+import com.puppycrawl.tools.checkstyle.AnnotationUtility;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
@@ -70,19 +71,13 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  * @author Utkarsh Srivastava
  */
 public class MethodNameCheck
-    extends AbstractAccessControlNameCheck
-{
+    extends AbstractAccessControlNameCheck {
 
     /**
      * A key is pointing to the warning message text in "messages.properties"
      * file.
      */
     public static final String MSG_KEY = "method.name.equals.class.name";
-
-    /**
-     * for allowing method name to be the same as the class name.
-     */
-    private boolean allowClassName;
 
     /**
      * {@link Override Override} annotation name.
@@ -94,30 +89,30 @@ public class MethodNameCheck
      */
     private static final String CANONICAL_OVERRIDE = "java.lang." + OVERRIDE;
 
+    /**
+     * for allowing method name to be the same as the class name.
+     */
+    private boolean allowClassName;
+
     /** Creates a new <code>MethodNameCheck</code> instance. */
-    public MethodNameCheck()
-    {
+    public MethodNameCheck() {
         super("^[a-z][a-zA-Z0-9]*$");
     }
 
     @Override
-    public int[] getDefaultTokens()
-    {
+    public int[] getDefaultTokens() {
         return new int[] {TokenTypes.METHOD_DEF, };
     }
 
     @Override
-    public int[] getAcceptableTokens()
-    {
+    public int[] getAcceptableTokens() {
         return new int[] {TokenTypes.METHOD_DEF, };
     }
 
     @Override
-    public void visitToken(DetailAST ast)
-    {
+    public void visitToken(DetailAST ast) {
         if (!AnnotationUtility.containsAnnotation(ast, OVERRIDE)
-            && !AnnotationUtility.containsAnnotation(ast, CANONICAL_OVERRIDE))
-        {
+            && !AnnotationUtility.containsAnnotation(ast, CANONICAL_OVERRIDE)) {
             super.visitToken(ast); // Will check the name against the format.
         }
 
@@ -136,8 +131,7 @@ public class MethodNameCheck
             // Such a rare case, will not have the logic to handle parsing
             // down the tree looking for the first ident.
             if (null != classIdent
-                && method.getText().equals(classIdent.getText()))
-            {
+                && method.getText().equals(classIdent.getText())) {
                 log(method.getLineNo(), method.getColumnNo(),
                     MSG_KEY, method.getText());
             }
@@ -148,8 +142,7 @@ public class MethodNameCheck
      * Sets the property for allowing a method to be the same name as a class.
      * @param allowClassName true to allow false to disallow
      */
-    public void setAllowClassName(boolean allowClassName)
-    {
+    public void setAllowClassName(boolean allowClassName) {
         this.allowClassName = allowClassName;
     }
 }

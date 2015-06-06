@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks;
 
 import static org.junit.Assert.assertNotNull;
@@ -23,11 +24,10 @@ import static org.junit.Assert.fail;
 import com.google.common.collect.Sets;
 import java.util.Set;
 import org.junit.Test;
-public class ClassResolverTest
-{
+
+public class ClassResolverTest {
     @Test
-    public void testMisc() throws ClassNotFoundException
-    {
+    public void testMisc() throws ClassNotFoundException {
         final Set<String> imps = Sets.newHashSet();
         imps.add("java.io.File");
         imps.add("nothing.will.match.*");
@@ -41,6 +41,7 @@ public class ClassResolverTest
             fail("Should not resolve class");
         }
         catch (ClassNotFoundException e) {
+            // expected
         }
         cr.resolve("java.lang.String", "");
         cr.resolve("StringBuffer", "");
@@ -51,6 +52,7 @@ public class ClassResolverTest
             fail();
         }
         catch (ClassNotFoundException e) {
+            // expected
         }
 
         imps.add("java.text.ChoiceFormat");
@@ -64,6 +66,7 @@ public class ClassResolverTest
             fail();
         }
         catch (ClassNotFoundException e) {
+            // expected
         }
     }
 }

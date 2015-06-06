@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.indentation;
 
 import com.google.common.collect.Maps;
@@ -33,8 +34,7 @@ import org.apache.commons.logging.LogFactory;
  *
  * @author jrichard
  */
-public class HandlerFactory
-{
+public class HandlerFactory {
     /** Logger for indentation check. */
     private static final Log LOG = LogFactory.getLog(HandlerFactory.class);
 
@@ -44,38 +44,12 @@ public class HandlerFactory
     private final Map<Integer, Constructor<?>> typeHandlers =
         Maps.newHashMap();
 
-    /**
-     * registers a handler
-     *
-     * @param type
-     *                type from TokenTypes
-     * @param handlerClass
-     *                the handler to register
-     */
-    private void register(int type, Class<?> handlerClass)
-    {
-        try {
-            final Constructor<?> ctor = handlerClass
-                    .getConstructor(new Class[] {IndentationCheck.class,
-                        DetailAST.class, // current AST
-                        ExpressionHandler.class, // parent
-                    });
-            typeHandlers.put(type, ctor);
-        }
-        catch (final NoSuchMethodException e) {
-            throw new RuntimeException("couldn't find ctor for "
-                                       + handlerClass);
-        }
-        catch (final SecurityException e) {
-            LOG.debug("couldn't find ctor for " + handlerClass, e);
-            throw new RuntimeException("couldn't find ctor for "
-                                       + handlerClass);
-        }
-    }
+    /** cache for created method call handlers */
+    private final Map<DetailAST, ExpressionHandler> createdHandlers =
+        Maps.newHashMap();
 
     /** Creates a HandlerFactory. */
-    public HandlerFactory()
-    {
+    public HandlerFactory() {
         register(TokenTypes.CASE_GROUP, CaseHandler.class);
         register(TokenTypes.LITERAL_SWITCH, SwitchHandler.class);
         register(TokenTypes.SLIST, SlistHandler.class);
@@ -104,6 +78,31 @@ public class HandlerFactory
         register(TokenTypes.VARIABLE_DEF, MemberDefHandler.class);
         register(TokenTypes.LITERAL_NEW, NewHandler.class);
         register(TokenTypes.INDEX_OP, IndexHandler.class);
+        register(TokenTypes.LITERAL_SYNCHRONIZED, SynchronizedHandler.class);
+    }
+
+    /**
+     * registers a handler
+     *
+     * @param type
+     *                type from TokenTypes
+     * @param handlerClass
+     *                the handler to register
+     */
+    private void register(int type, Class<?> handlerClass) {
+        try {
+            final Constructor<?> ctor = handlerClass
+                .getConstructor(new Class[] {IndentationCheck.class,
+                    DetailAST.class, // current AST
+                    ExpressionHandler.class, // parent
+                });
+            typeHandlers.put(type, ctor);
+        }
+        catch (final NoSuchMethodException | SecurityException e) {
+            final String message = "couldn't find ctor for " + handlerClass;
+            LOG.debug(message, e);
+            throw new RuntimeException(message);
+        }
     }
 
     /**
@@ -112,8 +111,7 @@ public class HandlerFactory
      * @param type type from TokenTypes
      * @return true if handler is registered, false otherwise
      */
-    public boolean isHandledType(int type)
-    {
+    public boolean isHandledType(int type) {
         final Set<Integer> typeSet = typeHandlers.keySet();
         return typeSet.contains(type);
     }
@@ -123,8 +121,7 @@ public class HandlerFactory
      *
      * @return int[] of TokenType types
      */
-    public int[] getHandledTypes()
-    {
+    public int[] getHandledTypes() {
         final Set<Integer> typeSet = typeHandlers.keySet();
         final int[] types = new int[typeSet.size()];
         int index = 0;
@@ -145,8 +142,7 @@ public class HandlerFactory
      * @return the ExpressionHandler for ast
      */
     public ExpressionHandler getHandler(IndentationCheck indentCheck,
-        DetailAST ast, ExpressionHandler parent)
-    {
+        DetailAST ast, ExpressionHandler parent) {
         final ExpressionHandler handler =
             createdHandlers.get(ast);
         if (handler != null) {
@@ -166,20 +162,15 @@ public class HandlerFactory
                         indentCheck, ast, parent);
             }
         }
-        catch (final InstantiationException e) {
-            LOG.debug("couldn't instantiate constructor for " + ast, e);
-            throw new RuntimeException("couldn't instantiate constructor for "
-                                       + ast);
+        catch (final InstantiationException | InvocationTargetException e) {
+            final String message = "couldn't instantiate constructor for " + ast;
+            LOG.debug(message, e);
+            throw new RuntimeException(message);
         }
         catch (final IllegalAccessException e) {
-            LOG.debug("couldn't access constructor for " + ast, e);
-            throw new RuntimeException("couldn't access constructor for "
-                                       + ast);
-        }
-        catch (final InvocationTargetException e) {
-            LOG.debug("couldn't instantiate constructor for " + ast, e);
-            throw new RuntimeException("couldn't instantiate constructor for "
-                                       + ast);
+            final String message = "couldn't access constructor for " + ast;
+            LOG.debug(message, e);
+            throw new RuntimeException(message);
         }
         if (expHandler == null) {
             throw new RuntimeException("no handler for type " + ast.getType());
@@ -197,8 +188,7 @@ public class HandlerFactory
      * @return new instance.
      */
     ExpressionHandler createMethodCallHandler(IndentationCheck indentCheck,
-        DetailAST ast, ExpressionHandler parent)
-    {
+        DetailAST ast, ExpressionHandler parent) {
         ExpressionHandler theParent = parent;
         DetailAST astNode = ast.getFirstChild();
         while (astNode != null && astNode.getType() == TokenTypes.DOT) {
@@ -212,12 +202,7 @@ public class HandlerFactory
     }
 
     /** Clears cache of created handlers. */
-    void clearCreatedHandlers()
-    {
+    void clearCreatedHandlers() {
         createdHandlers.clear();
     }
-
-    /** cache for created method call handlers */
-    private final Map<DetailAST, ExpressionHandler> createdHandlers =
-        Maps.newHashMap();
 }

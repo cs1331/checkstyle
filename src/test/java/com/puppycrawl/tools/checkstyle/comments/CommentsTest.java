@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.comments;
 
 import static com.puppycrawl.tools.checkstyle.api.TokenTypes.BLOCK_COMMENT_BEGIN;
@@ -53,8 +54,7 @@ import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 
-public class CommentsTest extends BaseCheckTestSupport
-{
+public class CommentsTest extends BaseCheckTestSupport {
     private static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
    /*
@@ -78,8 +78,7 @@ public class CommentsTest extends BaseCheckTestSupport
     *                 +--COMMENT_CONTENT [5,4]
     *         +--RCURLY [6,0]
     */
-    private static DetailAST buildInput_1()
-    {
+    private static DetailAST buildInput_1() {
         DetailAST packageDef = new DetailAST();
         packageDef.setType(PACKAGE_DEF);
         packageDef.setText("package");
@@ -295,8 +294,7 @@ public class CommentsTest extends BaseCheckTestSupport
      *                     +--RCURLY [11,4]
      *         +--RCURLY [12,0]
      */
-    private static DetailAST buildInput_2()
-    {
+    private static DetailAST buildInput_2() {
         DetailAST packageDef = new DetailAST();
         packageDef.setType(PACKAGE_DEF);
         packageDef.setText("package");
@@ -596,8 +594,7 @@ public class CommentsTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testCompareExpectedTreeWithInput_1() throws Exception
-    {
+    public void testCompareExpectedTreeWithInput_1() throws Exception {
         DefaultConfiguration checkConfig = createCheckConfig(CompareTreesWithComments.class);
         CompareTreesWithComments.expectedTree = buildInput_1();
         final String[] expected = {};
@@ -606,8 +603,7 @@ public class CommentsTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testCompareExpectedTreeWithInput_2() throws Exception
-    {
+    public void testCompareExpectedTreeWithInput_2() throws Exception {
         DefaultConfiguration checkConfig = createCheckConfig(CompareTreesWithComments.class);
         CompareTreesWithComments.expectedTree = buildInput_2();
         final String[] expected = {};

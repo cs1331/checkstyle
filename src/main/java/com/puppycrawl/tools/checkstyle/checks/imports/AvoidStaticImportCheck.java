@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.imports;
 
 import com.puppycrawl.tools.checkstyle.api.Check;
@@ -62,8 +63,7 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  * @author Travis Schneeberger
  */
 public class AvoidStaticImportCheck
-    extends Check
-{
+    extends Check {
 
     /**
      * A key is pointing to the warning message text in "messages.properties"
@@ -75,14 +75,12 @@ public class AvoidStaticImportCheck
     private String[] excludes = new String[0];
 
     @Override
-    public int[] getDefaultTokens()
-    {
+    public int[] getDefaultTokens() {
         return new int[] {TokenTypes.STATIC_IMPORT};
     }
 
     @Override
-    public int[] getAcceptableTokens()
-    {
+    public int[] getAcceptableTokens() {
         return new int[] {TokenTypes.STATIC_IMPORT};
     }
 
@@ -91,19 +89,17 @@ public class AvoidStaticImportCheck
      * @param excludes a list of fully-qualified class names/specific
      * static members where static imports are ok
      */
-    public void setExcludes(String[] excludes)
-    {
+    public void setExcludes(String... excludes) {
         this.excludes = excludes.clone();
     }
 
     @Override
-    public void visitToken(final DetailAST ast)
-    {
+    public void visitToken(final DetailAST ast) {
         final DetailAST startingDot =
             ast.getFirstChild().getNextSibling();
         final FullIdent name = FullIdent.createFullIdent(startingDot);
 
-        if (null != name && !isExempt(name.getText())) {
+        if (!isExempt(name.getText())) {
             log(startingDot.getLineNo(), MSG_KEY, name.getText());
         }
     }
@@ -115,8 +111,7 @@ public class AvoidStaticImportCheck
      *                the class or static member
      * @return true if except false if not
      */
-    private boolean isExempt(String classOrStaticMember)
-    {
+    private boolean isExempt(String classOrStaticMember) {
         for (String exclude : excludes) {
             if (classOrStaticMember.equals(exclude)) {
                 return true;

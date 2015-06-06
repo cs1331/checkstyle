@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.sizes;
 
 import com.puppycrawl.tools.checkstyle.api.Check;
@@ -30,8 +31,7 @@ import java.util.Deque;
  * @author Simon Harris
  */
 public final class ExecutableStatementCountCheck
-    extends Check
-{
+    extends Check {
 
     /**
      * A key is pointing to the warning message text in "messages.properties"
@@ -52,14 +52,12 @@ public final class ExecutableStatementCountCheck
     private Context context;
 
     /** Constructs a <code>ExecutableStatementCountCheck</code>. */
-    public ExecutableStatementCountCheck()
-    {
+    public ExecutableStatementCountCheck() {
         setMax(DEFAULT_MAX);
     }
 
     @Override
-    public int[] getDefaultTokens()
-    {
+    public int[] getDefaultTokens() {
         return new int[] {
             TokenTypes.CTOR_DEF,
             TokenTypes.METHOD_DEF,
@@ -70,14 +68,12 @@ public final class ExecutableStatementCountCheck
     }
 
     @Override
-    public int[] getRequiredTokens()
-    {
+    public int[] getRequiredTokens() {
         return new int[] {TokenTypes.SLIST};
     }
 
     @Override
-    public int[] getAcceptableTokens()
-    {
+    public int[] getAcceptableTokens() {
         return new int[] {
             TokenTypes.CTOR_DEF,
             TokenTypes.METHOD_DEF,
@@ -91,8 +87,7 @@ public final class ExecutableStatementCountCheck
      * Gets the maximum threshold.
      * @return the maximum threshold.
      */
-    public int getMax()
-    {
+    public int getMax() {
         return max;
     }
 
@@ -100,21 +95,18 @@ public final class ExecutableStatementCountCheck
      * Sets the maximum threshold.
      * @param max the maximum threshold.
      */
-    public void setMax(int max)
-    {
+    public void setMax(int max) {
         this.max = max;
     }
 
     @Override
-    public void beginTree(DetailAST rootAST)
-    {
+    public void beginTree(DetailAST rootAST) {
         context = new Context(null);
         contextStack.clear();
     }
 
     @Override
-    public void visitToken(DetailAST ast)
-    {
+    public void visitToken(DetailAST ast) {
         switch (ast.getType()) {
             case TokenTypes.CTOR_DEF:
             case TokenTypes.METHOD_DEF:
@@ -131,8 +123,7 @@ public final class ExecutableStatementCountCheck
     }
 
     @Override
-    public void leaveToken(DetailAST ast)
-    {
+    public void leaveToken(DetailAST ast) {
         switch (ast.getType()) {
             case TokenTypes.CTOR_DEF:
             case TokenTypes.METHOD_DEF:
@@ -152,8 +143,7 @@ public final class ExecutableStatementCountCheck
      * Process the start of the member definition.
      * @param ast the token representing the member definition.
      */
-    private void visitMemberDef(DetailAST ast)
-    {
+    private void visitMemberDef(DetailAST ast) {
         contextStack.push(context);
         context = new Context(ast);
     }
@@ -163,8 +153,7 @@ public final class ExecutableStatementCountCheck
      *
      * @param ast the token representing the member definition.
      */
-    private void leaveMemberDef(DetailAST ast)
-    {
+    private void leaveMemberDef(DetailAST ast) {
         final int count = context.getCount();
         if (count > getMax()) {
             log(ast.getLineNo(), ast.getColumnNo(),
@@ -178,25 +167,22 @@ public final class ExecutableStatementCountCheck
      *
      * @param ast the token representing the statement list.
      */
-    private void visitSlist(DetailAST ast)
-    {
+    private void visitSlist(DetailAST ast) {
         if (context.getAST() != null) {
             // find member AST for the statement list
             final DetailAST contextAST = context.getAST();
             DetailAST parent = ast.getParent();
-            while (parent != null) {
-                final int type = parent.getType();
-                if (type == TokenTypes.CTOR_DEF
-                    || type == TokenTypes.METHOD_DEF
-                    || type == TokenTypes.INSTANCE_INIT
-                    || type == TokenTypes.STATIC_INIT)
-                {
-                    if (parent == contextAST) {
-                        context.addCount(ast.getChildCount() / 2);
-                    }
-                    break;
-                }
+            int type = parent.getType();
+            while (type != TokenTypes.CTOR_DEF
+                && type != TokenTypes.METHOD_DEF
+                && type != TokenTypes.INSTANCE_INIT
+                && type != TokenTypes.STATIC_INIT) {
+
                 parent = parent.getParent();
+                type = parent.getType();
+            }
+            if (parent == contextAST) {
+                context.addCount(ast.getChildCount() / 2);
             }
         }
     }
@@ -205,8 +191,7 @@ public final class ExecutableStatementCountCheck
      * Class to encapsulate counting information about one member.
      * @author Simon Harris
      */
-    private static class Context
-    {
+    private static class Context {
         /** Member AST node. */
         private final DetailAST ast;
 
@@ -217,8 +202,7 @@ public final class ExecutableStatementCountCheck
          * Creates new member context.
          * @param ast member AST node.
          */
-        public Context(DetailAST ast)
-        {
+        public Context(DetailAST ast) {
             this.ast = ast;
             count = 0;
         }
@@ -227,8 +211,7 @@ public final class ExecutableStatementCountCheck
          * Increase count.
          * @param count the count increment.
          */
-        public void addCount(int count)
-        {
+        public void addCount(int count) {
             this.count += count;
         }
 
@@ -236,8 +219,7 @@ public final class ExecutableStatementCountCheck
          * Gets the member AST node.
          * @return the member AST node.
          */
-        public DetailAST getAST()
-        {
+        public DetailAST getAST() {
             return ast;
         }
 
@@ -245,8 +227,7 @@ public final class ExecutableStatementCountCheck
          * Gets the count.
          * @return the count.
          */
-        public int getCount()
-        {
+        public int getCount() {
             return count;
         }
     }

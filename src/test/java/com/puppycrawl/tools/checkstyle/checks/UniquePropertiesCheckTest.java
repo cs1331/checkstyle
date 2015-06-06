@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks;
 
 import java.io.File;
@@ -25,7 +26,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.TreeSet;
+import java.util.SortedSet;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -41,14 +42,12 @@ import static com.puppycrawl.tools.checkstyle.checks.UniquePropertiesCheck.MSG_K
 /**
  * JUnit tests for Unique Properties check.
  */
-public class UniquePropertiesCheckTest extends BaseFileSetCheckTestSupport
-{
+public class UniquePropertiesCheckTest extends BaseFileSetCheckTestSupport {
 
     private DefaultConfiguration checkConfig;
 
     @Before
-    public void setUp()
-    {
+    public void setUp() {
         checkConfig = createCheckConfig(UniquePropertiesCheck.class);
     }
 
@@ -58,10 +57,8 @@ public class UniquePropertiesCheckTest extends BaseFileSetCheckTestSupport
      *             on error occurres
      */
     @Test
-    public void testDefault() throws Exception
-    {
-        final String[] expected =
-        {
+    public void testDefault() throws Exception {
+        final String[] expected = {
             "3: " + getCheckMessage(MSG_KEY, "general.exception", 2),
             "5: " + getCheckMessage(MSG_KEY, "DefaultLogger.auditStarted", 2),
             "11: " + getCheckMessage(MSG_KEY, "onlineManual", 3),
@@ -80,8 +77,7 @@ public class UniquePropertiesCheckTest extends BaseFileSetCheckTestSupport
      *             on error occurs
      */
     @Test
-    public void testNotFoundKey() throws Exception
-    {
+    public void testNotFoundKey() throws Exception {
         final UniquePropertiesCheck check = new UniquePropertiesCheck();
         final List<String> testStrings = new ArrayList<>(3);
         testStrings.add("");
@@ -99,14 +95,13 @@ public class UniquePropertiesCheckTest extends BaseFileSetCheckTestSupport
      *             on error occurs
      */
     @Test
-    public void testIOException() throws Exception
-    {
+    public void testIOException() throws Exception {
         final UniquePropertiesCheck check = new UniquePropertiesCheck();
         check.configure(checkConfig);
         final String fileName =
                 getPath("InputUniquePropertiesCheckNotExisting.properties");
         final File file = new File(fileName);
-        final TreeSet<LocalizedMessage> messages =
+        final SortedSet<LocalizedMessage> messages =
                 check.process(file, Collections.<String>emptyList());
         Assert.assertEquals("Wrong messages count: " + messages.size(),
                 messages.size(), 1);
@@ -128,8 +123,7 @@ public class UniquePropertiesCheckTest extends BaseFileSetCheckTestSupport
      * @throws Exception
      *             on file exists
      */
-    private String getFileNotFoundDetail(File file) throws Exception
-    {
+    private String getFileNotFoundDetail(File file) throws Exception {
         // Create exception to know detail message we should wait in
         // LocalisedMessage
         try {

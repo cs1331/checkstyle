@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
@@ -27,8 +28,7 @@ import com.puppycrawl.tools.checkstyle.checks.CheckUtils;
  *
  * @author <a href="mailto:simon@redhillconsulting.com.au">Simon Harris</a>
  */
-public final class NestedIfDepthCheck extends AbstractNestedDepthCheck
-{
+public final class NestedIfDepthCheck extends AbstractNestedDepthCheck {
 
     /**
      * A key is pointing to the warning message text in "messages.properties"
@@ -40,44 +40,37 @@ public final class NestedIfDepthCheck extends AbstractNestedDepthCheck
     private static final int DEFAULT_MAX = 1;
 
     /** Creates new check instance with default allowed nesting depth. */
-    public NestedIfDepthCheck()
-    {
+    public NestedIfDepthCheck() {
         super(DEFAULT_MAX);
     }
 
     @Override
-    public int[] getDefaultTokens()
-    {
+    public int[] getDefaultTokens() {
         return new int[] {TokenTypes.LITERAL_IF};
     }
 
     @Override
-    public int[] getAcceptableTokens()
-    {
+    public int[] getAcceptableTokens() {
         return new int[] {TokenTypes.LITERAL_IF};
     }
 
     @Override
-    public void visitToken(DetailAST ast)
-    {
-        switch (ast.getType()) {
-            case TokenTypes.LITERAL_IF:
-                visitLiteralIf(ast);
-                break;
-            default:
-                throw new IllegalStateException(ast.toString());
+    public void visitToken(DetailAST ast) {
+        if (ast.getType() == TokenTypes.LITERAL_IF) {
+            visitLiteralIf(ast);
+        }
+        else {
+            throw new IllegalStateException(ast.toString());
         }
     }
 
     @Override
-    public void leaveToken(DetailAST ast)
-    {
-        switch (ast.getType()) {
-            case TokenTypes.LITERAL_IF:
-                leaveLiteralIf(ast);
-                break;
-            default:
-                throw new IllegalStateException(ast.toString());
+    public void leaveToken(DetailAST ast) {
+        if (ast.getType() == TokenTypes.LITERAL_IF) {
+            leaveLiteralIf(ast);
+        }
+        else {
+            throw new IllegalStateException(ast.toString());
         }
     }
 
@@ -85,8 +78,7 @@ public final class NestedIfDepthCheck extends AbstractNestedDepthCheck
      * Increases current nesting depth.
      * @param literalIf node for if.
      */
-    private void visitLiteralIf(DetailAST literalIf)
-    {
+    private void visitLiteralIf(DetailAST literalIf) {
         if (!CheckUtils.isElseIf(literalIf)) {
             nestIn(literalIf, MSG_KEY);
         }
@@ -96,8 +88,7 @@ public final class NestedIfDepthCheck extends AbstractNestedDepthCheck
      * Decreases current nesting depth.
      * @param literalIf node for if.
      */
-    private void leaveLiteralIf(DetailAST literalIf)
-    {
+    private void leaveLiteralIf(DetailAST literalIf) {
         if (!CheckUtils.isElseIf(literalIf)) {
             nestOut();
         }

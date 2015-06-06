@@ -16,37 +16,8 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
-package com.puppycrawl.tools.checkstyle.checks.indentation;
-
-import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
 /**
- * This class checks line wrapping for method call statements.
- * @author pirat9600q
- *
+ * Package containing input files for design checks.
  */
-public class MethodCallLineWrapHandler extends LineWrappingHandler
-{
-    /**
-     * Creates new instance of MethodCallLineWrapHandler.
-     * @param instance instance of IndentationCheck.
-     * @param firstNode first node of method call statement.
-     * @param lastNode last node of method call statement.
-     */
-    public MethodCallLineWrapHandler(IndentationCheck instance,
-        DetailAST firstNode, DetailAST lastNode)
-    {
-        super(instance, firstNode, lastNode);
-    }
-
-    @Override
-    protected int getCurrentIndentation()
-    {
-        DetailAST curNode = getFirstNode();
-        while (curNode.getType() != TokenTypes.IDENT) {
-            curNode = curNode.getFirstChild();
-        }
-        return curNode.getColumnNo() + getIndentLevel();
-    }
-}
+package com.puppycrawl.tools.checkstyle.design;

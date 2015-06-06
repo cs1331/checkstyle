@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.whitespace;
 
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
@@ -29,19 +30,16 @@ import static com.puppycrawl.tools.checkstyle.checks.whitespace.EmptyForInitiali
 .MSG_PRECEDED;
 
 public class EmptyForInitializerPadCheckTest
-    extends BaseCheckTestSupport
-{
+    extends BaseCheckTestSupport {
     private DefaultConfiguration checkConfig;
 
     @Before
-    public void setUp()
-    {
+    public void setUp() {
         checkConfig = createCheckConfig(EmptyForInitializerPadCheck.class);
     }
 
     @Test
-    public void testDefault() throws Exception
-    {
+    public void testDefault() throws Exception {
         final String[] expected = {
             "48:14: " + getCheckMessage(MSG_PRECEDED, ";"),
         };
@@ -49,8 +47,7 @@ public class EmptyForInitializerPadCheckTest
     }
 
     @Test
-    public void testSpaceOption() throws Exception
-    {
+    public void testSpaceOption() throws Exception {
         checkConfig.addAttribute("option", PadOption.SPACE.toString());
         final String[] expected = {
             "51:13: " + getCheckMessage(MSG_NOT_PRECEDED, ";"),

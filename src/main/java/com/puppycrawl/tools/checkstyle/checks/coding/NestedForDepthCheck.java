@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
@@ -40,8 +41,7 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  * @see com.puppycrawl.tools.checkstyle.checks.coding.AbstractNestedDepthCheck
  * @see com.puppycrawl.tools.checkstyle.checks.coding.NestedIfDepthCheck
  */
-public final class NestedForDepthCheck extends AbstractNestedDepthCheck
-{
+public final class NestedForDepthCheck extends AbstractNestedDepthCheck {
 
     /**
      * A key is pointing to the warning message text in "messages.properties"
@@ -53,34 +53,29 @@ public final class NestedForDepthCheck extends AbstractNestedDepthCheck
     private static final int DEFAULT_MAX = 1;
 
     /** Creates new check instance with default allowed nesting depth. */
-    public NestedForDepthCheck()
-    {
+    public NestedForDepthCheck() {
         super(DEFAULT_MAX);
     }
 
     @Override
-    public int[] getDefaultTokens()
-    {
+    public int[] getDefaultTokens() {
         return new int[] {TokenTypes.LITERAL_FOR};
     }
 
     @Override
-    public int[] getAcceptableTokens()
-    {
+    public int[] getAcceptableTokens() {
         return new int[] {TokenTypes.LITERAL_FOR};
     }
 
     @Override
-    public void visitToken(DetailAST ast)
-    {
+    public void visitToken(DetailAST ast) {
         if (TokenTypes.LITERAL_FOR == ast.getType()) {
             nestIn(ast, MSG_KEY);
         }
     }
 
     @Override
-    public void leaveToken(DetailAST ast)
-    {
+    public void leaveToken(DetailAST ast) {
         if (TokenTypes.LITERAL_FOR == ast.getType()) {
             nestOut();
         }

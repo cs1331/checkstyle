@@ -16,28 +16,36 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.design;
 
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
+import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import org.junit.Test;
 
 import static com.puppycrawl.tools.checkstyle.checks.design.DesignForExtensionCheck.MSG_KEY;
+import static org.junit.Assert.assertArrayEquals;
 
 public class DesignForExtensionCheckTest
-    extends BaseCheckTestSupport
-{
+    extends BaseCheckTestSupport {
     @Test
-    public void testIt() throws Exception
-    {
+    public void testIt() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(DesignForExtensionCheck.class);
         final String[] expected = {
             "46:5: " + getCheckMessage(MSG_KEY, "doh"),
             "54:5: " + getCheckMessage(MSG_KEY, "aNativeMethod"),
+            "105:9: " + getCheckMessage(MSG_KEY, "someMethod"),
         };
         verify(checkConfig, getPath("InputDesignForExtension.java"), expected);
 
     }
 
+    @Test
+    public void testGetAcceptableTokens() {
+        DesignForExtensionCheck obj = new DesignForExtensionCheck();
+        int[] expected = {TokenTypes.METHOD_DEF};
+        assertArrayEquals(expected, obj.getAcceptableTokens());
+    }
 }

@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.annotation;
 
 import java.io.File;
@@ -29,14 +30,12 @@ import static com.puppycrawl.tools.checkstyle.checks.annotation.MissingDeprecate
 import static com.puppycrawl.tools.checkstyle.checks.annotation.MissingDeprecatedCheck.MSG_KEY_JAVADOC_DUPLICATE_TAG;
 import static com.puppycrawl.tools.checkstyle.checks.annotation.MissingDeprecatedCheck.MSG_KEY_JAVADOC_MISSING;
 
-public class MissingDeprecatedTest extends BaseCheckTestSupport
-{
+public class MissingDeprecatedTest extends BaseCheckTestSupport {
     /**
      * Tests that memebers that are only deprecated via javadoc are flagged.
      */
     @Test
-    public void testBadDeprecatedAnnotation() throws Exception
-    {
+    public void testBadDeprecatedAnnotation() throws Exception {
         DefaultConfiguration checkConfig = createCheckConfig(MissingDeprecatedCheck.class);
 
         final String[] expected = {
@@ -58,8 +57,7 @@ public class MissingDeprecatedTest extends BaseCheckTestSupport
      * Tests that memebers that are only deprecated via the annotation are flagged.
      */
     @Test
-    public void testBadDeprecatedJavadoc() throws Exception
-    {
+    public void testBadDeprecatedJavadoc() throws Exception {
 
         DefaultConfiguration checkConfig = createCheckConfig(MissingDeprecatedCheck.class);
 
@@ -82,8 +80,7 @@ public class MissingDeprecatedTest extends BaseCheckTestSupport
      * Tests various special deprecation conditions such as duplicate or empty tags.
      */
     @Test
-    public void testSpecialCaseDeprecated() throws Exception
-    {
+    public void testSpecialCaseDeprecated() throws Exception {
 
         DefaultConfiguration checkConfig = createCheckConfig(MissingDeprecatedCheck.class);
 
@@ -110,8 +107,7 @@ public class MissingDeprecatedTest extends BaseCheckTestSupport
      * Tests that good forms of deprecation are not flagged.
      */
     @Test
-    public void testGoodDeprecated() throws Exception
-    {
+    public void testGoodDeprecated() throws Exception {
 
         DefaultConfiguration checkConfig = createCheckConfig(MissingDeprecatedCheck.class);
 

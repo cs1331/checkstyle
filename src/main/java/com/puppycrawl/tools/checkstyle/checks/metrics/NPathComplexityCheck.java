@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.metrics;
 
 import java.math.BigInteger;
@@ -32,11 +33,8 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  *
  * @author <a href="mailto:simon@redhillconsulting.com.au">Simon Harris</a>
  * @author o_sukhodolsky
- * TODO: For every or: _value += (_orCount * (nestedValue - 1));
- * TODO: For every and: ???
  */
-public final class NPathComplexityCheck extends AbstractComplexityCheck
-{
+public final class NPathComplexityCheck extends AbstractComplexityCheck {
 
     /**
      * A key is pointing to the warning message text in "messages.properties"
@@ -48,14 +46,12 @@ public final class NPathComplexityCheck extends AbstractComplexityCheck
     private static final int DEFAULT_MAX = 200;
 
     /** Creates new instance of the check. */
-    public NPathComplexityCheck()
-    {
+    public NPathComplexityCheck() {
         super(DEFAULT_MAX);
     }
 
     @Override
-    public int[] getDefaultTokens()
-    {
+    public int[] getDefaultTokens() {
         return new int[] {
             TokenTypes.CTOR_DEF,
             TokenTypes.METHOD_DEF,
@@ -75,8 +71,7 @@ public final class NPathComplexityCheck extends AbstractComplexityCheck
     }
 
     @Override
-    public int[] getAcceptableTokens()
-    {
+    public int[] getAcceptableTokens() {
         return new int[] {
             TokenTypes.CTOR_DEF,
             TokenTypes.METHOD_DEF,
@@ -96,8 +91,7 @@ public final class NPathComplexityCheck extends AbstractComplexityCheck
     }
 
     @Override
-    public void visitToken(DetailAST ast)
-    {
+    public void visitToken(DetailAST ast) {
         switch (ast.getType()) {
             case TokenTypes.LITERAL_WHILE:
             case TokenTypes.LITERAL_DO:
@@ -119,8 +113,7 @@ public final class NPathComplexityCheck extends AbstractComplexityCheck
     }
 
     @Override
-    public void leaveToken(DetailAST ast)
-    {
+    public void leaveToken(DetailAST ast) {
         switch (ast.getType()) {
             case TokenTypes.LITERAL_WHILE:
             case TokenTypes.LITERAL_DO:
@@ -142,33 +135,28 @@ public final class NPathComplexityCheck extends AbstractComplexityCheck
     }
 
     @Override
-    protected String getMessageID()
-    {
+    protected String getMessageID() {
         return MSG_KEY;
     }
 
     /** Visits else, catch or case. */
-    private void visitAddingConditional()
-    {
+    private void visitAddingConditional() {
         pushValue();
     }
 
     /** Leaves else, catch or case. */
-    private void leaveAddingConditional()
-    {
+    private void leaveAddingConditional() {
         setCurrentValue(
                 getCurrentValue().subtract(BigInteger.ONE).add(popValue()));
     }
 
     /** Visits while, do, for, if, try, ? (in ?::) or switch. */
-    private void visitMultiplyingConditional()
-    {
+    private void visitMultiplyingConditional() {
         pushValue();
     }
 
     /** Leaves while, do, for, if, try, ? (in ?::) or switch. */
-    private void leaveMultiplyingConditional()
-    {
+    private void leaveMultiplyingConditional() {
         setCurrentValue(
                 getCurrentValue().add(BigInteger.ONE).multiply(popValue()));
     }

@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.javadoc;
 
 import org.junit.Test;
@@ -27,12 +28,10 @@ import static com.puppycrawl.tools.checkstyle.checks.javadoc.NonEmptyAtclauseDes
 .MSG_KEY;
 
 public class NonEmptyAtclauseDescriptionCheckTest
-        extends BaseCheckTestSupport
-{
+        extends BaseCheckTestSupport {
     @Test
     public void testCheck()
-            throws Exception
-    {
+            throws Exception {
         final DefaultConfiguration checkConfig =
                 createCheckConfig(NonEmptyAtclauseDescriptionCheck.class);
         final String[] expected = {

@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks;
 
 import static org.junit.Assert.assertTrue;
@@ -33,53 +34,44 @@ import com.puppycrawl.tools.checkstyle.checks.imports.AvoidStarImportCheck;
 import org.junit.Test;
 
 public class FileSetCheckLifecycleTest
-    extends BaseCheckTestSupport
-{
+    extends BaseCheckTestSupport {
     @Override
     protected DefaultConfiguration createCheckerConfig(
-        Configuration checkConfig)
-    {
+        Configuration checkConfig) {
         final DefaultConfiguration dc = new DefaultConfiguration("root");
         dc.addChild(checkConfig);
         return dc;
     }
 
-    public static class TestFileSetCheck extends AbstractFileSetCheck
-    {
+    public static class TestFileSetCheck extends AbstractFileSetCheck {
         private static boolean destroyed;
         private static boolean fileContentAvailable;
 
         @Override
-        public void destroy()
-        {
+        public void destroy() {
             destroyed = true;
         }
 
-        public static boolean isDestroyed()
-        {
+        public static boolean isDestroyed() {
             return destroyed;
         }
 
-        public static boolean isFileContentAvailable()
-        {
+        public static boolean isFileContentAvailable() {
             return fileContentAvailable;
         }
 
         @Override
-        protected void processFiltered(File file, List<String> lines)
-        {
+        protected void processFiltered(File file, List<String> lines) {
         }
 
         @Override
-        public void finishProcessing()
-        {
+        public void finishProcessing() {
             fileContentAvailable = FileContentsHolder.getContents() != null;
         }
     }
 
     @Test
-    public void testTranslation() throws Exception
-    {
+    public void testTranslation() throws Exception {
         final Configuration checkConfig =
             createCheckConfig(TestFileSetCheck.class);
         final String[] expected = {
@@ -90,8 +82,7 @@ public class FileSetCheckLifecycleTest
     }
 
     @Test
-    public void testProcessCallsFinishBeforeCallingDestroy() throws Exception
-    {
+    public void testProcessCallsFinishBeforeCallingDestroy() throws Exception {
 
         DefaultConfiguration dc = new DefaultConfiguration("configuration");
         DefaultConfiguration twConf = createCheckConfig(TreeWalker.class);
@@ -101,7 +92,7 @@ public class FileSetCheckLifecycleTest
         twConf.addChild(new DefaultConfiguration(AvoidStarImportCheck.class.getName()));
 
         final Checker checker = new Checker();
-        final Locale locale = Locale.ENGLISH;
+        final Locale locale = Locale.ROOT;
         checker.setLocaleCountry(locale.getCountry());
         checker.setLocaleLanguage(locale.getLanguage());
         checker.setModuleClassLoader(Thread.currentThread().getContextClassLoader());

@@ -16,12 +16,13 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.annotation;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.puppycrawl.tools.checkstyle.api.AnnotationUtility;
+import com.puppycrawl.tools.checkstyle.AnnotationUtility;
 import com.puppycrawl.tools.checkstyle.api.Check;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.JavadocTagInfo;
@@ -71,8 +72,27 @@ import com.puppycrawl.tools.checkstyle.Utils;
  *
  * @author Travis Schneeberger
  */
-public final class MissingDeprecatedCheck extends Check
-{
+public final class MissingDeprecatedCheck extends Check {
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String MSG_KEY_ANNOTATION_MISSING_DEPRECATED =
+            "annotation.missing.deprecated";
+
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String MSG_KEY_JAVADOC_DUPLICATE_TAG =
+            "javadoc.duplicateTag";
+
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String MSG_KEY_JAVADOC_MISSING = "javadoc.missing";
+
     /** {@link Deprecated Deprecated} annotation name */
     private static final String DEPRECATED = "Deprecated";
 
@@ -96,37 +116,15 @@ public final class MissingDeprecatedCheck extends Check
     /** Multiline finished at next Javadoc * */
     private static final String NEXT_TAG = "@";
 
-    /**
-     * A key is pointing to the warning message text in "messages.properties"
-     * file.
-     */
-    public static final String MSG_KEY_ANNOTATION_MISSING_DEPRECATED =
-        "annotation.missing.deprecated";
-
-    /**
-     * A key is pointing to the warning message text in "messages.properties"
-     * file.
-     */
-    public static final String MSG_KEY_JAVADOC_DUPLICATE_TAG =
-        "javadoc.duplicateTag";
-
-    /**
-     * A key is pointing to the warning message text in "messages.properties"
-     * file.
-     */
-    public static final String MSG_KEY_JAVADOC_MISSING = "javadoc.missing";
-
     /** {@inheritDoc} */
     @Override
-    public int[] getDefaultTokens()
-    {
+    public int[] getDefaultTokens() {
         return this.getAcceptableTokens();
     }
 
     /** {@inheritDoc} */
     @Override
-    public int[] getAcceptableTokens()
-    {
+    public int[] getAcceptableTokens() {
         return new int[] {
             TokenTypes.INTERFACE_DEF,
             TokenTypes.CLASS_DEF,
@@ -142,8 +140,7 @@ public final class MissingDeprecatedCheck extends Check
 
     /** {@inheritDoc} */
     @Override
-    public void visitToken(final DetailAST ast)
-    {
+    public void visitToken(final DetailAST ast) {
         final TextBlock javadoc =
             this.getFileContents().getJavadocBefore(ast.getLineNo());
 
@@ -164,8 +161,7 @@ public final class MissingDeprecatedCheck extends Check
      * @param javadoc the javadoc of the AST
      * @return true if contains the tag
      */
-    private boolean containsJavadocTag(final TextBlock javadoc)
-    {
+    private boolean containsJavadocTag(final TextBlock javadoc) {
         if (javadoc == null) {
             return false;
         }
@@ -183,8 +179,8 @@ public final class MissingDeprecatedCheck extends Check
             final Matcher javadocNoargMatcher =
                 MissingDeprecatedCheck.MATCH_DEPRECATED.matcher(line);
             final Matcher noargMultilineStart =
-                MissingDeprecatedCheck.
-                    MATCH_DEPRECATED_MULTILINE_START.matcher(line);
+                MissingDeprecatedCheck
+                    .MATCH_DEPRECATED_MULTILINE_START.matcher(line);
 
             if (javadocNoargMatcher.find()) {
                 if (found) {
@@ -200,8 +196,7 @@ public final class MissingDeprecatedCheck extends Check
                 // not whitespace or '*' characters.
 
                 for (int reindex = i + 1;
-                    reindex < lines.length; reindex++)
-                {
+                    reindex < lines.length; reindex++) {
                     final Matcher multilineCont =
                         MissingDeprecatedCheck.MATCH_DEPRECATED_MULTILINE_CONT
                         .matcher(lines[reindex]);
@@ -210,8 +205,7 @@ public final class MissingDeprecatedCheck extends Check
                         reindex = lines.length;
                         final String lFin = multilineCont.group(1);
                         if (!lFin.equals(MissingDeprecatedCheck.NEXT_TAG)
-                            && !lFin.equals(MissingDeprecatedCheck.END_JAVADOC))
-                        {
+                            && !lFin.equals(MissingDeprecatedCheck.END_JAVADOC)) {
                             if (found) {
                                 this.log(currentLine, MSG_KEY_JAVADOC_DUPLICATE_TAG,
                                     JavadocTagInfo.DEPRECATED.getText());

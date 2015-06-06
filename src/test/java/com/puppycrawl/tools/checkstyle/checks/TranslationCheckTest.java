@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks;
 
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
@@ -27,20 +28,17 @@ import org.junit.Test;
 import static com.puppycrawl.tools.checkstyle.checks.TranslationCheck.MSG_KEY;
 
 public class TranslationCheckTest
-    extends BaseCheckTestSupport
-{
+    extends BaseCheckTestSupport {
     @Override
     protected DefaultConfiguration createCheckerConfig(
-        Configuration checkConfig)
-    {
+        Configuration checkConfig) {
         final DefaultConfiguration dc = new DefaultConfiguration("root");
         dc.addChild(checkConfig);
         return dc;
     }
 
     @Test
-    public void testTranslation() throws Exception
-    {
+    public void testTranslation() throws Exception {
         final Configuration checkConfig = createCheckConfig(TranslationCheck.class);
         final String[] expected = {
             "0: " + getCheckMessage(MSG_KEY, "only.english"),
@@ -56,16 +54,8 @@ public class TranslationCheckTest
             expected);
     }
 
-    // TODO: test with the same resourcebundle name in different packages
-    // x/messages.properties
-    //     key1=x
-    // y/messages.properties
-    //     key2=y
-    // should not result in error message about key1 missing in the y bundle
-
     @Test
-    public void testBaseNameSeparator() throws Exception
-    {
+    public void testBaseNameSeparator() throws Exception {
         final DefaultConfiguration checkConfig = createCheckConfig(TranslationCheck.class);
         checkConfig.addAttribute("basenameSeparator", "-");
         final String[] expected = {

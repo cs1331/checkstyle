@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.indentation;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
@@ -26,8 +27,7 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  *
  * @author jrichard
  */
-public class ObjectBlockHandler extends BlockParentHandler
-{
+public class ObjectBlockHandler extends BlockParentHandler {
     /**
      * Construct an instance of this handler with the given indentation check,
      * abstract syntax tree, and parent handler.
@@ -37,38 +37,32 @@ public class ObjectBlockHandler extends BlockParentHandler
      * @param parent        the parent handler
      */
     public ObjectBlockHandler(IndentationCheck indentCheck,
-        DetailAST ast, ExpressionHandler parent)
-    {
+        DetailAST ast, ExpressionHandler parent) {
         super(indentCheck, "object def", ast, parent);
     }
 
     @Override
-    protected DetailAST getToplevelAST()
-    {
+    protected DetailAST getToplevelAST() {
         return null;
     }
 
     @Override
-    protected DetailAST getLCurly()
-    {
+    protected DetailAST getLCurly() {
         return getMainAst().findFirstToken(TokenTypes.LCURLY);
     }
 
     @Override
-    protected DetailAST getRCurly()
-    {
+    protected DetailAST getRCurly() {
         return getMainAst().findFirstToken(TokenTypes.RCURLY);
     }
 
     @Override
-    protected DetailAST getListChild()
-    {
+    protected DetailAST getListChild() {
         return getMainAst();
     }
 
     @Override
-    protected IndentLevel getLevelImpl()
-    {
+    protected IndentLevel getLevelImpl() {
         final DetailAST parentAST = getMainAst().getParent();
         IndentLevel indent = getParent().getLevel();
         if (parentAST.getType() == TokenTypes.LITERAL_NEW) {
@@ -81,8 +75,7 @@ public class ObjectBlockHandler extends BlockParentHandler
     }
 
     @Override
-    public void checkIndentation()
-    {
+    public void checkIndentation() {
         // if we have a class or interface as a parent, don't do anything,
         // as this is checked by class def; so
         // only do this if we have a new for a parent (anonymous inner
@@ -96,24 +89,21 @@ public class ObjectBlockHandler extends BlockParentHandler
     }
 
     @Override
-    protected boolean rcurlyMustStart()
-    {
+    protected boolean rcurlyMustStart() {
         return false;
     }
 
     @Override
-    protected void checkRCurly()
-    {
+    protected void checkRCurly() {
         final DetailAST lcurly = getLCurly();
         final DetailAST rcurly = getRCurly();
         final int rcurlyPos = expandedTabsColumnNo(rcurly);
         final IndentLevel level = curlyLevel();
         level.addAcceptedIndent(level.getFirstIndentLevel() + getLineWrappingIndent());
 
-        if (rcurly != null && !level.accept(rcurlyPos)
+        if (!level.accept(rcurlyPos)
             && (rcurlyMustStart() || startsLine(rcurly))
-                && !areOnSameLine(rcurly, lcurly))
-        {
+                && !areOnSameLine(rcurly, lcurly)) {
             logError(rcurly, "rcurly", rcurlyPos, curlyLevel());
         }
     }
@@ -123,8 +113,7 @@ public class ObjectBlockHandler extends BlockParentHandler
      * @return value of lineWrappingIndentation property
      *         of <code>IndentationCheck</code>
      */
-    private int getLineWrappingIndent()
-    {
+    private int getLineWrappingIndent() {
         return getIndentCheck().getLineWrappingIndentation();
     }
 }

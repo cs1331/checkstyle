@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.whitespace;
 
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
@@ -30,12 +31,10 @@ import static com.puppycrawl.tools.checkstyle.checks.whitespace.AbstractParenPad
 .WS_NOT_PRECEDED;
 
 public class ParenPadCheckTest
-    extends BaseCheckTestSupport
-{
+    extends BaseCheckTestSupport {
     @Test
     public void testDefault()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(ParenPadCheck.class);
         final String[] expected = {
@@ -52,8 +51,7 @@ public class ParenPadCheckTest
 
     @Test
     public void testSpace()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(ParenPadCheck.class);
         checkConfig.addAttribute("option", PadOption.SPACE.toString());
@@ -83,14 +81,15 @@ public class ParenPadCheckTest
             "225:14: " + getCheckMessage(WS_NOT_FOLLOWED, "("),
             "235:14: " + getCheckMessage(WS_NOT_FOLLOWED, "("),
             "235:39: " + getCheckMessage(WS_NOT_PRECEDED, ")"),
+            "252:21: " + getCheckMessage(WS_NOT_FOLLOWED, "("),
+            "252:93: " + getCheckMessage(WS_NOT_PRECEDED, ")"),
         };
         verify(checkConfig, getPath("InputWhitespace.java"), expected);
     }
 
     @Test
     public void testDefaultForIterator()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(ParenPadCheck.class);
         final String[] expected = {
@@ -107,8 +106,7 @@ public class ParenPadCheckTest
 
     @Test
     public void testSpaceEmptyForIterator()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(ParenPadCheck.class);
         checkConfig.addAttribute("option", PadOption.SPACE.toString());
@@ -127,8 +125,7 @@ public class ParenPadCheckTest
     }
 
     @Test
-    public void test1322879() throws Exception
-    {
+    public void test1322879() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(ParenPadCheck.class);
         checkConfig.addAttribute("option", PadOption.SPACE.toString());

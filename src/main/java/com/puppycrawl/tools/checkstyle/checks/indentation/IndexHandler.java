@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.indentation;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
@@ -25,8 +26,7 @@ import com.puppycrawl.tools.checkstyle.api.DetailAST;
  *
  * @author yudindi
  */
-public class IndexHandler extends ExpressionHandler
-{
+public class IndexHandler extends ExpressionHandler {
 
     /**
      * Construct an instance of this handler with the given indentation check,
@@ -38,20 +38,17 @@ public class IndexHandler extends ExpressionHandler
      */
     public IndexHandler(IndentationCheck indentCheck,
                       DetailAST ast,
-                      ExpressionHandler parent)
-    {
+                      ExpressionHandler parent) {
         super(indentCheck, "index op", ast, parent);
     }
 
     @Override
-    public void checkIndentation()
-    {
+    public void checkIndentation() {
         // do nothing. Used to provide a correct suggested child level for now.
     }
 
     @Override
-    public IndentLevel suggestedChildLevel(ExpressionHandler child)
-    {
+    public IndentLevel suggestedChildLevel(ExpressionHandler child) {
         return getLevel();
     }
 

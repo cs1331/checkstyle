@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks;
 
 import java.util.regex.Pattern;
@@ -27,7 +28,7 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
 /**
  * <p>
- * A check for TODO comments. To check for other patterns in Java comments, set
+ * A check for 'TODO' comments. To check for other patterns in Java comments, set
  * property format.
  * </p>
  * <p>
@@ -51,8 +52,7 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  * @author Baratali Izmailov
  */
 public class TodoCommentCheck
-        extends Check
-{
+        extends Check {
 
     /**
      * A key is pointing to the warning message text in "messages.properties"
@@ -61,7 +61,7 @@ public class TodoCommentCheck
     public static final String MSG_KEY = "todo.match";
 
     /**
-     * Format of todo comment.
+     * Format of 'todo' comment.
      */
     private String format = "TODO:";
 
@@ -71,39 +71,34 @@ public class TodoCommentCheck
     private Pattern regexp = Pattern.compile(format);
 
     @Override
-    public boolean isCommentNodesRequired()
-    {
+    public boolean isCommentNodesRequired() {
         return true;
     }
 
     /**
-     * Setter for todo comment format.
+     * Setter for 'todo' comment format.
      * @param format
-     *        format of todo comment.
+     *        format of 'todo' comment.
      * @throws org.apache.commons.beanutils.ConversionException
      *         if unable to create Pattern object.
      */
-    public void setFormat(String format)
-    {
+    public void setFormat(String format) {
         this.format = format;
         regexp = Utils.createPattern(format);
     }
 
     @Override
-    public int[] getDefaultTokens()
-    {
+    public int[] getDefaultTokens() {
         return new int[] {TokenTypes.COMMENT_CONTENT };
     }
 
     @Override
-    public int[] getAcceptableTokens()
-    {
+    public int[] getAcceptableTokens() {
         return new int[] {TokenTypes.COMMENT_CONTENT };
     }
 
     @Override
-    public void visitToken(DetailAST ast)
-    {
+    public void visitToken(DetailAST ast) {
         final String[] lines = ast.getText().split("\n");
 
         for (int i = 0; i < lines.length; i++) {

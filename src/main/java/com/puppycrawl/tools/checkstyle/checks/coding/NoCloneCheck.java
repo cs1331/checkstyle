@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
 /**
@@ -125,8 +126,7 @@ package com.puppycrawl.tools.checkstyle.checks.coding;
  * @see java.lang.Cloneable
  * @see java.lang.CloneNotSupportedException
  */
-public class NoCloneCheck extends AbstractIllegalMethodCheck
-{
+public class NoCloneCheck extends AbstractIllegalMethodCheck {
 
     /**
      * A key is pointing to the warning message text in "messages.properties"
@@ -137,8 +137,7 @@ public class NoCloneCheck extends AbstractIllegalMethodCheck
     /**
      * Creates an instance.
      */
-    public NoCloneCheck()
-    {
+    public NoCloneCheck() {
         super("clone", MSG_KEY);
     }
 }

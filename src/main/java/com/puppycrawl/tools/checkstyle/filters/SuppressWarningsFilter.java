@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.filters;
 
 import com.puppycrawl.tools.checkstyle.api.AuditEvent;
@@ -30,12 +31,10 @@ import com.puppycrawl.tools.checkstyle.checks.SuppressWarningsHolder;
  */
 public class SuppressWarningsFilter
     extends AutomaticBean
-    implements Filter
-{
+    implements Filter {
     /** {@inheritDoc} */
     @Override
-    public boolean accept(AuditEvent event)
-    {
+    public boolean accept(AuditEvent event) {
         return !SuppressWarningsHolder.isSuppressed(event.getSourceName(),
             event.getLine(), event.getColumn());
     }

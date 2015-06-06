@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
@@ -26,12 +27,10 @@ import org.junit.Test;
 import static com.puppycrawl.tools.checkstyle.checks.coding.FallThroughCheck.MSG_FALL_THROUGH;
 import static com.puppycrawl.tools.checkstyle.checks.coding.FallThroughCheck.MSG_FALL_THROUGH_LAST;
 
-public class FallThroughCheckTest extends BaseCheckTestSupport
-{
+public class FallThroughCheckTest extends BaseCheckTestSupport {
 
     @Test
-    public void testDefault() throws Exception
-    {
+    public void testDefault() throws Exception {
         DefaultConfiguration checkConfig = createCheckConfig(FallThroughCheck.class);
         final String[] expected = {
             "14:13: " + getCheckMessage(MSG_FALL_THROUGH),
@@ -44,6 +43,7 @@ public class FallThroughCheckTest extends BaseCheckTestSupport
             "369:11: " + getCheckMessage(MSG_FALL_THROUGH),
             "372:11: " + getCheckMessage(MSG_FALL_THROUGH),
             "374:40: " + getCheckMessage(MSG_FALL_THROUGH),
+            "416:13: " + getCheckMessage(MSG_FALL_THROUGH),
         };
         verify(checkConfig,
                getPath("coding" + File.separator + "InputFallThrough.java"),
@@ -51,8 +51,7 @@ public class FallThroughCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testLastCaseGroup() throws Exception
-    {
+    public void testLastCaseGroup() throws Exception {
         DefaultConfiguration checkConfig = createCheckConfig(FallThroughCheck.class);
         checkConfig.addAttribute("checkLastCaseGroup", "true");
         final String[] expected = {
@@ -68,6 +67,7 @@ public class FallThroughCheckTest extends BaseCheckTestSupport
             "372:11: " + getCheckMessage(MSG_FALL_THROUGH),
             "374:40: " + getCheckMessage(MSG_FALL_THROUGH),
             "376:11: " + getCheckMessage(MSG_FALL_THROUGH_LAST),
+            "416:13: " + getCheckMessage(MSG_FALL_THROUGH),
         };
         verify(checkConfig,
                getPath("coding" + File.separator + "InputFallThrough.java"),
@@ -75,8 +75,7 @@ public class FallThroughCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testOwnPattern() throws Exception
-    {
+    public void testOwnPattern() throws Exception {
         final String ownPattern = "Continue with next case";
         final DefaultConfiguration checkConfig =
             createCheckConfig(FallThroughCheck.class);
@@ -111,6 +110,7 @@ public class FallThroughCheckTest extends BaseCheckTestSupport
             "348:11: " + getCheckMessage(MSG_FALL_THROUGH),
             "351:11: " + getCheckMessage(MSG_FALL_THROUGH),
             "353:30: " + getCheckMessage(MSG_FALL_THROUGH),
+            "416:13: " + getCheckMessage(MSG_FALL_THROUGH),
         };
         verify(checkConfig,
                getPath("coding" + File.separator + "InputFallThrough.java"),

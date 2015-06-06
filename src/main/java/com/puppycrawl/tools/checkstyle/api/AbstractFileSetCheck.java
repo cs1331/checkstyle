@@ -16,11 +16,13 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.api;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
-import java.util.TreeSet;
+import java.util.SortedSet;
 
 import com.puppycrawl.tools.checkstyle.Utils;
 
@@ -32,8 +34,7 @@ import com.puppycrawl.tools.checkstyle.Utils;
  */
 public abstract class AbstractFileSetCheck
     extends AbstractViolationReporter
-    implements FileSetCheck
-{
+    implements FileSetCheck {
     /** The dispatcher errors are fired to. */
     private MessageDispatcher dispatcher;
 
@@ -52,27 +53,23 @@ public abstract class AbstractFileSetCheck
 
     /** {@inheritDoc} */
     @Override
-    public void init()
-    {
+    public void init() {
     }
 
     /** {@inheritDoc} */
     @Override
-    public void destroy()
-    {
+    public void destroy() {
     }
 
     /** {@inheritDoc} */
     @Override
-    public void beginProcessing(String charset)
-    {
+    public void beginProcessing(String charset) {
     }
 
     /** {@inheritDoc} */
     @Override
-    public final TreeSet<LocalizedMessage> process(File file,
-                                                   List<String> lines)
-    {
+    public final SortedSet<LocalizedMessage> process(File file,
+                                                   List<String> lines) {
         getMessageCollector().reset();
         // Process only what interested in
         if (Utils.fileExtensionMatches(file, fileExtensions)) {
@@ -83,14 +80,12 @@ public abstract class AbstractFileSetCheck
 
     /** {@inheritDoc} */
     @Override
-    public void finishProcessing()
-    {
+    public void finishProcessing() {
     }
 
     /** {@inheritDoc} */
     @Override
-    public final void setMessageDispatcher(MessageDispatcher dispatcher)
-    {
+    public final void setMessageDispatcher(MessageDispatcher dispatcher) {
         this.dispatcher = dispatcher;
     }
 
@@ -100,8 +95,7 @@ public abstract class AbstractFileSetCheck
      *
      * @return the current MessageDispatcher.
      */
-    protected final MessageDispatcher getMessageDispatcher()
-    {
+    protected final MessageDispatcher getMessageDispatcher() {
         return dispatcher;
     }
 
@@ -109,9 +103,8 @@ public abstract class AbstractFileSetCheck
      * @return file extensions that identify the files that pass the
      * filter of this FileSetCheck.
      */
-    public String[] getFileExtensions()
-    {
-        return fileExtensions;
+    public String[] getFileExtensions() {
+        return Arrays.copyOf(fileExtensions, fileExtensions.length);
     }
 
     /**
@@ -120,8 +113,7 @@ public abstract class AbstractFileSetCheck
      * @param extensions the set of file extensions. A missing
      * initial '.' character of an extension is automatically added.
      */
-    public final void setFileExtensions(String[] extensions)
-    {
+    public final void setFileExtensions(String... extensions) {
         if (extensions == null) {
             fileExtensions = null;
             return;
@@ -130,7 +122,7 @@ public abstract class AbstractFileSetCheck
         fileExtensions = new String[extensions.length];
         for (int i = 0; i < extensions.length; i++) {
             final String extension = extensions[i];
-            if (extension.startsWith(".")) {
+            if (Utils.startsWithChar(extension, '.')) {
                 fileExtensions[i] = extension;
             }
             else {
@@ -146,21 +138,18 @@ public abstract class AbstractFileSetCheck
      *
      * @return the collector for localized messages.
      */
-    protected final LocalizedMessages getMessageCollector()
-    {
+    protected final LocalizedMessages getMessageCollector() {
         return messages;
     }
 
     @Override
-    public final void log(int line, String key, Object... args)
-    {
+    public final void log(int line, String key, Object... args) {
         log(line, 0, key, args);
     }
 
     @Override
     public final void log(int lineNo, int colNo, String key,
-            Object... args)
-    {
+            Object... args) {
         getMessageCollector().add(
             new LocalizedMessage(lineNo,
                                  colNo,
@@ -179,9 +168,8 @@ public abstract class AbstractFileSetCheck
      * all logged errors and than clears errors' list.
      * @param fileName the audited file
      */
-    protected final void fireErrors(String fileName)
-    {
-        final TreeSet<LocalizedMessage> errors = getMessageCollector()
+    protected final void fireErrors(String fileName) {
+        final SortedSet<LocalizedMessage> errors = getMessageCollector()
                 .getMessages();
         getMessageCollector().reset();
         getMessageDispatcher().fireErrors(fileName, errors);

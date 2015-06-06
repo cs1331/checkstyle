@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
@@ -50,8 +51,7 @@ import java.util.regex.Pattern;
  * </pre>
  * @author Stan Quinn
  */
-public class RegexpCheck extends AbstractFormatCheck
-{
+public class RegexpCheck extends AbstractFormatCheck {
 
     /**
      * A key is pointing to the warning message text in "messages.properties"
@@ -112,8 +112,7 @@ public class RegexpCheck extends AbstractFormatCheck
     /**
      * Instantiates an new RegexpCheck.
      */
-    public RegexpCheck()
-    {
+    public RegexpCheck() {
         super("$^", Pattern.MULTILINE); // the empty language
     }
 
@@ -121,8 +120,7 @@ public class RegexpCheck extends AbstractFormatCheck
      * Setter for message property.
      * @param message custom message which should be used in report.
      */
-    public void setMessage(String message)
-    {
+    public void setMessage(String message) {
         this.message = message == null ? "" : message;
     }
 
@@ -133,8 +131,7 @@ public class RegexpCheck extends AbstractFormatCheck
      * it's being used in logMessage() so it's covered in EMMA.
      * @return custom message to be used in report.
      */
-    public String getMessage()
-    {
+    public String getMessage() {
         return message;
     }
 
@@ -142,8 +139,7 @@ public class RegexpCheck extends AbstractFormatCheck
      * Sets if matches within comments should be ignored.
      * @param ignoreComments True if comments should be ignored.
      */
-    public void setIgnoreComments(boolean ignoreComments)
-    {
+    public void setIgnoreComments(boolean ignoreComments) {
         this.ignoreComments = ignoreComments;
     }
 
@@ -151,8 +147,7 @@ public class RegexpCheck extends AbstractFormatCheck
      * Sets if pattern is illegal, otherwise pattern is required.
      * @param illegalPattern True if pattern is not allowed.
      */
-    public void setIllegalPattern(boolean illegalPattern)
-    {
+    public void setIllegalPattern(boolean illegalPattern) {
         this.illegalPattern = illegalPattern;
     }
 
@@ -160,8 +155,7 @@ public class RegexpCheck extends AbstractFormatCheck
      * Sets the limit on the number of errors to report.
      * @param errorLimit the number of errors to report.
      */
-    public void setErrorLimit(int errorLimit)
-    {
+    public void setErrorLimit(int errorLimit) {
         this.errorLimit = errorLimit;
     }
 
@@ -170,21 +164,18 @@ public class RegexpCheck extends AbstractFormatCheck
      * @param duplicateLimit negative values mean no duplicate checking,
      * any positive value is used as the limit.
      */
-    public void setDuplicateLimit(int duplicateLimit)
-    {
+    public void setDuplicateLimit(int duplicateLimit) {
         this.duplicateLimit = duplicateLimit;
         checkForDuplicates = duplicateLimit > DEFAULT_DUPLICATE_LIMIT;
     }
 
     @Override
-    public int[] getDefaultTokens()
-    {
+    public int[] getDefaultTokens() {
         return new int[0];
     }
 
     @Override
-    public void beginTree(DetailAST rootAST)
-    {
+    public void beginTree(DetailAST rootAST) {
         final Pattern pattern = getRegexp();
         matcher = pattern.matcher(getFileContents().getText().getFullText());
         matchCount = 0;
@@ -193,8 +184,7 @@ public class RegexpCheck extends AbstractFormatCheck
     }
 
     /** recursive method that finds the matches. */
-    private void findMatch()
-    {
+    private void findMatch() {
         int startLine;
         int startColumn;
         int endLine;
@@ -209,7 +199,13 @@ public class RegexpCheck extends AbstractFormatCheck
         else if (foundMatch) {
             final FileText text = getFileContents().getText();
             final LineColumn start = text.lineColumn(matcher.start());
-            final LineColumn end = text.lineColumn(matcher.end() - 1);
+            final LineColumn end;
+            if (matcher.end() == 0) {
+                end = text.lineColumn(0);
+            }
+            else {
+                end = text.lineColumn(matcher.end() - 1);
+            }
             startLine = start.getLine();
             startColumn = start.getColumn();
             endLine = end.getLine();
@@ -222,15 +218,13 @@ public class RegexpCheck extends AbstractFormatCheck
             if (!ignore) {
                 matchCount++;
                 if (illegalPattern || checkForDuplicates
-                        && matchCount - 1 > duplicateLimit)
-                {
+                        && matchCount - 1 > duplicateLimit) {
                     errorCount++;
                     logMessage(startLine);
                 }
             }
             if (errorCount < errorLimit
-                    && (ignore || illegalPattern || checkForDuplicates))
-            {
+                    && (ignore || illegalPattern || checkForDuplicates)) {
                 findMatch();
             }
         }
@@ -240,8 +234,7 @@ public class RegexpCheck extends AbstractFormatCheck
      * Displays the right message.
      * @param lineNumber the line number the message relates to.
      */
-    private void logMessage(int lineNumber)
-    {
+    private void logMessage(int lineNumber) {
         String msg = "".equals(getMessage()) ? getFormat() : message;
         if (errorCount >= errorLimit) {
             msg = ERROR_LIMIT_EXCEEDED_MESSAGE + msg;

@@ -16,24 +16,39 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.sizes;
 
-import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
-import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
-import org.junit.Test;
-
+import static com.puppycrawl.tools.checkstyle.checks.sizes.MethodCountCheck.MSG_MANY_METHODS;
 import static com.puppycrawl.tools.checkstyle.checks.sizes.MethodCountCheck.MSG_PACKAGE_METHODS;
 import static com.puppycrawl.tools.checkstyle.checks.sizes.MethodCountCheck.MSG_PRIVATE_METHODS;
 import static com.puppycrawl.tools.checkstyle.checks.sizes.MethodCountCheck.MSG_PROTECTED_METHODS;
 import static com.puppycrawl.tools.checkstyle.checks.sizes.MethodCountCheck.MSG_PUBLIC_METHODS;
-import static com.puppycrawl.tools.checkstyle.checks.sizes.MethodCountCheck.MSG_MANY_METHODS;
+import static org.junit.Assert.assertArrayEquals;
+import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
+import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
+import com.puppycrawl.tools.checkstyle.api.TokenTypes;
+import org.junit.Test;
 
-public class MethodCountCheckTest extends BaseCheckTestSupport
-{
+public class MethodCountCheckTest extends BaseCheckTestSupport {
+    @Test
+    public void testGetAcceptableTokens() {
+        MethodCountCheck methodCountCheckObj =
+            new MethodCountCheck();
+        int[] actual = methodCountCheckObj.getAcceptableTokens();
+        int[] expected = {
+            TokenTypes.CLASS_DEF,
+            TokenTypes.ENUM_CONSTANT_DEF,
+            TokenTypes.ENUM_DEF,
+            TokenTypes.INTERFACE_DEF,
+            TokenTypes.METHOD_DEF,
+        };
+
+        assertArrayEquals(expected, actual);
+    }
 
     @Test
-    public void testDefaults() throws Exception
-    {
+    public void testDefaults() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(MethodCountCheck.class);
 
@@ -45,8 +60,7 @@ public class MethodCountCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testThrees() throws Exception
-    {
+    public void testThrees() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(MethodCountCheck.class);
         checkConfig.addAttribute("maxPrivate", "3");
@@ -72,8 +86,7 @@ public class MethodCountCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testEnum() throws Exception
-    {
+    public void testEnum() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(MethodCountCheck.class);
         checkConfig.addAttribute("maxPrivate", "0");

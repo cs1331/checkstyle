@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.whitespace;
 
 import com.puppycrawl.tools.checkstyle.api.Check;
@@ -63,8 +64,7 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  *
  * @author maxvetrenko
  */
-public class NoLineWrapCheck extends Check
-{
+public class NoLineWrapCheck extends Check {
 
     /**
      * A key is pointing to the warning message text in "messages.properties"
@@ -73,14 +73,12 @@ public class NoLineWrapCheck extends Check
     public static final String MSG_KEY = "no.line.wrap";
 
     @Override
-    public int[] getDefaultTokens()
-    {
+    public int[] getDefaultTokens() {
         return new int[] {TokenTypes.PACKAGE_DEF, TokenTypes.IMPORT};
     }
 
     @Override
-    public int[] getAcceptableTokens()
-    {
+    public int[] getAcceptableTokens() {
         return new int[] {
             TokenTypes.IMPORT,
             TokenTypes.PACKAGE_DEF,
@@ -93,8 +91,7 @@ public class NoLineWrapCheck extends Check
     }
 
     @Override
-    public void visitToken(DetailAST ast)
-    {
+    public void visitToken(DetailAST ast) {
         if (ast.getLineNo() != ast.getLastChild().getLineNo()) {
             log(ast.getLineNo(), MSG_KEY, ast.getText());
         }

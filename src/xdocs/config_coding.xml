@@ -13,6 +13,7 @@
     <title>Coding</title>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
     <script type="text/javascript" src="js/anchors.js"></script>
+    <script type="text/javascript" src="js/google-analytics.js"></script>
   </head>
 
   <body>
@@ -108,7 +109,7 @@ String b = (a==null || a.length&lt;1) ? null : a.substring(1);
       <subsection name="Description">
         <p>
           Checks that classes that define a covariant <code>equals()</code> method also override method <code>equals(java.lang.Object)</code>.  Inspired by <a
-          href="http://www.cs.nyu.edu/~lharris/papers/findbugsPaper.pdf">findbugs</a>.
+          href="http://www.cs.nyu.edu/~lharris/papers/findbugsPaper.pdf">Finding Bugs is Easy, chapter '2.3.1 Bad Covariant Definition of Equals (Eq)'</a>.
         </p>
 
         <p>
@@ -693,14 +694,14 @@ class SomeClass
     <section name="IllegalToken">
       <subsection name="Description">
         <p>
-          Checks for illegal tokens.
+          Checks for illegal tokens. By default labels are prohibited.
         </p>
 
         <p>
-          Rational: Certain language features often lead to hard-to-maintain
-          code or are not obvious to novice developers. Other features may be
-          discouraged in certain frameworks, such as not having native methods
-          in Enterprise JavaBeans components.
+          Rationale: Certain language features can harm readability, lead to
+          confusion or are not obvious to novice developers. Other features
+          may be discouraged in certain frameworks, such as not having
+          native methods in Enterprise JavaBeans components.
         </p>
       </subsection>
 
@@ -925,9 +926,21 @@ class SomeClass
     <section name="MagicNumber">
       <subsection name="Description">
         <p>
-          Checks that there are no &quot;magic numbers&quot;, where a magic
-          number is a numeric literal that is not defined as a constant. By
-          default, -1, 0, 1, and 2 are not considered to be magic numbers.
+          Checks that there are no <a href="http://en.wikipedia.org/wiki/Magic_number_%28programming%29">
+          &quot;magic numbers&quot;</a> where a magic
+          number is a numeric literal that is not defined as a constant.
+          By default, -1, 0, 1, and 2 are not considered to be magic numbers.
+        </p>
+        <p>
+          It is fine to have one constant defining multiple numeric literals within one expression:
+          <source>
+static final int SECONDS_PER_DAY = 24 * 60 * 60;
+static final double SPECIAL_RATIO = 4.0 / 3.0;
+static final double SPECIAL_SUM = 1 + Math.E;
+static final double SPECIAL_DIFFERENCE = 4 - Math.PI;
+static final Border STANDARD_BORDER = BorderFactory.createEmptyBorder(3, 3, 3, 3);
+static final Integer ANSWER_TO_THE_ULTIMATE_QUESTION_OF_LIFE = new Integer(42);
+          </source>
         </p>
       </subsection>
 
@@ -963,15 +976,35 @@ class SomeClass
             <td><a href="property_types.html#boolean">boolean</a></td>
             <td><span class="default">false</span></td>
           </tr>
+          <tr>
+              <td>ignoreFieldDeclaration</td>
+              <td>ignore magic numbers in field declarations.</td>
+              <td><a href="property_types.html#boolean">boolean</a></td>
+              <td><span class="default">false</span></td>
+          </tr>
         </table>
       </subsection>
 
       <subsection name="Examples">
         <p>
-          To configure the check:
+          To configure the check with default configuration:
         </p>
         <source>
 &lt;module name=&quot;MagicNumber&quot;/&gt;
+        </source>
+        <p>
+          results is following violations:
+        </p>
+        <source>
+@MyAnnotation(6) // violation
+class MyClass {
+    private field = 7; // violation
+
+    void foo() {
+       int i = i + 1; // no violation
+       int j = j + 8; // violation
+    }
+}
         </source>
 
         <p>
@@ -982,8 +1015,25 @@ class SomeClass
 &lt;module name=&quot;MagicNumber&quot;&gt;
     &lt;property name=&quot;tokens&quot; value=&quot;NUM_DOUBLE, NUM_FLOAT&quot;/&gt;
     &lt;property name=&quot;ignoreNumbers&quot; value=&quot;0, 0.5, 1&quot;/&gt;
+    &lt;property name=&quot;ignoreFieldDeclaration&quot; value=&quot;true&quot;/&gt;
+    &lt;property name=&quot;ignoreAnnotation&quot; value=&quot;true&quot;/&gt;
 &lt;/module&gt;
         </source>
+        <p>
+          results is following violations:
+        </p>
+        <source>
+@MyAnnotation(6) // no violation
+class MyClass {
+    private field = 7; // no violation
+
+    void foo() {
+       int i = i + 1; // no violation
+       int j = j + 8; // violation
+    }
+}
+        </source>
+
       </subsection>
 
       <subsection name="Package">
@@ -1040,21 +1090,26 @@ class SomeClass
     <section name="ModifiedControlVariable">
       <subsection name="Description">
         <p>
-          Check for ensuring that for loop control variables are not
-          modified inside the for block. An example is:
+            Check for ensuring that for loop control variables are not modified inside the for block. An example is:
         </p>
-
         <source>
-for (int i = 0; i &lt; 1; i++) {
-    i++;
-}
+           for (int i = 0; i &lt; 1; i++) {
+             i++; //violation
+           }
         </source>
-
+          <p>
+            Rationale: If the control variable is modified inside the loop
+            body, the program flow becomes more difficult to follow.<br/>
+            See <a href="http://docs.oracle.com/javase/specs/jls/se8/html/jls-14.html#jls-14.14">FOR statement</a> specification for more details.
+          </p>
         <p>
-          Rationale: If the control variable is modified inside the loop
-          body, the program flow becomes more difficult to follow. An option
-          is to replace the for loop with a while loop.
+            Such loop would be supressed:
         </p>
+        <source>
+            for (int i = 0; i &lt; 10;) {
+                i++;
+            }
+        </source>
       </subsection>
 
       <subsection name="Example">
@@ -1699,8 +1754,8 @@ if (&quot;something&quot;.equals(x))
     <section name="ReturnCount">
       <subsection name="Description">
         <p>
-          Restricts the number of return statements (2 by default).  Ignores
-          specified methods (<code>equals()</code> by default).
+          Restricts the number of return statements in methods, constructors and lambda expressions
+          (2 by default). Ignores specified methods (<code>equals()</code> by default).
         </p>
 
         <p>
@@ -1716,6 +1771,21 @@ if (&quot;something&quot;.equals(x))
             <th>description</th>
             <th>type</th>
             <th>default value</th>
+          </tr>
+          <tr>
+            <td>tokens</td>
+            <td>tokens to check</td>
+            <td>
+              subset of tokens
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#METHOD_DEF">METHOD_DEF</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#CTOR_DEF">CTOR_DEF</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LAMBDA">LAMBDA</a>
+            </td>
+            <td>
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#METHOD_DEF">METHOD_DEF</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#CTOR_DEF">CTOR_DEF</a>,
+              <a href="apidocs/com/puppycrawl/tools/checkstyle/api/TokenTypes.html#LAMBDA">LAMBDA</a>
+            </td>
           </tr>
           <tr>
             <td>max</td>
@@ -1752,6 +1822,26 @@ if (&quot;something&quot;.equals(x))
 &lt;module name=&quot;ReturnCount&quot;&gt;
     &lt;property name=&quot;max&quot; value=&quot;3&quot;/&gt;
     &lt;property name=&quot;format&quot; value=&quot;^$&quot;/&gt;
+&lt;/module&gt;
+        </source>
+
+        <p>
+          To configure the check so that it doesn't allow any return statements
+          in constructors, more than one return statement in all lambda
+          expressions and more than two return statements in methods:
+        </p>
+        <source>
+&lt;module name=&quot;ReturnCount&quot;&gt;
+    &lt;property name=&quot;max&quot; value=&quot;0&quot;/&gt;
+    &lt;property name=&quot;tokens&quot; value=&quot;CTOR_DEF&quot;/&gt;
+&lt;/module&gt;
+&lt;module name=&quot;ReturnCount&quot;&gt;
+    &lt;property name=&quot;max&quot; value=&quot;1&quot;/&gt;
+    &lt;property name=&quot;tokens&quot; value=&quot;LAMBDA&quot;/&gt;
+&lt;/module&gt;
+&lt;module name=&quot;ReturnCount&quot;&gt;
+    &lt;property name=&quot;max&quot; value=&quot;2&quot;/&gt;
+    &lt;property name=&quot;tokens&quot; value=&quot;METHOD_DEF&quot;/&gt;
 &lt;/module&gt;
         </source>
       </subsection>

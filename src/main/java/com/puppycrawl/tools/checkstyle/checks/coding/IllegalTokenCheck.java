@@ -16,8 +16,10 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
+import com.puppycrawl.tools.checkstyle.Utils;
 import com.puppycrawl.tools.checkstyle.api.Check;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
@@ -25,11 +27,11 @@ import java.util.Set;
 
 /**
  * <p>
- * Checks for illegal tokens.
+ * Checks for illegal tokens. By default labels are prohibited.
  * </p>
  * <p>
- * Rational: Certain language features are often lead to hard to
- * maintain code or are non-obvious to novice developers. Others
+ * Rationale: Certain language features can harm readability, lead to
+ * confusion or are not obvious to novice developers. Other features
  * may be discouraged in certain frameworks, such as not having
  * native methods in EJB components.
  * </p>
@@ -51,8 +53,7 @@ import java.util.Set;
  * @author Rick Giles
  */
 public class IllegalTokenCheck
-    extends Check
-{
+    extends Check {
 
     /**
      * A key is pointing to the warning message text in "messages.properties"
@@ -61,18 +62,14 @@ public class IllegalTokenCheck
     public static final String MSG_KEY = "illegal.token";
 
     @Override
-    public int[] getDefaultTokens()
-    {
+    public int[] getDefaultTokens() {
         return new int[] {
-            TokenTypes.LITERAL_SWITCH,
-            TokenTypes.POST_INC,
-            TokenTypes.POST_DEC,
+            TokenTypes.LABELED_STAT,
         };
     }
 
     @Override
-    public int[] getAcceptableTokens()
-    {
+    public int[] getAcceptableTokens() {
         // Any tokens set by property 'tokens' are acceptable
         int[] tokensToCopy = getDefaultTokens();
         final Set<String> tokenNames = getTokenNames();
@@ -80,7 +77,7 @@ public class IllegalTokenCheck
             tokensToCopy = new int[tokenNames.size()];
             int i = 0;
             for (String name : tokenNames) {
-                tokensToCopy[i] = TokenTypes.getTokenId(name);
+                tokensToCopy[i] = Utils.getTokenId(name);
                 i++;
             }
         }
@@ -90,13 +87,29 @@ public class IllegalTokenCheck
     }
 
     @Override
-    public void visitToken(DetailAST ast)
-    {
+    public void visitToken(DetailAST ast) {
         log(
             ast.getLineNo(),
             ast.getColumnNo(),
             MSG_KEY,
-            ast.getText());
+            convertToString(ast)
+        );
+    }
+
+    /**
+     * Converts given AST node to string representation.
+     * @param ast node to be represented as string
+     * @return string representation of AST node
+     */
+    private String convertToString(DetailAST ast) {
+        final String tokenText;
+        if (ast.getType() == TokenTypes.LABELED_STAT) {
+            tokenText = ast.getFirstChild().getText() + ast.getText();
+        }
+        else {
+            tokenText = ast.getText();
+        }
+        return tokenText;
     }
 
 }

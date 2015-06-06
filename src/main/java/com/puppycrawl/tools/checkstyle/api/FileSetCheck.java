@@ -16,11 +16,12 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.api;
 
 import java.io.File;
 import java.util.List;
-import java.util.TreeSet;
+import java.util.SortedSet;
 
 /**
  * Interface for Checking a set of files for some criteria.
@@ -29,8 +30,7 @@ import java.util.TreeSet;
  * @author oliver
  */
 public interface FileSetCheck
-    extends Configurable, Contextualizable
-{
+    extends Configurable, Contextualizable {
     /**
      * Sets the MessageDispatcher that is used to dispatch error
      * messages to AuditListeners during processing.
@@ -69,9 +69,9 @@ public interface FileSetCheck
      *
      * @param file the file to be processed
      * @param lines an immutable list of the contents of the file.
-     * @return the list of messages to be logged.
+     * @return the sorted set of messages to be logged.
      */
-    TreeSet<LocalizedMessage> process(File file, List<String> lines);
+    SortedSet<LocalizedMessage> process(File file, List<String> lines);
 
     /**
      * Called when all the files have been processed. This is the time to

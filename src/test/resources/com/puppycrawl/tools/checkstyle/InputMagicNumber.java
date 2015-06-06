@@ -136,9 +136,9 @@ class ComplexAndFlagged
 class ComplexButNotFlagged
 {
     // according to user feedback this is typical code that should not be flagged
-    // (at least in the default configuration of MagicNumberCheck)
+    public static final double SPECIAL_SUM = 2 + 1e10, SPECIAL_DIFFERENCE = 4 - java.lang.Math.PI;
     public static final Integer DEFAULT_INT = new Integer(27);
-    public static final int SECS_PER_DAY = 24 * 60 * 60;
+    public static final int SECS_PER_DAY = 24 * 60 * 60, SPECIAL_RATIO = 4 / 3;
     public static final javax.swing.border.Border STD_BORDER =
         javax.swing.BorderFactory.createEmptyBorder(3, 3, 3, 3);
 }
@@ -185,5 +185,16 @@ class TestHashCodeMethod {
     @IntMethodAnnotation(42)
     public void another() {
     }
+
+    @IntMethodAnnotation(value=43)
+    public void another2() {
+    }
     
+    @IntMethodAnnotation(-44)
+    public void anotherNegative() {
+    }
+
+    @IntMethodAnnotation(value=-45)
+    public void anotherNegative2() {
+    }
 }

@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.grammars;
 
 /**
@@ -24,8 +25,7 @@ package com.puppycrawl.tools.checkstyle.grammars;
  *
  * @author o_sukhodolsky
  */
-public interface CommentListener
-{
+public interface CommentListener {
     /**
      * Report the location of a single line comment that extends from the
      * given point to the end of the line. The type of comment is identified

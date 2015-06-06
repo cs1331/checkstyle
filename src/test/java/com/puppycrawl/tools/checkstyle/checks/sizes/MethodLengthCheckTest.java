@@ -16,19 +16,32 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.sizes;
 
+import static com.puppycrawl.tools.checkstyle.checks.sizes.MethodLengthCheck.MSG_KEY;
+import static org.junit.Assert.assertArrayEquals;
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
+import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import org.junit.Test;
 
-import static com.puppycrawl.tools.checkstyle.checks.sizes.MethodLengthCheck.MSG_KEY;
-
-public class MethodLengthCheckTest extends BaseCheckTestSupport
-{
+public class MethodLengthCheckTest extends BaseCheckTestSupport {
     @Test
-    public void testIt() throws Exception
-    {
+    public void testGetAcceptableTokens() {
+        MethodLengthCheck methodLengthCheckObj =
+            new MethodLengthCheck();
+        int[] actual = methodLengthCheckObj.getAcceptableTokens();
+        int[] expected = {
+            TokenTypes.METHOD_DEF,
+            TokenTypes.CTOR_DEF,
+        };
+
+        assertArrayEquals(expected, actual);
+    }
+
+    @Test
+    public void testIt() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(MethodLengthCheck.class);
         checkConfig.addAttribute("max", "19");
@@ -39,8 +52,7 @@ public class MethodLengthCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testcountEmpty() throws Exception
-    {
+    public void testcountEmpty() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(MethodLengthCheck.class);
         checkConfig.addAttribute("max", "19");
@@ -51,8 +63,7 @@ public class MethodLengthCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testAbstract() throws Exception
-    {
+    public void testAbstract() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(MethodLengthCheck.class);
         final String[] expected = {

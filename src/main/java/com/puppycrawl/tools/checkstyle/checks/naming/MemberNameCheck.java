@@ -16,10 +16,11 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.naming;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import com.puppycrawl.tools.checkstyle.api.ScopeUtils;
+import com.puppycrawl.tools.checkstyle.ScopeUtils;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
 /**
@@ -49,29 +50,24 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  * @author Rick Giles
  */
 public class MemberNameCheck
-    extends AbstractAccessControlNameCheck
-{
+    extends AbstractAccessControlNameCheck {
     /** Creates a new <code>MemberNameCheck</code> instance. */
-    public MemberNameCheck()
-    {
+    public MemberNameCheck() {
         super("^[a-z][a-zA-Z0-9]*$");
     }
 
     @Override
-    public int[] getDefaultTokens()
-    {
+    public int[] getDefaultTokens() {
         return new int[] {TokenTypes.VARIABLE_DEF};
     }
 
     @Override
-    public int[] getAcceptableTokens()
-    {
+    public int[] getAcceptableTokens() {
         return new int[] {TokenTypes.VARIABLE_DEF};
     }
 
     @Override
-    protected final boolean mustCheckName(DetailAST ast)
-    {
+    protected final boolean mustCheckName(DetailAST ast) {
         final DetailAST modifiersAST =
             ast.findFirstToken(TokenTypes.MODIFIERS);
         final boolean isStatic = modifiersAST != null

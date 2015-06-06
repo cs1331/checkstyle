@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.header;
 
 import java.io.BufferedInputStream;
@@ -41,14 +42,14 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.puppycrawl.tools.checkstyle.api.AbstractFileSetCheck;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Abstract super class for header checks.
  * Provides support for header and headerFile properties.
  * @author o_sukhosolsky
  */
-public abstract class AbstractHeaderCheck extends AbstractFileSetCheck
-{
+public abstract class AbstractHeaderCheck extends AbstractFileSetCheck {
     /** The file that contains the header to check against. */
     private String filename;
 
@@ -63,8 +64,7 @@ public abstract class AbstractHeaderCheck extends AbstractFileSetCheck
      * Return the header lines to check against.
      * @return the header lines to check against.
      */
-    protected ImmutableList<String> getHeaderLines()
-    {
+    protected ImmutableList<String> getHeaderLines() {
         return ImmutableList.copyOf(readerLines);
     }
 
@@ -73,8 +73,7 @@ public abstract class AbstractHeaderCheck extends AbstractFileSetCheck
      * @param charset the charset to use for loading the header from a file
      * @throws UnsupportedEncodingException if charset is unsupported
      */
-    public void setCharset(String charset) throws UnsupportedEncodingException
-    {
+    public void setCharset(String charset) throws UnsupportedEncodingException {
         if (!Charset.isSupported(charset)) {
             final String message = "unsupported charset: '" + charset + "'";
             throw new UnsupportedEncodingException(message);
@@ -86,10 +85,9 @@ public abstract class AbstractHeaderCheck extends AbstractFileSetCheck
      * Set the header file to check against.
      * @param fileName the file that contains the header to check against.
      */
-    public void setHeaderFile(String fileName)
-    {
+    public void setHeaderFile(String fileName) {
         // Handle empty param
-        if (fileName == null || fileName.trim().length() == 0) {
+        if (StringUtils.isBlank(fileName)) {
             return;
         }
 
@@ -100,8 +98,7 @@ public abstract class AbstractHeaderCheck extends AbstractFileSetCheck
      * Load the header from a file.
      * @throws CheckstyleException if the file cannot be loaded
      */
-    private void loadHeaderFile() throws CheckstyleException
-    {
+    private void loadHeaderFile() throws CheckstyleException {
         checkHeaderNotInitialized();
         Reader headerReader = null;
         try {
@@ -124,8 +121,7 @@ public abstract class AbstractHeaderCheck extends AbstractFileSetCheck
      * @return resolved header file URI
      * @throws IOException on failure
      */
-    private URI resolveHeaderFile() throws IOException
-    {
+    private URI resolveHeaderFile() throws IOException {
         // figure out if this is a File or a URL
         URI uri;
         try {
@@ -166,8 +162,7 @@ public abstract class AbstractHeaderCheck extends AbstractFileSetCheck
      * Called before initializing the header.
      * @throws ConversionException if header has already been set
      */
-    private void checkHeaderNotInitialized()
-    {
+    private void checkHeaderNotInitialized() {
         if (!readerLines.isEmpty()) {
             throw new ConversionException(
                     "header has already been set - "
@@ -181,9 +176,8 @@ public abstract class AbstractHeaderCheck extends AbstractFileSetCheck
      * @param header header content to check against.
      * @throws ConversionException if the header cannot be interpreted
      */
-    public void setHeader(String header)
-    {
-        if (header == null || header.trim().length() == 0) {
+    public void setHeader(String header) {
+        if (StringUtils.isBlank(header)) {
             return;
         }
 
@@ -208,8 +202,7 @@ public abstract class AbstractHeaderCheck extends AbstractFileSetCheck
      * @param headerReader delivers the header to check against
      * @throws IOException if
      */
-    private void loadHeader(final Reader headerReader) throws IOException
-    {
+    private void loadHeader(final Reader headerReader) throws IOException {
         final LineNumberReader lnr = new LineNumberReader(headerReader);
         readerLines.clear();
         while (true) {
@@ -226,13 +219,11 @@ public abstract class AbstractHeaderCheck extends AbstractFileSetCheck
      * Hook method for post processing header lines.
      * This implementation does nothing.
      */
-    protected void postprocessHeaderLines()
-    {
+    protected void postprocessHeaderLines() {
     }
 
     @Override
-    protected final void finishLocalSetup() throws CheckstyleException
-    {
+    protected final void finishLocalSetup() throws CheckstyleException {
         if (filename != null) {
             loadHeaderFile();
         }

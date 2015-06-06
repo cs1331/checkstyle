@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle;
 
 import java.io.OutputStream;
@@ -40,13 +41,16 @@ import com.puppycrawl.tools.checkstyle.api.SeverityLevel;
  */
 public class XMLLogger
     extends AutomaticBean
-    implements AuditListener
-{
+    implements AuditListener {
     /** decimal radix */
     private static final int BASE_10 = 10;
 
     /** hex radix */
     private static final int BASE_16 = 16;
+
+    /** some known entities to detect */
+    private static final String[] ENTITIES = {"gt", "amp", "lt", "apos",
+                                              "quot", };
 
     /** close output stream in auditFinished */
     private boolean closeStream;
@@ -54,18 +58,13 @@ public class XMLLogger
     /** helper writer that allows easy encoding and printing */
     private PrintWriter writer;
 
-    /** some known entities to detect */
-    private static final String[] ENTITIES = {"gt", "amp", "lt", "apos",
-                                              "quot", };
-
     /**
      * Creates a new <code>XMLLogger</code> instance.
      * Sets the output to a defined stream.
      * @param os the stream to write logs to.
      * @param closeStream close oS in auditFinished
      */
-    public XMLLogger(OutputStream os, boolean closeStream)
-    {
+    public XMLLogger(OutputStream os, boolean closeStream) {
         setOutputStream(os);
         this.closeStream = closeStream;
     }
@@ -74,8 +73,7 @@ public class XMLLogger
      * sets the OutputStream
      * @param oS the OutputStream to use
      **/
-    private void setOutputStream(OutputStream oS)
-    {
+    private void setOutputStream(OutputStream oS) {
         try {
             final OutputStreamWriter osw = new OutputStreamWriter(oS, "UTF-8");
             writer = new PrintWriter(osw);
@@ -88,8 +86,7 @@ public class XMLLogger
 
     /** {@inheritDoc} */
     @Override
-    public void auditStarted(AuditEvent evt)
-    {
+    public void auditStarted(AuditEvent evt) {
         writer.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 
         final ResourceBundle compilationProperties =
@@ -102,8 +99,7 @@ public class XMLLogger
 
     /** {@inheritDoc} */
     @Override
-    public void auditFinished(AuditEvent evt)
-    {
+    public void auditFinished(AuditEvent evt) {
         writer.println("</checkstyle>");
         if (closeStream) {
             writer.close();
@@ -115,22 +111,19 @@ public class XMLLogger
 
     /** {@inheritDoc} */
     @Override
-    public void fileStarted(AuditEvent evt)
-    {
+    public void fileStarted(AuditEvent evt) {
         writer.println("<file name=\"" + encode(evt.getFileName()) + "\">");
     }
 
     /** {@inheritDoc} */
     @Override
-    public void fileFinished(AuditEvent evt)
-    {
+    public void fileFinished(AuditEvent evt) {
         writer.println("</file>");
     }
 
     /** {@inheritDoc} */
     @Override
-    public void addError(AuditEvent evt)
-    {
+    public void addError(AuditEvent evt) {
         if (SeverityLevel.IGNORE != evt.getSeverityLevel()) {
             writer.print("<error" + " line=\"" + evt.getLine() + "\"");
             if (evt.getColumn() > 0) {
@@ -150,8 +143,7 @@ public class XMLLogger
 
     /** {@inheritDoc} */
     @Override
-    public void addException(AuditEvent evt, Throwable throwable)
-    {
+    public void addException(AuditEvent evt, Throwable throwable) {
         final StringWriter sw = new StringWriter();
         final PrintWriter pw = new PrintWriter(sw);
         pw.println("<exception>");
@@ -168,8 +160,7 @@ public class XMLLogger
      * @param value the value to escape.
      * @return the escaped value if necessary.
      */
-    public String encode(String value)
-    {
+    public String encode(String value) {
         final StringBuilder sb = new StringBuilder();
         for (int i = 0; i < value.length(); i++) {
             final char c = value.charAt(i);
@@ -187,10 +178,9 @@ public class XMLLogger
                     sb.append("&quot;");
                     break;
                 case '&':
-                    final int nextSemi = value.indexOf(";", i);
+                    final int nextSemi = value.indexOf(';', i);
                     if (nextSemi < 0
-                        || !isReference(value.substring(i, nextSemi + 1)))
-                    {
+                        || !isReference(value.substring(i, nextSemi + 1))) {
                         sb.append("&amp;");
                     }
                     else {
@@ -206,12 +196,11 @@ public class XMLLogger
     }
 
     /**
-     * @return whether the given argument a character or entity reference
      * @param ent the possible entity to look for.
+     * @return whether the given argument a character or entity reference
      */
-    public boolean isReference(String ent)
-    {
-        if (!(ent.charAt(0) == '&') || !ent.endsWith(";")) {
+    public boolean isReference(String ent) {
+        if (ent.charAt(0) != '&' || !Utils.endsWithChar(ent, ';')) {
             return false;
         }
 

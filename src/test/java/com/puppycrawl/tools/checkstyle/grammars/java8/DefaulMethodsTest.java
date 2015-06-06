@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.grammars.java8;
 
 import java.io.File;
@@ -26,13 +27,11 @@ import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.checks.naming.MemberNameCheck;
 
-public class DefaulMethodsTest extends BaseCheckTestSupport
-{
+public class DefaulMethodsTest extends BaseCheckTestSupport {
 
     @Test
     public void testCanParse()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
                 createCheckConfig(MemberNameCheck.class);
         final String[] expected = {};
@@ -46,8 +45,7 @@ public class DefaulMethodsTest extends BaseCheckTestSupport
 
     @Test
     public void testSwitch()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
                 createCheckConfig(MemberNameCheck.class);
         final String[] expected = {};

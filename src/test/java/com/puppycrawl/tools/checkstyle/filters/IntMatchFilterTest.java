@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.filters;
 
 import static org.junit.Assert.assertEquals;
@@ -24,11 +25,9 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 /** Tests IntMatchFilter */
-public class IntMatchFilterTest
-{
+public class IntMatchFilterTest {
     @Test
-    public void testDecide()
-    {
+    public void testDecide() {
         final IntFilter filter = new IntMatchFilter(0);
         assertFalse("less than", filter.accept(Integer.valueOf(-1)));
         assertTrue("equal", filter.accept(Integer.valueOf(0)));
@@ -36,8 +35,7 @@ public class IntMatchFilterTest
     }
 
     @Test
-    public void testEquals()
-    {
+    public void testEquals() {
         final IntFilter filter = new IntMatchFilter(0);
         final IntFilter filter2 = new IntMatchFilter(0);
         final IntFilter filter3 = new IntMatchFilter(1);

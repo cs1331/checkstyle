@@ -16,7 +16,10 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.api;
+
+import java.util.Locale;
 
 /**
  * <p>
@@ -29,9 +32,9 @@ package com.puppycrawl.tools.checkstyle.api;
  *
  * @author David Schneider
  * @author Travis Schneeberger
+ * @author Mehmet Can Cömert
  */
-public enum SeverityLevel
-{
+public enum SeverityLevel {
     /** security level ignore. */
     IGNORE,
     /** security level info. */
@@ -42,17 +45,15 @@ public enum SeverityLevel
     ERROR;
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return getName();
     }
 
     /**
      * @return the name of this severity level.
      */
-    public String getName()
-    {
-        return name().toLowerCase();
+    public String getName() {
+        return name().toLowerCase(Locale.ENGLISH);
     }
 
     /**
@@ -62,9 +63,8 @@ public enum SeverityLevel
      * @return the <code>SeverityLevel</code>
      * associated with <code>securityLevelName</code>
      */
-    public static SeverityLevel getInstance(String securityLevelName)
-    {
+    public static SeverityLevel getInstance(String securityLevelName) {
         return valueOf(SeverityLevel.class, securityLevelName.trim()
-                .toUpperCase());
+                .toUpperCase(Locale.ENGLISH));
     }
 }

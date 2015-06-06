@@ -16,9 +16,11 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.design;
 
 import java.util.Map;
+import java.util.SortedMap;
 import java.util.TreeMap;
 
 import com.puppycrawl.tools.checkstyle.api.Check;
@@ -75,10 +77,13 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  * }
  * </code></pre>
  *
+ * <p> ATTENTION: This Check does not support customization of validated tokens,
+ *  so do not use the "tokens" property.
+ * </p>
+ *
  * @author maxvetrenko
  */
-public class OneTopLevelClassCheck extends Check
-{
+public class OneTopLevelClassCheck extends Check {
 
     /**
      * A key is pointing to the warning message text in "messages.properties"
@@ -93,30 +98,35 @@ public class OneTopLevelClassCheck extends Check
     private boolean publicTypeFound;
 
     /** Mapping between type names and line numbers of the type declarations.*/
-    private TreeMap<Integer, String> lineNumberTypeMap = new TreeMap<>();
+    private SortedMap<Integer, String> lineNumberTypeMap = new TreeMap<>();
 
     @Override
-    public int[] getDefaultTokens()
-    {
+    public int[] getDefaultTokens() {
+        return getAcceptableTokens();
+    }
+
+    // ZERO tokens as Check do Traverse of Tree himself, he does not need to subscribed to Tokens
+    @Override
+    public int[] getAcceptableTokens() {
         return new int[] {};
     }
 
     @Override
-    public void beginTree(DetailAST rootAST)
-    {
+    public void beginTree(DetailAST rootAST) {
+        publicTypeFound = false;
+        lineNumberTypeMap.clear();
+
         DetailAST currentNode = rootAST;
         while (currentNode != null) {
             if (currentNode.getType() == TokenTypes.CLASS_DEF
                     || currentNode.getType() == TokenTypes.ENUM_DEF
-                    || currentNode.getType() == TokenTypes.INTERFACE_DEF)
-            {
+                    || currentNode.getType() == TokenTypes.INTERFACE_DEF) {
                 if (isPublic(currentNode)) {
                     publicTypeFound = true;
                 }
-
                 else {
-                    final String typeName = currentNode.
-                            findFirstToken(TokenTypes.IDENT).getText();
+                    final String typeName = currentNode
+                            .findFirstToken(TokenTypes.IDENT).getText();
                     lineNumberTypeMap.put(currentNode.getLineNo(), typeName);
                 }
             }
@@ -125,21 +135,18 @@ public class OneTopLevelClassCheck extends Check
     }
 
     @Override
-    public void finishTree(DetailAST rootAST)
-    {
-        if (!publicTypeFound && !lineNumberTypeMap.isEmpty()) {
-            // skip first top-level type.
-            lineNumberTypeMap.remove(lineNumberTypeMap.firstKey());
-        }
+    public void finishTree(DetailAST rootAST) {
+        if (!lineNumberTypeMap.isEmpty()) {
+            if (!publicTypeFound) {
+                // skip first top-level type.
+                lineNumberTypeMap.remove(lineNumberTypeMap.firstKey());
+            }
 
-        for (Map.Entry<Integer, String> entry
-                : lineNumberTypeMap.entrySet())
-        {
-            log(entry.getKey(), MSG_KEY, entry.getValue());
+            for (Map.Entry<Integer, String> entry
+                    : lineNumberTypeMap.entrySet()) {
+                log(entry.getKey(), MSG_KEY, entry.getValue());
+            }
         }
-
-        lineNumberTypeMap.clear();
-        publicTypeFound = false;
     }
 
     /**
@@ -147,8 +154,7 @@ public class OneTopLevelClassCheck extends Check
      * @param typeDef type definition node.
      * @return true if a type has a public access level modifier.
      */
-    private boolean isPublic(DetailAST typeDef)
-    {
+    private boolean isPublic(DetailAST typeDef) {
         final DetailAST modifiers =
                 typeDef.findFirstToken(TokenTypes.MODIFIERS);
         return modifiers.findFirstToken(TokenTypes.LITERAL_PUBLIC) != null;

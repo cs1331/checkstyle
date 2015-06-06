@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.api;
 
 import com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocNodeImpl;
@@ -29,8 +30,7 @@ import com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocNodeImpl;
  * @see JavadocNodeImpl
  * @see com.puppycrawl.tools.checkstyle.checks.javadoc.AbstractJavadocCheck
  */
-public interface DetailNode
-{
+public interface DetailNode {
     /**
      * Node type.
      * @return node type.

@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
@@ -26,19 +27,16 @@ import org.junit.Test;
 import static com.puppycrawl.tools.checkstyle.checks.coding.MissingSwitchDefaultCheck.MSG_KEY;
 
 public class MissingSwitchDefaultCheckTest
-    extends BaseCheckTestSupport
-{
+    extends BaseCheckTestSupport {
     private DefaultConfiguration checkConfig;
 
     @Before
-    public void setUp()
-    {
+    public void setUp() {
         checkConfig = createCheckConfig(MissingSwitchDefaultCheck.class);
     }
 
     @Test
-    public void testMissingSwitchDefault() throws Exception
-    {
+    public void testMissingSwitchDefault() throws Exception {
         final String[] expected = {
             "17:9: " + getCheckMessage(MSG_KEY, "default"),
         };

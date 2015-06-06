@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.javadoc;
 
 import java.util.ArrayList;
@@ -40,8 +41,7 @@ import com.puppycrawl.tools.checkstyle.api.JavadocTokenTypes;
  * @author max
  *
  */
-public class JavadocTagContinuationIndentationCheck extends AbstractJavadocCheck
-{
+public class JavadocTagContinuationIndentationCheck extends AbstractJavadocCheck {
 
     /**
      * A key is pointing to the warning message text in "messages.properties"
@@ -61,34 +61,29 @@ public class JavadocTagContinuationIndentationCheck extends AbstractJavadocCheck
      * Sets custom indentation level.
      * @param offset custom value.
      */
-    public void setOffset(int offset)
-    {
+    public void setOffset(int offset) {
         this.offset = offset;
     }
 
     @Override
-    public int[] getDefaultJavadocTokens()
-    {
+    public int[] getDefaultJavadocTokens() {
         return new int[] {JavadocTokenTypes.DESCRIPTION };
     }
 
     @Override
-    public void visitJavadocToken(DetailNode ast)
-    {
-        final List<DetailNode> textNodes = getAllNewlineNodes(ast);
+    public void visitJavadocToken(DetailNode ast) {
         if (isInlineDescription(ast)) {
             return;
         }
+        final List<DetailNode> textNodes = getAllNewlineNodes(ast);
         for (DetailNode newlineNode : textNodes) {
             final DetailNode textNode = JavadocUtils.getNextSibling(JavadocUtils
                     .getNextSibling(newlineNode));
             if (textNode != null && textNode.getType() == JavadocTokenTypes.TEXT
-                    && textNode.getChildren().length > 1)
-            {
+                    && textNode.getChildren().length > 1) {
                 final DetailNode whitespace = JavadocUtils.getFirstChild(textNode);
                 if (whitespace.getType() == JavadocTokenTypes.WS
-                        && whitespace.getText().length() - 1 < offset)
-                {
+                        && whitespace.getText().length() - 1 < offset) {
                     log(textNode.getLineNumber(), MSG_KEY, offset);
                 }
             }
@@ -100,8 +95,7 @@ public class JavadocTagContinuationIndentationCheck extends AbstractJavadocCheck
      * @param descriptionNode DESCRIPTION node.
      * @return List with NEWLINE nodes.
      */
-    private List<DetailNode> getAllNewlineNodes(DetailNode descriptionNode)
-    {
+    private List<DetailNode> getAllNewlineNodes(DetailNode descriptionNode) {
         final List<DetailNode> textNodes = new ArrayList<>();
         DetailNode node = JavadocUtils.getFirstChild(descriptionNode);
         while (JavadocUtils.getNextSibling(node) != null) {
@@ -118,8 +112,7 @@ public class JavadocTagContinuationIndentationCheck extends AbstractJavadocCheck
      * @param description DESCRIPTION node.
      * @return true, if description node is a description of in-line tag.
      */
-    private boolean isInlineDescription(DetailNode description)
-    {
+    private boolean isInlineDescription(DetailNode description) {
         DetailNode inlineTag = description.getParent();
         while (inlineTag != null) {
             if (inlineTag.getType() == JavadocTokenTypes.JAVADOC_INLINE_TAG) {

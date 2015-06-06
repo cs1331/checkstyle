@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.imports;
 
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
@@ -26,11 +27,9 @@ import org.junit.Test;
 import static com.puppycrawl.tools.checkstyle.checks.imports.ImportOrderCheck.MSG_ORDERING;
 import static com.puppycrawl.tools.checkstyle.checks.imports.ImportOrderCheck.MSG_SEPARATION;
 
-public class ImportOrderCheckTest extends BaseCheckTestSupport
-{
+public class ImportOrderCheckTest extends BaseCheckTestSupport {
     @Test
-    public void testDefault() throws Exception
-    {
+    public void testDefault() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(ImportOrderCheck.class);
         final String[] expected = {
@@ -44,8 +43,7 @@ public class ImportOrderCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testGroups() throws Exception
-    {
+    public void testGroups() throws Exception {
         final DefaultConfiguration checkConfig = createCheckConfig(ImportOrderCheck.class);
         checkConfig.addAttribute("groups", "java.awt");
         checkConfig.addAttribute("groups", "javax.swing");
@@ -60,8 +58,7 @@ public class ImportOrderCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testGroupsRegexp() throws Exception
-    {
+    public void testGroupsRegexp() throws Exception {
         final DefaultConfiguration checkConfig = createCheckConfig(ImportOrderCheck.class);
         checkConfig.addAttribute("groups", "java, /^javax?\\.(awt|swing)\\./");
         checkConfig.addAttribute("ordered", "false");
@@ -73,8 +70,7 @@ public class ImportOrderCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testSeparated() throws Exception
-    {
+    public void testSeparated() throws Exception {
         final DefaultConfiguration checkConfig = createCheckConfig(ImportOrderCheck.class);
         checkConfig.addAttribute("groups", "java.awt, javax.swing, java.io");
         checkConfig.addAttribute("separated", "true");
@@ -89,8 +85,7 @@ public class ImportOrderCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testCaseInsensitive() throws Exception
-    {
+    public void testCaseInsensitive() throws Exception {
         final DefaultConfiguration checkConfig = createCheckConfig(ImportOrderCheck.class);
         checkConfig.addAttribute("caseSensitive", "false");
         final String[] expected = {
@@ -100,8 +95,7 @@ public class ImportOrderCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testTop() throws Exception
-    {
+    public void testTop() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(ImportOrderCheck.class);
         checkConfig.addAttribute("option", "top");
@@ -114,8 +108,7 @@ public class ImportOrderCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testAbove() throws Exception
-    {
+    public void testAbove() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(ImportOrderCheck.class);
         checkConfig.addAttribute("option", "above");
@@ -130,8 +123,7 @@ public class ImportOrderCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testInFlow() throws Exception
-    {
+    public void testInFlow() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(ImportOrderCheck.class);
         checkConfig.addAttribute("option", "inflow");
@@ -149,8 +141,7 @@ public class ImportOrderCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testUnder() throws Exception
-    {
+    public void testUnder() throws Exception {
         // is default (testDefault)
         final DefaultConfiguration checkConfig =
             createCheckConfig(ImportOrderCheck.class);
@@ -165,8 +156,7 @@ public class ImportOrderCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testBottom() throws Exception
-    {
+    public void testBottom() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(ImportOrderCheck.class);
         checkConfig.addAttribute("option", "bottom");
@@ -180,8 +170,7 @@ public class ImportOrderCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testHonorsTokenProperty() throws Exception
-    {
+    public void testHonorsTokenProperty() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(ImportOrderCheck.class);
         checkConfig.addAttribute("tokens", "IMPORT");
@@ -193,8 +182,7 @@ public class ImportOrderCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testWildcard() throws Exception
-    {
+    public void testWildcard() throws Exception {
         final DefaultConfiguration checkConfig = createCheckConfig(ImportOrderCheck.class);
         checkConfig.addAttribute("groups", "com,*,java");
         final String[] expected = {
@@ -205,8 +193,7 @@ public class ImportOrderCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testWildcardUnspecified() throws Exception
-    {
+    public void testWildcardUnspecified() throws Exception {
         final DefaultConfiguration checkConfig = createCheckConfig(ImportOrderCheck.class);
 
         /*
@@ -220,8 +207,7 @@ public class ImportOrderCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testNoFailureForRedundantImports() throws Exception
-    {
+    public void testNoFailureForRedundantImports() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(ImportOrderCheck.class);
         final String[] expected = {};
@@ -229,8 +215,7 @@ public class ImportOrderCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testStaticGroupsAlphabeticalOrder() throws Exception
-    {
+    public void testStaticGroupsAlphabeticalOrder() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(ImportOrderCheck.class);
         checkConfig.addAttribute("option", "top");
@@ -241,8 +226,7 @@ public class ImportOrderCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testStaticGroupsOrder() throws Exception
-    {
+    public void testStaticGroupsOrder() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(ImportOrderCheck.class);
         checkConfig.addAttribute("option", "top");
@@ -254,8 +238,7 @@ public class ImportOrderCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testStaticGroupsAlphabeticalOrderBottom() throws Exception
-    {
+    public void testStaticGroupsAlphabeticalOrderBottom() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(ImportOrderCheck.class);
         checkConfig.addAttribute("option", "bottom");
@@ -266,8 +249,7 @@ public class ImportOrderCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testStaticGroupsOrderBottom() throws Exception
-    {
+    public void testStaticGroupsOrderBottom() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(ImportOrderCheck.class);
         checkConfig.addAttribute("option", "bottom");
@@ -279,8 +261,7 @@ public class ImportOrderCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testStaticGroupsOrderAbove() throws Exception
-    {
+    public void testStaticGroupsOrderAbove() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(ImportOrderCheck.class);
         checkConfig.addAttribute("option", "above");
@@ -294,8 +275,7 @@ public class ImportOrderCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testStaticOnDemandGroupsOrder() throws Exception
-    {
+    public void testStaticOnDemandGroupsOrder() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(ImportOrderCheck.class);
         checkConfig.addAttribute("option", "top");
@@ -308,8 +288,7 @@ public class ImportOrderCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testStaticOnDemandGroupsAlphabeticalOrder() throws Exception
-    {
+    public void testStaticOnDemandGroupsAlphabeticalOrder() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(ImportOrderCheck.class);
         checkConfig.addAttribute("option", "top");
@@ -321,8 +300,7 @@ public class ImportOrderCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testStaticOnDemandGroupsOrderBottom() throws Exception
-    {
+    public void testStaticOnDemandGroupsOrderBottom() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(ImportOrderCheck.class);
         checkConfig.addAttribute("option", "bottom");
@@ -335,8 +313,7 @@ public class ImportOrderCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testStaticOnDemandGroupsAlphabeticalOrderBottom() throws Exception
-    {
+    public void testStaticOnDemandGroupsAlphabeticalOrderBottom() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(ImportOrderCheck.class);
         checkConfig.addAttribute("option", "bottom");
@@ -348,8 +325,7 @@ public class ImportOrderCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testStaticOnDemandGroupsOrderAbove() throws Exception
-    {
+    public void testStaticOnDemandGroupsOrderAbove() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(ImportOrderCheck.class);
         checkConfig.addAttribute("option", "above");

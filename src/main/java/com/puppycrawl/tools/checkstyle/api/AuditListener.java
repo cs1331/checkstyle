@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.api;
 
 import java.util.EventListener;
@@ -34,8 +35,7 @@ import java.util.EventListener;
  * @author <a href="mailto:stephane.bailliez@wanadoo.fr">Stephane Bailliez</a>
  */
 public interface AuditListener
-    extends EventListener
-{
+    extends EventListener {
     /**
      * Notify that the audit is about to start.
      * @param evt the event details

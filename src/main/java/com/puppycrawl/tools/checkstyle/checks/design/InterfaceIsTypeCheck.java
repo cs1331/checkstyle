@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.design;
 
 import com.puppycrawl.tools.checkstyle.api.Check;
@@ -41,8 +42,7 @@ import com.puppycrawl.tools.checkstyle.api.DetailAST;
  * @author lkuehne
  */
 public final class InterfaceIsTypeCheck
-        extends Check
-{
+        extends Check {
 
     /**
      * A key is pointing to the warning message text in "messages.properties"
@@ -54,26 +54,22 @@ public final class InterfaceIsTypeCheck
     private boolean allowMarkerInterfaces = true;
 
     @Override
-    public int[] getDefaultTokens()
-    {
+    public int[] getDefaultTokens() {
         return new int[] {TokenTypes.INTERFACE_DEF};
     }
 
     @Override
-    public int[] getRequiredTokens()
-    {
+    public int[] getRequiredTokens() {
         return getDefaultTokens();
     }
 
     @Override
-    public int[] getAcceptableTokens()
-    {
+    public int[] getAcceptableTokens() {
         return new int[] {TokenTypes.INTERFACE_DEF};
     }
 
     @Override
-    public void visitToken(DetailAST ast)
-    {
+    public void visitToken(DetailAST ast) {
         final DetailAST objBlock =
                 ast.findFirstToken(TokenTypes.OBJBLOCK);
         final DetailAST methodDef =
@@ -93,8 +89,7 @@ public final class InterfaceIsTypeCheck
      * Controls whether marker interfaces like Serializable are allowed.
      * @param flag whether to allow marker interfaces or not
      */
-    public void setAllowMarkerInterfaces(boolean flag)
-    {
+    public void setAllowMarkerInterfaces(boolean flag) {
         allowMarkerInterfaces = flag;
     }
 }

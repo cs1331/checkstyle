@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.javadoc;
 
 import org.junit.Test;
@@ -25,22 +26,18 @@ import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 
 import static com.puppycrawl.tools.checkstyle.checks.javadoc.AbstractJavadocCheck.PARSE_ERROR_MESSAGE_KEY;
 
-public class AbstractJavadocCheckTest extends BaseCheckTestSupport
-{
-    public static class TempCheck extends AbstractJavadocCheck
-    {
+public class AbstractJavadocCheckTest extends BaseCheckTestSupport {
+    public static class TempCheck extends AbstractJavadocCheck {
 
         @Override
-        public int[] getDefaultJavadocTokens()
-        {
+        public int[] getDefaultJavadocTokens() {
             return null;
         }
 
     }
 
     @Test
-    public void testNumberFormatException() throws Exception
-    {
+    public void testNumberFormatException() throws Exception {
         final DefaultConfiguration checkConfig = createCheckConfig(TempCheck.class);
         final String[] expected = {
             "3: " + getCheckMessage(PARSE_ERROR_MESSAGE_KEY, 52, "no viable "

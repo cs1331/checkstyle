@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle;
 
 import static org.junit.Assert.assertEquals;
@@ -39,14 +40,12 @@ import org.junit.Test;
  * Enter a description of class XMLLoggerTest.java.
  * @author Rick Giles
  */
-public class XMLLoggerTest
-{
+public class XMLLoggerTest {
     private final ByteArrayOutputStream outStream = new ByteArrayOutputStream();
 
     @Test
     public void testEncode()
-        throws IOException
-    {
+        throws IOException {
         final XMLLogger logger = new XMLLogger(outStream, false);
         final String[][] encodings = {
             {"<", "&lt;"},
@@ -66,8 +65,7 @@ public class XMLLoggerTest
 
     @Test
     public void testIsReference()
-        throws IOException
-    {
+        throws IOException {
         final XMLLogger logger = new XMLLogger(outStream, false);
         final String[] reference = {
             "&#0;",
@@ -96,8 +94,7 @@ public class XMLLoggerTest
 
     @Test
     public void testCloseStream()
-        throws IOException
-    {
+        throws IOException {
         final XMLLogger logger = new XMLLogger(outStream, true);
         logger.auditStarted(null);
         logger.auditFinished(null);
@@ -107,8 +104,7 @@ public class XMLLoggerTest
 
     @Test
     public void testNoCloseStream()
-        throws IOException
-    {
+        throws IOException {
         final XMLLogger logger = new XMLLogger(outStream, false);
         logger.auditStarted(null);
         logger.auditFinished(null);
@@ -119,8 +115,7 @@ public class XMLLoggerTest
 
     @Test
     public void testFileStarted()
-        throws IOException
-    {
+        throws IOException {
         final XMLLogger logger = new XMLLogger(outStream, true);
         logger.auditStarted(null);
         final AuditEvent ev = new AuditEvent(this, "Test.java");
@@ -132,8 +127,7 @@ public class XMLLoggerTest
 
     @Test
     public void testFileFinished()
-        throws IOException
-    {
+        throws IOException {
         final XMLLogger logger = new XMLLogger(outStream, true);
         logger.auditStarted(null);
         final AuditEvent ev = new AuditEvent(this, "Test.java");
@@ -144,8 +138,7 @@ public class XMLLoggerTest
     }
 
     @Test
-    public void testAddError() throws IOException
-    {
+    public void testAddError() throws IOException {
         final XMLLogger logger = new XMLLogger(outStream, true);
         logger.auditStarted(null);
         final LocalizedMessage message =
@@ -163,8 +156,7 @@ public class XMLLoggerTest
 
     @Test
     public void testAddException()
-        throws IOException
-    {
+        throws IOException {
         final XMLLogger logger = new XMLLogger(outStream, true);
         logger.auditStarted(null);
         final LocalizedMessage message =
@@ -184,8 +176,7 @@ public class XMLLoggerTest
     }
 
     private String[] getOutStreamLines()
-        throws IOException
-    {
+        throws IOException {
         final byte[] bytes = outStream.toByteArray();
         final ByteArrayInputStream inStream =
             new ByteArrayInputStream(bytes);
@@ -209,8 +200,7 @@ public class XMLLoggerTest
      * @param expectedLines expected error report lines
      */
     private void verifyLines(String[] expectedLines)
-        throws IOException
-    {
+        throws IOException {
         final String[] lines = getOutStreamLines();
         assertEquals("length.", expectedLines.length + 3, lines.length);
         assertEquals("first line.",
@@ -224,11 +214,9 @@ public class XMLLoggerTest
         assertEquals("last line.", "</checkstyle>", lines[lines.length - 1]);
     }
 
-    private static class TestThrowable extends Exception
-    {
+    private static class TestThrowable extends Exception {
         @Override
-        public void printStackTrace(PrintWriter s)
-        {
+        public void printStackTrace(PrintWriter s) {
             s.print("stackTrace");
         }
     }

@@ -16,14 +16,14 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.javadoc;
 
 /**
  * Value object for storing data about an invalid Javadoc validTags.
  * @author Oliver Burn
  */
-public final class InvalidJavadocTag
-{
+public final class InvalidJavadocTag {
     /** The line in which the invalid tag occurs. */
     private final int line;
     /** The column in which the invalid tag occurs. */
@@ -37,25 +37,33 @@ public final class InvalidJavadocTag
      * @param col the column of the tag
      * @param name the name of the invalid tag
      */
-    public InvalidJavadocTag(int line, int col, String name)
-    {
+    public InvalidJavadocTag(int line, int col, String name) {
         this.line = line;
         this.col = col;
         this.name = name;
     }
 
-    public int getLine()
-    {
+    /**
+     *  Getter for line field.
+     *  @return line field
+     */
+    public int getLine() {
         return line;
     }
 
-    public int getCol()
-    {
+    /**
+     *  Getter for col field.
+     *  @return col field
+     */
+    public int getCol() {
         return col;
     }
 
-    public String getName()
-    {
+    /**
+     *  Getter for name field.
+     *  @return name field
+     */
+    public String getName() {
         return name;
     }
 }

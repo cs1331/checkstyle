@@ -16,9 +16,12 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.filters;
 
 import com.google.common.collect.Sets;
+
+import java.util.Objects;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -30,28 +33,9 @@ import java.util.StringTokenizer;
  * @author Rick Giles
  * @author o_sukhodolsky
  */
-class CSVFilter implements IntFilter
-{
+class CSVFilter implements IntFilter {
     /** filter set */
     private final Set<IntFilter> filters = Sets.newHashSet();
-
-    /**
-     * Adds a IntFilter to the set.
-     * @param filter the IntFilter to add.
-     */
-    public void addFilter(IntFilter filter)
-    {
-        filters.add(filter);
-    }
-
-    /**
-     * Returns the IntFilters of the filter set.
-     * @return the IntFilters of the filter set.
-     */
-    protected Set<IntFilter> getFilters()
-    {
-        return filters;
-    }
 
     /**
      * Constructs a <code>CSVFilter</code> from a CSV, Comma-Separated Values,
@@ -63,12 +47,11 @@ class CSVFilter implements IntFilter
      * contain a parsable integer.
      */
     public CSVFilter(String pattern)
-        throws NumberFormatException
-    {
+        throws NumberFormatException {
         final StringTokenizer tokenizer = new StringTokenizer(pattern, ",");
         while (tokenizer.hasMoreTokens()) {
             final String token = tokenizer.nextToken().trim();
-            final int index = token.indexOf("-");
+            final int index = token.indexOf('-');
             if (index == -1) {
                 final int matchValue = Integer.parseInt(token);
                 addFilter(new IntMatchFilter(matchValue));
@@ -84,13 +67,28 @@ class CSVFilter implements IntFilter
     }
 
     /**
+     * Adds a IntFilter to the set.
+     * @param filter the IntFilter to add.
+     */
+    public void addFilter(IntFilter filter) {
+        filters.add(filter);
+    }
+
+    /**
+     * Returns the IntFilters of the filter set.
+     * @return the IntFilters of the filter set.
+     */
+    protected Set<IntFilter> getFilters() {
+        return filters;
+    }
+
+    /**
      * Determines whether an Integer matches a CSV integer value.
      * @param intValue the Integer to check.
      * @return true if intValue is an Integer that matches a CSV value.
      */
     @Override
-    public boolean accept(int intValue)
-    {
+    public boolean accept(int intValue) {
         for (IntFilter filter : getFilters()) {
             if (filter.accept(intValue)) {
                 return true;
@@ -100,24 +98,19 @@ class CSVFilter implements IntFilter
     }
 
     @Override
-    public String toString()
-    {
-        return filters.toString();
-    }
-
-    @Override
-    public int hashCode()
-    {
-        return filters.hashCode();
-    }
-
-    @Override
-    public boolean equals(Object object)
-    {
-        if (object instanceof CSVFilter) {
-            final CSVFilter other = (CSVFilter) object;
-            return this.filters.equals(other.filters);
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
         }
-        return false;
+        if (object == null || getClass() != object.getClass()) {
+            return false;
+        }
+        final CSVFilter csvFilter = (CSVFilter) object;
+        return Objects.equals(filters, csvFilter.filters);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(filters);
     }
 }

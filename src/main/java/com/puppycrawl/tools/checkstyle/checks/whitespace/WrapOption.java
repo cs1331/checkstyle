@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.whitespace;
 
 /**
@@ -23,8 +24,7 @@ package com.puppycrawl.tools.checkstyle.checks.whitespace;
  *
  * @author Rick Giles
  */
-public enum WrapOption
-{
+public enum WrapOption {
     /** Require that the token is on a new line. */
     NL,
     /** Require that the token is at the end of the line. */

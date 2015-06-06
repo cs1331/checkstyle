@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.whitespace;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
@@ -30,8 +31,7 @@ import com.puppycrawl.tools.checkstyle.checks.AbstractOptionCheck;
  * @author Oliver Burn
  */
 abstract class AbstractParenPadCheck
-    extends AbstractOptionCheck<PadOption>
-{
+    extends AbstractOptionCheck<PadOption> {
 
     /**
      * A key is pointing to the warning message text in "messages.properties"
@@ -60,8 +60,7 @@ abstract class AbstractParenPadCheck
     /**
      * Sets the paren pad option to nospace.
      */
-    AbstractParenPadCheck()
-    {
+    AbstractParenPadCheck() {
         super(PadOption.NOSPACE, PadOption.class);
     }
 
@@ -69,20 +68,17 @@ abstract class AbstractParenPadCheck
      * Process a token representing a left parentheses.
      * @param ast the token representing a left parentheses
      */
-    protected void processLeft(DetailAST ast)
-    {
+    protected void processLeft(DetailAST ast) {
         final String line = getLines()[ast.getLineNo() - 1];
         final int after = ast.getColumnNo() + 1;
         if (after < line.length()) {
             if (PadOption.NOSPACE == getAbstractOption()
-                && Character.isWhitespace(line.charAt(after)))
-            {
+                && Character.isWhitespace(line.charAt(after))) {
                 log(ast.getLineNo(), after, WS_FOLLOWED, "(");
             }
             else if (PadOption.SPACE == getAbstractOption()
                      && !Character.isWhitespace(line.charAt(after))
-                     && line.charAt(after) != ')')
-            {
+                     && line.charAt(after) != ')') {
                 log(ast.getLineNo(), after, WS_NOT_FOLLOWED, "(");
             }
         }
@@ -92,21 +88,18 @@ abstract class AbstractParenPadCheck
      * Process a token representing a right parentheses.
      * @param ast the token representing a right parentheses
      */
-    protected void processRight(DetailAST ast)
-    {
+    protected void processRight(DetailAST ast) {
         final String line = getLines()[ast.getLineNo() - 1];
         final int before = ast.getColumnNo() - 1;
         if (before >= 0) {
             if (PadOption.NOSPACE == getAbstractOption()
                 && Character.isWhitespace(line.charAt(before))
-                && !Utils.whitespaceBefore(before, line))
-            {
+                && !Utils.whitespaceBefore(before, line)) {
                 log(ast.getLineNo(), before, WS_PRECEDED, ")");
             }
             else if (PadOption.SPACE == getAbstractOption()
                 && !Character.isWhitespace(line.charAt(before))
-                && line.charAt(before) != '(')
-            {
+                && line.charAt(before) != '(') {
                 log(ast.getLineNo(), ast.getColumnNo(),
                     WS_NOT_PRECEDED, ")");
             }

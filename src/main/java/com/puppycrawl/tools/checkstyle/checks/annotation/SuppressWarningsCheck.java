@@ -16,11 +16,12 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.annotation;
 
 import java.util.regex.Matcher;
 
-import com.puppycrawl.tools.checkstyle.api.AnnotationUtility;
+import com.puppycrawl.tools.checkstyle.AnnotationUtility;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import com.puppycrawl.tools.checkstyle.checks.AbstractFormatCheck;
@@ -84,8 +85,14 @@ import com.puppycrawl.tools.checkstyle.checks.AbstractFormatCheck;
  * </pre>
  * @author Travis Schneeberger
  */
-public class SuppressWarningsCheck extends AbstractFormatCheck
-{
+public class SuppressWarningsCheck extends AbstractFormatCheck {
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String MSG_KEY_SUPPRESSED_WARNING_NOT_ALLOWED =
+        "suppressed.warning.not.allowed";
+
     /** {@link SuppressWarnings SuppressWarnings} annotation name */
     private static final String SUPPRESS_WARNINGS = "SuppressWarnings";
 
@@ -97,32 +104,22 @@ public class SuppressWarningsCheck extends AbstractFormatCheck
         "java.lang." + SUPPRESS_WARNINGS;
 
     /**
-     * A key is pointing to the warning message text in "messages.properties"
-     * file.
-     */
-    public static final String MSG_KEY_SUPPRESSED_WARNING_NOT_ALLOWED =
-        "suppressed.warning.not.allowed";
-
-    /**
      * Ctor that specifies the default for the format property
      * as specified in the class javadocs.
      */
-    public SuppressWarningsCheck()
-    {
+    public SuppressWarningsCheck() {
         super("^$|^\\s+$");
     }
 
     /** {@inheritDoc} */
     @Override
-    public final int[] getDefaultTokens()
-    {
+    public final int[] getDefaultTokens() {
         return this.getAcceptableTokens();
     }
 
     /** {@inheritDoc} */
     @Override
-    public final int[] getAcceptableTokens()
-    {
+    public final int[] getAcceptableTokens() {
         return new int[] {
             TokenTypes.CLASS_DEF,
             TokenTypes.INTERFACE_DEF,
@@ -139,8 +136,7 @@ public class SuppressWarningsCheck extends AbstractFormatCheck
 
     /** {@inheritDoc} */
     @Override
-    public void visitToken(final DetailAST ast)
-    {
+    public void visitToken(final DetailAST ast) {
         final DetailAST annotation = this.getSuppressWarnings(ast);
 
         if (annotation == null) {
@@ -199,8 +195,7 @@ public class SuppressWarningsCheck extends AbstractFormatCheck
      * @param ast the AST
      * @return the {@link SuppressWarnings SuppressWarnings} annotation
      */
-    private DetailAST getSuppressWarnings(DetailAST ast)
-    {
+    private DetailAST getSuppressWarnings(DetailAST ast) {
         final DetailAST annotation = AnnotationUtility.getAnnotation(
             ast, SuppressWarningsCheck.SUPPRESS_WARNINGS);
 
@@ -218,8 +213,7 @@ public class SuppressWarningsCheck extends AbstractFormatCheck
      * @param warningText the warning.
      */
     private void logMatch(final int lineNo,
-        final int colNum, final String warningText)
-    {
+        final int colNum, final String warningText) {
         final Matcher matcher = this.getRegexp().matcher(warningText);
         if (matcher.matches()) {
             this.log(lineNo, colNum,
@@ -233,8 +227,7 @@ public class SuppressWarningsCheck extends AbstractFormatCheck
      * @param annotation the annotation
      * @return a Token representing the expr.
      */
-    private DetailAST findWarningsHolder(final DetailAST annotation)
-    {
+    private DetailAST findWarningsHolder(final DetailAST annotation) {
         final DetailAST annValuePair =
             annotation.findFirstToken(TokenTypes.ANNOTATION_MEMBER_VALUE_PAIR);
         final DetailAST annArrayInit;
@@ -267,8 +260,7 @@ public class SuppressWarningsCheck extends AbstractFormatCheck
      * @param warning the warning string
      * @return the string without two quotes
      */
-    private String removeQuotes(final String warning)
-    {
+    private String removeQuotes(final String warning) {
         assert warning != null : "the warning was null";
         assert warning.charAt(0) == '"';
         assert warning.charAt(warning.length() - 1) == '"';
@@ -284,8 +276,7 @@ public class SuppressWarningsCheck extends AbstractFormatCheck
      * @param cond a Conditional type
      * {@link TokenTypes#QUESTION QUESTION}
      */
-    private void walkConditional(final DetailAST cond)
-    {
+    private void walkConditional(final DetailAST cond) {
         if (cond.getType() != TokenTypes.QUESTION) {
             final String warningText =
                 this.removeQuotes(cond.getText());
@@ -305,8 +296,7 @@ public class SuppressWarningsCheck extends AbstractFormatCheck
      * @return either the value
      * or another conditional
      */
-    private DetailAST getCondLeft(final DetailAST cond)
-    {
+    private DetailAST getCondLeft(final DetailAST cond) {
         final DetailAST colon = cond.findFirstToken(TokenTypes.COLON);
         return colon.getPreviousSibling();
     }
@@ -319,8 +309,7 @@ public class SuppressWarningsCheck extends AbstractFormatCheck
      * @return either the value
      * or another conditional
      */
-    private DetailAST getCondRight(final DetailAST cond)
-    {
+    private DetailAST getCondRight(final DetailAST cond) {
         final DetailAST colon = cond.findFirstToken(TokenTypes.COLON);
         return colon.getNextSibling();
     }

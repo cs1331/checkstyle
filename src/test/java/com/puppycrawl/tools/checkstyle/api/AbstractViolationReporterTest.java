@@ -16,11 +16,12 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.api;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.TreeSet;
+import java.util.SortedSet;
 
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
@@ -32,34 +33,28 @@ import org.junit.Test;
  *
  * @author lkuehne
  */
-public class AbstractViolationReporterTest extends BaseCheckTestSupport
-{
-    private final Check emptyCheck = new Check()
-    {
+public class AbstractViolationReporterTest extends BaseCheckTestSupport {
+    private final Check emptyCheck = new Check() {
         @Override
-        public int[] getDefaultTokens()
-        {
+        public int[] getDefaultTokens() {
             return new int[0];
         }
     };
 
     @Test
-    public void testGetMessageBundleWithPackage()
-    {
+    public void testGetMessageBundleWithPackage() {
         assertEquals("com.mycompany.checks.messages",
             emptyCheck.getMessageBundle("com.mycompany.checks.MyCoolCheck"));
     }
 
     @Test
-    public void testGetMessageBundleWithoutPackage()
-    {
+    public void testGetMessageBundleWithoutPackage() {
         assertEquals("messages",
             emptyCheck.getMessageBundle("MyCoolCheck"));
     }
 
     @Test
-    public void testCustomMessage() throws Exception
-    {
+    public void testCustomMessage() throws Exception {
         DefaultConfiguration config = createCheckConfig(emptyCheck.getClass());
         config.addMessage("msgKey", "This is a custom message.");
         emptyCheck.configure(config);
@@ -69,15 +64,14 @@ public class AbstractViolationReporterTest extends BaseCheckTestSupport
 
         emptyCheck.log(0, "msgKey");
 
-        TreeSet<LocalizedMessage> messages = collector.getMessages();
+        SortedSet<LocalizedMessage> messages = collector.getMessages();
         Assert.assertTrue(messages.size() == 1);
         Assert.assertEquals("This is a custom message.", messages.first()
                 .getMessage());
     }
 
     @Test
-    public void testCustomMessageWithParameters() throws Exception
-    {
+    public void testCustomMessageWithParameters() throws Exception {
         DefaultConfiguration config = createCheckConfig(emptyCheck.getClass());
         config.addMessage("msgKey", "This is a custom message with {0}.");
         emptyCheck.configure(config);
@@ -87,7 +81,7 @@ public class AbstractViolationReporterTest extends BaseCheckTestSupport
 
         emptyCheck.log(0, "msgKey", "TestParam");
 
-        TreeSet<LocalizedMessage> messages = collector.getMessages();
+        SortedSet<LocalizedMessage> messages = collector.getMessages();
         Assert.assertTrue(messages.size() == 1);
 
         Assert.assertEquals("This is a custom message with TestParam.",
@@ -95,8 +89,7 @@ public class AbstractViolationReporterTest extends BaseCheckTestSupport
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testCustomMessageWithParametersNegative() throws Exception
-    {
+    public void testCustomMessageWithParametersNegative() throws Exception {
         DefaultConfiguration config = createCheckConfig(emptyCheck.getClass());
         config.addMessage("msgKey", "This is a custom message {0.");
         emptyCheck.configure(config);
@@ -106,7 +99,7 @@ public class AbstractViolationReporterTest extends BaseCheckTestSupport
 
         emptyCheck.log(0, "msgKey", "TestParam");
 
-        TreeSet<LocalizedMessage> messages = collector.getMessages();
+        SortedSet<LocalizedMessage> messages = collector.getMessages();
         Assert.assertTrue(messages.size() == 1);
 
         //we expect an exception here because of the bogus custom message

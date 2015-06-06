@@ -16,8 +16,10 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
+import com.puppycrawl.tools.checkstyle.Utils;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
@@ -37,8 +39,7 @@ import com.puppycrawl.tools.checkstyle.checks.DescendantTokenCheck;
  *
  * @author o_sukhodolsky
  */
-public class MissingCtorCheck extends DescendantTokenCheck
-{
+public class MissingCtorCheck extends DescendantTokenCheck {
 
     /**
      * A key is pointing to the warning message text in "messages.properties"
@@ -47,35 +48,28 @@ public class MissingCtorCheck extends DescendantTokenCheck
     public static final String MSG_KEY = "missing.ctor";
 
     /** Creates new instance of the check. */
-    public MissingCtorCheck()
-    {
-        setLimitedTokens(new String[] {
-            TokenTypes.getTokenName(TokenTypes.CTOR_DEF),
-        });
+    public MissingCtorCheck() {
+        setLimitedTokens(Utils.getTokenName(TokenTypes.CTOR_DEF));
         setMinimumNumber(1);
         setMaximumDepth(2);
         setMinimumMessage(MSG_KEY);
     }
 
     @Override
-    public int[] getDefaultTokens()
-    {
+    public int[] getDefaultTokens() {
         return new int[]{TokenTypes.CLASS_DEF};
     }
 
     @Override
-    public int[] getAcceptableTokens()
-    {
+    public int[] getAcceptableTokens() {
         return getDefaultTokens();
     }
 
     @Override
-    public void visitToken(DetailAST ast)
-    {
+    public void visitToken(DetailAST ast) {
         final DetailAST modifiers = ast.findFirstToken(TokenTypes.MODIFIERS);
         if (modifiers != null
-            && modifiers.branchContains(TokenTypes.ABSTRACT))
-        {
+            && modifiers.branchContains(TokenTypes.ABSTRACT)) {
             // should apply the check to abstract class
             return;
         }

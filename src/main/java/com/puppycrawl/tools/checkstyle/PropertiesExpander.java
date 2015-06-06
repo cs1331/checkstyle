@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle;
 
 import java.util.Properties;
@@ -27,8 +28,7 @@ import java.util.Properties;
  * @author lkuehne
  */
 public final class PropertiesExpander
-    implements PropertyResolver
-{
+    implements PropertyResolver {
     /** the underlying Properties object. */
     private final Properties properties;
 
@@ -38,8 +38,7 @@ public final class PropertiesExpander
      * property resolution.
      * @throws IllegalArgumentException indicates null was passed
      */
-    public PropertiesExpander(Properties properties)
-    {
+    public PropertiesExpander(Properties properties) {
         if (properties == null) {
             throw new IllegalArgumentException("cannot pass null");
         }
@@ -48,8 +47,7 @@ public final class PropertiesExpander
 
     /** {@inheritDoc} */
     @Override
-    public String resolve(String propertyName)
-    {
+    public String resolve(String propertyName) {
         return properties.getProperty(propertyName);
     }
 }

@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks;
 
 import com.puppycrawl.tools.checkstyle.api.Check;
@@ -30,32 +31,27 @@ import com.puppycrawl.tools.checkstyle.api.FileContents;
  * @author Rick Giles
  */
 public class FileContentsHolder
-    extends Check
-{
+    extends Check {
     /** The current file contents. */
     private static final ThreadLocal<FileContents> FILE_CONTENTS = new ThreadLocal<>();
 
     /** @return the current file contents. */
-    public static FileContents getContents()
-    {
+    public static FileContents getContents() {
         return FILE_CONTENTS.get();
     }
 
     @Override
-    public int[] getDefaultTokens()
-    {
+    public int[] getDefaultTokens() {
         return new int[0];
     }
 
     @Override
-    public void beginTree(DetailAST rootAST)
-    {
+    public void beginTree(DetailAST rootAST) {
         FILE_CONTENTS.set(getFileContents());
     }
 
     @Override
-    public void destroy()
-    {
+    public void destroy() {
         // This needs to be called in destroy, rather than finishTree()
         // as finishTree() is called before the messages are passed to the
         // filters. Without calling remove, there is a memory leak.

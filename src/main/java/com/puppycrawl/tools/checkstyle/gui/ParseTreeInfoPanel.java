@@ -30,15 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TooManyListenersException;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 
 import antlr.ANTLRException;
@@ -55,23 +47,20 @@ import com.puppycrawl.tools.checkstyle.api.FileText;
  *
  * @author Lars Kühne
  */
-public class ParseTreeInfoPanel extends JPanel
-{
+public class ParseTreeInfoPanel extends JPanel {
     /** For Serialisation that will never happen. */
     private static final long serialVersionUID = -4243405131202059043L;
-    private final JTreeTable treeTable;
-    private final ParseTreeModel parseTreeModel;
+
+    private final transient ParseTreeModel parseTreeModel;
     private final JTextArea jTextArea;
-    private File lastDirectory = null;
-    private File currentFile = null;
+    private File lastDirectory;
+    private File currentFile;
     private final Action reloadAction;
     private final List<Integer>   lines2position  = new ArrayList<>();
 
-    private static class JavaFileFilter extends FileFilter
-    {
+    private static class JavaFileFilter extends FileFilter {
         @Override
-        public boolean accept(File f)
-        {
+        public boolean accept(File f) {
             if (f == null) {
                 return false;
             }
@@ -79,14 +68,12 @@ public class ParseTreeInfoPanel extends JPanel
         }
 
         @Override
-        public String getDescription()
-        {
+        public String getDescription() {
             return "Java Source Code";
         }
     }
 
-    public void openAst(DetailAST parseTree, final Component parent)
-    {
+    public void openAst(DetailAST parseTree, final Component parent) {
         parseTreeModel.setParseTree(parseTree);
         reloadAction.setEnabled(true);
 
@@ -105,22 +92,19 @@ public class ParseTreeInfoPanel extends JPanel
         jTextArea.moveCaretPosition(0);
     }
 
-    private class FileSelectionAction extends AbstractAction
-    {
+    private class FileSelectionAction extends AbstractAction {
         /**
          *
          */
         private static final long serialVersionUID = -1926935338069418119L;
 
-        public FileSelectionAction()
-        {
+        public FileSelectionAction() {
             super("Select Java File");
             putValue(Action.MNEMONIC_KEY, KeyEvent.VK_S);
         }
 
         @Override
-        public void actionPerformed(ActionEvent e)
-        {
+        public void actionPerformed(ActionEvent e) {
             final JFileChooser fc = new JFileChooser( lastDirectory );
             final FileFilter filter = new JavaFileFilter();
             fc.setFileFilter(filter);
@@ -133,22 +117,19 @@ public class ParseTreeInfoPanel extends JPanel
         }
     }
 
-    private class ReloadAction extends AbstractAction
-    {
+    private class ReloadAction extends AbstractAction {
         /**
          *
          */
         private static final long serialVersionUID = -1021880396046355863L;
 
-        public ReloadAction()
-        {
+        public ReloadAction() {
             super("Reload Java File");
             putValue(Action.MNEMONIC_KEY, KeyEvent.VK_R);
         }
 
         @Override
-        public void actionPerformed(ActionEvent e)
-        {
+        public void actionPerformed(ActionEvent e) {
             final Component parent =
                 SwingUtilities.getRoot(ParseTreeInfoPanel.this);
             openFile(currentFile, parent);
@@ -156,29 +137,24 @@ public class ParseTreeInfoPanel extends JPanel
     }
 
 
-    private class FileDropListener implements FileDrop.Listener
-    {
+    private class FileDropListener implements FileDrop.Listener {
         private final JScrollPane mSp;
 
         @Override
-        public void filesDropped(File[] files)
-        {
-            if (files != null && files.length > 0)
-            {
+        public void filesDropped(File... files) {
+            if (files != null && files.length > 0) {
                 final File file = files[0];
                 openFile(file, mSp);
             }
         }
 
-        public FileDropListener(JScrollPane aSp)
-        {
+        public FileDropListener(JScrollPane aSp) {
             mSp = aSp;
         }
     }
 
 
-    public void openFile(File file, final Component parent)
-    {
+    public void openFile(File file, final Component parent) {
         if (file != null) {
             try {
                 Main.frame.setTitle("Checkstyle : " + file.getName());
@@ -197,8 +173,7 @@ public class ParseTreeInfoPanel extends JPanel
                  // starts line counting at 1
                  getLines2position().add(0);
                  // insert the contents of the file to the text area
-                 for (String element : sourceLines)
-                 {
+                 for (String element : sourceLines) {
                    getLines2position().add(jTextArea.getText().length());
                    jTextArea.append(element + "\n");
                  }
@@ -235,8 +210,7 @@ public class ParseTreeInfoPanel extends JPanel
      */
     @Deprecated
     public static DetailAST parseFile(String fileName)
-        throws IOException, ANTLRException
-    {
+        throws IOException, ANTLRException {
         return parseFile(new FileText(new File(fileName), getEncoding()));
     }
 
@@ -247,8 +221,7 @@ public class ParseTreeInfoPanel extends JPanel
      * @throws ANTLRException if the file is not a Java source
      */
     public static DetailAST parseFile(FileText text)
-        throws ANTLRException
-    {
+        throws ANTLRException {
         final FileContents contents = new FileContents(text);
         return TreeWalker.parse(contents);
     }
@@ -259,21 +232,18 @@ public class ParseTreeInfoPanel extends JPanel
      * It defaults to UTF-8.
      * @return the configured file encoding
      */
-    private static String getEncoding()
-    {
+    private static String getEncoding() {
         return System.getProperty("file.encoding", "UTF-8");
     }
 
     /**
      * Create a new ParseTreeInfoPanel instance.
      */
-    public ParseTreeInfoPanel()
-    {
+    public ParseTreeInfoPanel() {
         setLayout(new BorderLayout());
 
-        final DetailAST treeRoot = null;
-        parseTreeModel = new ParseTreeModel(treeRoot);
-        treeTable = new JTreeTable(parseTreeModel);
+        parseTreeModel = new ParseTreeModel(null);
+        JTreeTable treeTable = new JTreeTable(parseTreeModel);
         final JScrollPane sp = new JScrollPane(treeTable);
         this.add(sp, BorderLayout.NORTH);
 
@@ -298,33 +268,51 @@ public class ParseTreeInfoPanel extends JPanel
         p.add(reloadButton);
 
         try {
-            // TODO: creating an object for the side effect of the constructor
-            // and then ignoring the object looks strange.
             new FileDrop(sp, new FileDropListener(sp));
         }
-        catch (final TooManyListenersException ex)
-        {
+        catch (final TooManyListenersException ex) {
            showErrorDialog(null, "Cannot initialize Drag and Drop support");
         }
 
     }
 
-    private void showErrorDialog(final Component parent, final String msg)
-    {
-        final Runnable showError = new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                JOptionPane.showMessageDialog(parent, msg);
-            }
-        };
+    private void showErrorDialog(final Component parent, final String msg) {
+        final Runnable showError = new FrameShower(parent, msg);
         SwingUtilities.invokeLater(showError);
     }
 
-    public List<Integer> getLines2position()
-    {
+    public List<Integer> getLines2position() {
       return lines2position;
+    }
+
+    /**
+     * http://findbugs.sourceforge.net/bugDescriptions.html#SW_SWING_METHODS_INVOKED_IN_SWING_THREAD
+     */
+    private static class FrameShower implements Runnable {
+        /**
+         * frame
+         */
+        final Component parent;
+
+        /**
+         * frame
+         */
+        final String msg;
+
+        /**
+         * contstructor
+         */
+        public FrameShower(Component parent, final String msg) {
+            this.parent = parent;
+            this.msg = msg;
+        }
+
+        /**
+         * display a frame
+         */
+        public void run() {
+            JOptionPane.showMessageDialog(parent, msg);
+        }
     }
 }
 

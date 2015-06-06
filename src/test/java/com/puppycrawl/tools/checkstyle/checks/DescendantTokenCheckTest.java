@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks;
 
 import static com.puppycrawl.tools.checkstyle.checks.DescendantTokenCheck.MSG_KEY_MAX;
@@ -29,12 +30,10 @@ import org.junit.Test;
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 
-public class DescendantTokenCheckTest extends BaseCheckTestSupport
-{
+public class DescendantTokenCheckTest extends BaseCheckTestSupport {
     @Test
     public void testDefault()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(DescendantTokenCheck.class);
         final String[] expected = {};
@@ -43,8 +42,7 @@ public class DescendantTokenCheckTest extends BaseCheckTestSupport
 
     @Test
     public void testMaximumNumber()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(DescendantTokenCheck.class);
         checkConfig.addAttribute("tokens", "LITERAL_NATIVE");
@@ -58,8 +56,7 @@ public class DescendantTokenCheckTest extends BaseCheckTestSupport
 
     @Test
     public void testMessage()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(DescendantTokenCheck.class);
         checkConfig.addAttribute("tokens", "LITERAL_NATIVE");
@@ -74,8 +71,7 @@ public class DescendantTokenCheckTest extends BaseCheckTestSupport
 
     @Test
     public void testMinimumNumber()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(DescendantTokenCheck.class);
         checkConfig.addAttribute("tokens", "LITERAL_SWITCH");
@@ -89,8 +85,7 @@ public class DescendantTokenCheckTest extends BaseCheckTestSupport
 
     @Test
     public void testMinimumDepth()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(DescendantTokenCheck.class);
         checkConfig.addAttribute("tokens", "LITERAL_SWITCH");
@@ -103,8 +98,7 @@ public class DescendantTokenCheckTest extends BaseCheckTestSupport
 
     @Test
     public void testMaximumDepth()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(DescendantTokenCheck.class);
         checkConfig.addAttribute("tokens", "LITERAL_SWITCH");
@@ -117,8 +111,7 @@ public class DescendantTokenCheckTest extends BaseCheckTestSupport
 
     @Test
     public void testEmptyStatements()
-        throws Exception
-    {
+        throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(DescendantTokenCheck.class);
         checkConfig.addAttribute("tokens", "EMPTY_STAT");
@@ -150,8 +143,7 @@ public class DescendantTokenCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testMissingSwitchDefault() throws Exception
-    {
+    public void testMissingSwitchDefault() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(DescendantTokenCheck.class);
         checkConfig.addAttribute("tokens", "LITERAL_SWITCH");
@@ -168,8 +160,7 @@ public class DescendantTokenCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testStringLiteralEquality() throws Exception
-    {
+    public void testStringLiteralEquality() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(DescendantTokenCheck.class);
         checkConfig.addAttribute("tokens", "EQUAL,NOT_EQUAL");
@@ -187,8 +178,7 @@ public class DescendantTokenCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testIllegalTokenDefault() throws Exception
-    {
+    public void testIllegalTokenDefault() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(DescendantTokenCheck.class);
         checkConfig.addAttribute("tokens", "LITERAL_SWITCH, POST_INC, POST_DEC");
@@ -206,8 +196,7 @@ public class DescendantTokenCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testIllegalTokenNative() throws Exception
-    {
+    public void testIllegalTokenNative() throws Exception {
         final DefaultConfiguration checkConfig =
             createCheckConfig(DescendantTokenCheck.class);
         checkConfig.addAttribute("tokens", "LITERAL_NATIVE");
@@ -223,8 +212,7 @@ public class DescendantTokenCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testReturnFromCatch() throws Exception
-    {
+    public void testReturnFromCatch() throws Exception {
         DefaultConfiguration checkConfig = createCheckConfig(DescendantTokenCheck.class);
 
         checkConfig.addAttribute("tokens", "LITERAL_CATCH");
@@ -243,8 +231,7 @@ public class DescendantTokenCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testReturnFromFinally() throws Exception
-    {
+    public void testReturnFromFinally() throws Exception {
         DefaultConfiguration checkConfig = createCheckConfig(DescendantTokenCheck.class);
 
         checkConfig.addAttribute("tokens", "LITERAL_FINALLY");
@@ -263,8 +250,7 @@ public class DescendantTokenCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testNoSum() throws Exception
-    {
+    public void testNoSum() throws Exception {
         DefaultConfiguration checkConfig = createCheckConfig(DescendantTokenCheck.class);
 
         checkConfig.addAttribute("tokens", "NOT_EQUAL,EQUAL");
@@ -281,8 +267,7 @@ public class DescendantTokenCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testWithSumCustomMsg() throws Exception
-    {
+    public void testWithSumCustomMsg() throws Exception {
         DefaultConfiguration checkConfig = createCheckConfig(DescendantTokenCheck.class);
         checkConfig.addAttribute("tokens", "NOT_EQUAL,EQUAL");
         checkConfig.addAttribute("limitedTokens", "LITERAL_THIS,LITERAL_NULL");
@@ -304,8 +289,7 @@ public class DescendantTokenCheckTest extends BaseCheckTestSupport
     }
 
     @Test
-    public void testWithSumDefaultMsg() throws Exception
-    {
+    public void testWithSumDefaultMsg() throws Exception {
         DefaultConfiguration checkConfig = createCheckConfig(DescendantTokenCheck.class);
         checkConfig.addAttribute("tokens", "NOT_EQUAL,EQUAL");
         checkConfig.addAttribute("limitedTokens", "LITERAL_THIS,LITERAL_NULL");

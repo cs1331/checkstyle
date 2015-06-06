@@ -16,6 +16,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ////////////////////////////////////////////////////////////////////////////////
+
 package com.puppycrawl.tools.checkstyle.checks.metrics;
 
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
@@ -32,12 +33,10 @@ import static com.puppycrawl.tools.checkstyle.checks.metrics.JavaNCSSCheck.MSG_M
  *
  * @author Lars Ködderitzsch
  */
-public class JavaNCSSCheckTest extends BaseCheckTestSupport
-{
+public class JavaNCSSCheckTest extends BaseCheckTestSupport {
 
     @Test
-    public void test() throws Exception
-    {
+    public void test() throws Exception {
         DefaultConfiguration checkConfig = createCheckConfig(JavaNCSSCheck.class);
 
         checkConfig.addAttribute("methodMaximum", "0");

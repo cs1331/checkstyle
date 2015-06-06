@@ -13,6 +13,7 @@
     <title>Class Design</title>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
     <script type="text/javascript" src="js/anchors.js"></script>
+    <script type="text/javascript" src="js/google-analytics.js"></script>
   </head>
 
   <body>
@@ -104,8 +105,8 @@
             <td><code>^serialVersionUID$</code></td>
           </tr>
           <tr>
-            <td>allowPublicFinalFields</td>
-            <td>allows field with only final modifier be public</td>
+            <td>allowPublicImmutableFields</td>
+            <td>allows immutable fields be declared as public if defined in final class</td>
             <td><a href="property_types.html#boolean">boolean</a></td>
             <td><code>true</code></td>
           </tr>
@@ -577,6 +578,8 @@ public class StringUtils // not final to allow subclassing
       <subsection name="Description">
         <p>
           Restricts throws statements to a specified count (1 by default).
+          Methods with "Override" or "java.lang.Override" annotation are skipped
+          from validation as current class cannot change signature of these methods.
         </p>
 
         <p>
@@ -587,6 +590,11 @@ public class StringUtils // not final to allow subclassing
           exceptions into a hierarchy such that in the simplest case, only one
           type of exception need be checked for by a caller but any
           subclasses can be caught specifically if necessary.
+        </p>
+
+        <p>
+          <b>ignorePrivateMethods</b> - allows to skip private methods as they do
+          not cause problems for other classes.
         </p>
       </subsection>
 
@@ -604,6 +612,12 @@ public class StringUtils // not final to allow subclassing
             <td><a href="property_types.html#integer">Integer</a></td>
             <td><code>1</code></td>
           </tr>
+          <tr>
+            <td>ignorePrivateMethods</td>
+            <td>whether private methods must be ignored</td>
+            <td><a href="property_types.html#boolean">Boolean</a></td>
+            <td><code>true</code></td>
+          </tr>
         </table>
       </subsection>
 
@@ -615,6 +629,15 @@ public class StringUtils // not final to allow subclassing
         <source>
 &lt;module name=&quot;ThrowsCount&quot;&gt;
     &lt;property name=&quot;max&quot; value=&quot;2&quot;/&gt;
+&lt;/module&gt;
+        </source>
+
+        <p>
+          To configure the check so that it doesn't skip private methods:
+        </p>
+        <source>
+&lt;module name=&quot;ThrowsCount&quot;&gt;
+    &lt;property name=&quot;ignorePrivateMethods&quot; value=&quot;false&quot;/&gt;
 &lt;/module&gt;
         </source>
       </subsection>
@@ -682,13 +705,8 @@ public class StringUtils // not final to allow subclassing
 &lt;module name="OneTopLevelClass"/&gt;
         </source>
         <p>
-          An example of check's configuration applied only to classes:
+          <b>ATTENTION:</b> This Check does not support customization of validated tokens, so do not use the "tokens" property.
         </p>
-        <source>
-&lt;module name="OneTopLevelClass"&gt;
-    &lt;property name="tokens" value="CLASS_DEF"&gt;
-&lt;/module&gt;
-        </source>
         <p>
           An example of code with violations:
         </p>
