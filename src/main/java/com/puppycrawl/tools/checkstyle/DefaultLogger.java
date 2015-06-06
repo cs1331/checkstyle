@@ -138,11 +138,12 @@ public class DefaultLogger extends AutomaticBean implements AuditListener {
 
     @Override
     public void auditStarted(AuditEvent event) {
+        // No need to implement this method in this class
     }
 
     @Override
     public void auditFinished(AuditEvent event) {
-        mInfoWriter.println("Audit done. Errors (potential points off):\n"
+        infoWriter.println("Audit done. Errors (potential points off):\n"
             + errorCount);
         closeStreams();
     }
