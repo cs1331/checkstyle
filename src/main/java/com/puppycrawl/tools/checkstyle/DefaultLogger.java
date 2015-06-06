@@ -124,7 +124,6 @@ public class DefaultLogger extends AutomaticBean implements AuditListener {
         if (severityLevel != SeverityLevel.IGNORE) {
             final String errorMessage = formatter.format(event);
             errorWriter.println(errorMessage);
-            
             errorCount++;
         }
     }
