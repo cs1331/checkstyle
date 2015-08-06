@@ -18,6 +18,7 @@
             <property name="scope" value="public"/>
             <property name="checkFirstSentence" value="false"/>
         </module>
+        <module name="NonEmptyAtclauseDescription"/>
     </module>
 
 </module>
