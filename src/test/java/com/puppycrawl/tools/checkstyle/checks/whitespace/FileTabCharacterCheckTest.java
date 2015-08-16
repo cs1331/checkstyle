@@ -19,15 +19,16 @@
 
 package com.puppycrawl.tools.checkstyle.checks.whitespace;
 
+import static com.puppycrawl.tools.checkstyle.checks.whitespace.FileTabCharacterCheck.CONTAINS_TAB;
+import static com.puppycrawl.tools.checkstyle.checks.whitespace.FileTabCharacterCheck.FILE_CONTAINS_TAB;
+
+import java.io.File;
+
+import org.junit.Test;
+
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.api.Configuration;
-import java.io.File;
-import org.junit.Test;
-
-import static com.puppycrawl.tools.checkstyle.checks.whitespace.FileTabCharacterCheck.CONTAINS_TAB;
-import static com.puppycrawl.tools.checkstyle.checks.whitespace.FileTabCharacterCheck
-.FILE_CONTAINS_TAB;
 
 public class FileTabCharacterCheckTest
     extends BaseCheckTestSupport {
@@ -76,8 +77,14 @@ public class FileTabCharacterCheckTest
     public void testBadFile() throws Exception {
         final DefaultConfiguration checkConfig = createConfig(false);
         final String path = getPath("Claira");
+        String exceptionMessage = " (No such file or directory)";
+        if (System.getProperty("os.name")
+                .toLowerCase().startsWith("windows")) {
+            exceptionMessage = " (The system cannot find the file specified)";
+        }
+
         final String[] expected = {
-            "0: File not found!",
+            "0: Got an exception - " + path + exceptionMessage,
         };
         final File[] files = {
             new File(path),
@@ -89,7 +96,7 @@ public class FileTabCharacterCheckTest
      * Creates a configuration that is functionally close to that in the docs.
      * @param verbose verbose mode
      */
-    private DefaultConfiguration createConfig(boolean verbose) {
+    private static DefaultConfiguration createConfig(boolean verbose) {
         final DefaultConfiguration checkConfig =
             createCheckConfig(FileTabCharacterCheck.class);
         checkConfig.addAttribute("eachLine", Boolean.toString(verbose));

@@ -54,15 +54,13 @@ public class LineColumn implements Comparable<LineColumn> {
         return col;
     }
 
-    /** {@inheritDoc} */
     @Override
     public int compareTo(LineColumn lineColumn) {
-        return this.getLine() != lineColumn.getLine()
-            ? this.getLine() - lineColumn.getLine()
-            : this.getColumn() - lineColumn.getColumn();
+        return getLine() != lineColumn.getLine()
+            ? Integer.compare(getLine(), lineColumn.getLine())
+            : Integer.compare(getColumn(), lineColumn.getColumn());
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -71,12 +69,11 @@ public class LineColumn implements Comparable<LineColumn> {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        final LineColumn that = (LineColumn) o;
-        return Objects.equals(line, that.line)
-                && Objects.equals(col, that.col);
+        final LineColumn lineColumn = (LineColumn) o;
+        return Objects.equals(line, lineColumn.line)
+                && Objects.equals(col, lineColumn.col);
     }
 
-    /** {@inheritDoc} */
     @Override
     public int hashCode() {
         return Objects.hash(line, col);

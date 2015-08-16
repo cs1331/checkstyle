@@ -20,15 +20,15 @@
 package com.puppycrawl.tools.checkstyle.checks.imports;
 
 import java.io.File;
-import java.net.URI;
+
+import org.apache.commons.beanutils.ConversionException;
+import org.apache.commons.lang3.StringUtils;
 
 import com.puppycrawl.tools.checkstyle.api.Check;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.FullIdent;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import org.apache.commons.beanutils.ConversionException;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * Check that controls what packages can be imported in each package. Useful
@@ -119,35 +119,9 @@ public class ImportControlCheck extends Check {
             }
             final AccessResult access = currentLeaf.checkAccess(imp.getText(),
                     inPkg);
-            if (AccessResult.ALLOWED != access) {
+            if (access != AccessResult.ALLOWED) {
                 log(ast, MSG_DISALLOWED, imp.getText());
             }
-        }
-    }
-
-    /**
-     * Set the parameter for the url containing the import control
-     * configuration. It will cause the url to be loaded.
-     * @param url the url of the file to load.
-     * @throws ConversionException on error loading the file.
-     */
-    public void setUrl(final String url) {
-        // Handle empty param
-        if (StringUtils.isBlank(url)) {
-            return;
-        }
-        final URI uri;
-        try {
-            uri = URI.create(url);
-        }
-        catch (final IllegalArgumentException ex) {
-            throw new ConversionException("syntax error in url " + url, ex);
-        }
-        try {
-            root = ImportControlLoader.load(uri);
-        }
-        catch (final CheckstyleException ex) {
-            throw new ConversionException("Unable to load " + url, ex);
         }
     }
 

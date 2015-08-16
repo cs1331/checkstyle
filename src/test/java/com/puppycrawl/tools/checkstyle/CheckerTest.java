@@ -22,14 +22,21 @@ package com.puppycrawl.tools.checkstyle;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-import com.google.common.collect.Sets;
-import com.puppycrawl.tools.checkstyle.api.LocalizedMessage;
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.TreeSet;
+
 import org.junit.Test;
+
+import com.google.common.collect.Sets;
+import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
+import com.puppycrawl.tools.checkstyle.api.Configuration;
+import com.puppycrawl.tools.checkstyle.api.LocalizedMessage;
 
 public class CheckerTest {
     @Test
@@ -133,26 +140,6 @@ public class CheckerTest {
 
         c.addFilter(f);
 
-        // Let's try fire some events
-        // we do not call filter in fireAuditStarted() (fix for 1080343)
-//         c.fireAuditStarted();
-//         assertTrue("Checker.fireAuditStarted() doesn't call filter", f.wasCalled());
-
-        // we do not call filter in fireAuditFinished() (fix for 1080343)
-//         f.resetFilter();
-//         c.fireAuditFinished();
-//         assertTrue("Checker.fireAuditFinished() doesn't call filter", f.wasCalled());
-
-        // we do not call filter in fireFileStarted() (fix for 1080343)
-//         f.resetFilter();
-//         c.fireFileStarted("Some File Name");
-//         assertTrue("Checker.fireFileStarted() doesn't call filter", f.wasCalled());
-
-        // we do not call filter in fireFileFinished() (fix for 1080343)
-//         f.resetFilter();
-//         c.fireFileFinished("Some File Name");
-//         assertTrue("Checker.fireFileFinished() doesn't call filter", f.wasCalled());
-
         f.resetFilter();
         final TreeSet<LocalizedMessage> msgs = Sets.newTreeSet();
         msgs.add(new LocalizedMessage(0, 0, "a Bundle", "message.key",
@@ -169,30 +156,6 @@ public class CheckerTest {
         c.addFilter(f);
         c.addFilter(f2);
         c.removeFilter(f);
-
-        // Let's try fire some events
-        // we do call filter in fireErrors() only (fix for 1080343)
-//      c.fireAuditStarted();
-//         assertTrue("Checker.fireAuditStarted() doesn't call filter", f2.wasCalled());
-//         assertFalse("Checker.fireAuditStarted() does call removed filter", f.wasCalled());
-
-        // we do call filter in fireErrors() only (fix for 1080343)
-//         f2.resetFilter();
-//         c.fireAuditFinished();
-//         assertTrue("Checker.fireAuditFinished() doesn't call filter", f2.wasCalled());
-//         assertFalse("Checker.fireAuditFinished() does call removed filter", f.wasCalled());
-
-        // we do call filter in fireErrors() only (fix for 1080343)
-//         f2.resetFilter();
-//         c.fireFileStarted("Some File Name");
-//         assertTrue("Checker.fireFileStarted() doesn't call filter", f2.wasCalled());
-//         assertFalse("Checker.fireFileStarted() does call removed filter", f.wasCalled());
-
-        // we do call filter in fireErrors() only (fix for 1080343)
-//         f2.resetFilter();
-//         c.fireFileFinished("Some File Name");
-//         assertTrue("Checker.fireFileFinished() doesn't call filter", f2.wasCalled());
-//         assertFalse("Checker.fireFileFinished() does call removed filter", f.wasCalled());
 
         f2.resetFilter();
         final TreeSet<LocalizedMessage> msgs = Sets.newTreeSet();
@@ -216,5 +179,93 @@ public class CheckerTest {
         c.setFileExtensions(fileExtensions);
         final int counter = c.process(files);
         assertEquals(counter, 1); // comparing to 1 as there is only one legal file in input
+    }
+
+    @SuppressWarnings("deprecation")
+    @Test
+    public void testSetters() throws Exception {
+        // all  that is set by reflection, so just make code coverage be happy
+        final Checker c = new Checker();
+        c.setClassLoader(this.getClass().getClassLoader());
+        c.setClassloader(this.getClass().getClassLoader());
+        c.setBasedir("some");
+        c.setSeverity("ignore");
+
+        PackageObjectFactory factory = new PackageObjectFactory(
+                new HashSet<String>(), Thread.currentThread().getContextClassLoader());
+        c.setModuleFactory(factory);
+
+        c.setFileExtensions((String[]) null);
+        c.setFileExtensions(new String[]{".java", "xml"});
+
+        try {
+            c.setCharset("UNKNOW-CHARSET");
+            fail("Exception is expected");
+        }
+        catch (UnsupportedEncodingException ex) {
+            assertEquals("unsupported charset: 'UNKNOW-CHARSET'", ex.getMessage());
+        }
+    }
+
+    @Test
+    public void testNoClassLoaderNoModuleFactory() throws Exception {
+        final Checker c = new Checker();
+
+        try {
+            c.finishLocalSetup();
+            fail("Exception is expected");
+        }
+        catch (CheckstyleException ex) {
+            assertEquals("if no custom moduleFactory is set, "
+                            + "moduleClassLoader must be specified", ex.getMessage());
+        }
+    }
+
+    @Test
+    public void testNoModuleFactory() throws Exception {
+        final Checker c = new Checker();
+        c.setModuleClassLoader(Thread.currentThread().getContextClassLoader());
+
+        c.finishLocalSetup();
+    }
+
+    @Test
+    public void testFinishLocalSetupFullyInitialized() throws Exception {
+        final Checker c = new Checker();
+        c.setModuleClassLoader(Thread.currentThread().getContextClassLoader());
+        PackageObjectFactory factory = new PackageObjectFactory(
+                new HashSet<String>(), Thread.currentThread().getContextClassLoader());
+        c.setModuleFactory(factory);
+
+        c.finishLocalSetup();
+    }
+
+    @Test
+    public void testSetupChildExceptions() throws Exception {
+        final Checker c = new Checker();
+        PackageObjectFactory factory = new PackageObjectFactory(
+                new HashSet<String>(), Thread.currentThread().getContextClassLoader());
+        c.setModuleFactory(factory);
+
+        Configuration config = new DefaultConfiguration("java.lang.String");
+        try {
+            c.setupChild(config);
+            fail("Exception is expected");
+        }
+        catch (CheckstyleException ex) {
+            assertEquals("cannot initialize module java.lang.String "
+                    + "- java.lang.String is not allowed as a child in Checker", ex.getMessage());
+        }
+    }
+
+    @Test
+    public void testSetupChildListener() throws Exception {
+        final Checker c = new Checker();
+        PackageObjectFactory factory = new PackageObjectFactory(
+                new HashSet<String>(), Thread.currentThread().getContextClassLoader());
+        c.setModuleFactory(factory);
+
+        Configuration config = new DefaultConfiguration(DebugAuditAdapter.class.getCanonicalName());
+        c.setupChild(config);
     }
 }

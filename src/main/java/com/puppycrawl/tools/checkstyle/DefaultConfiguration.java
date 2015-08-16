@@ -19,16 +19,15 @@
 
 package com.puppycrawl.tools.checkstyle;
 
-import com.google.common.collect.ImmutableMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 import com.puppycrawl.tools.checkstyle.api.Configuration;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Default implementation of the Configuration interface.
@@ -58,31 +57,27 @@ public final class DefaultConfiguration implements Configuration {
         this.name = name;
     }
 
-    /** {@inheritDoc} */
     @Override
     public String[] getAttributeNames() {
         final Set<String> keySet = attributeMap.keySet();
         return keySet.toArray(new String[keySet.size()]);
     }
 
-    /** {@inheritDoc} */
     @Override
-    public String getAttribute(String name) throws CheckstyleException {
-        if (!attributeMap.containsKey(name)) {
+    public String getAttribute(String attributeName) throws CheckstyleException {
+        if (!attributeMap.containsKey(attributeName)) {
             throw new CheckstyleException(
-                    "missing key '" + name + "' in " + getName());
+                    "missing key '" + attributeName + "' in " + getName());
         }
-        return attributeMap.get(name);
+        return attributeMap.get(attributeName);
     }
 
-    /** {@inheritDoc} */
     @Override
     public Configuration[] getChildren() {
         return children.toArray(
             new Configuration[children.size()]);
     }
 
-    /** {@inheritDoc} */
     @Override
     public String getName() {
         return name;
@@ -106,16 +101,16 @@ public final class DefaultConfiguration implements Configuration {
 
     /**
      * Adds an attribute to this configuration.
-     * @param name the name of the attribute.
+     * @param attributeName the name of the attribute.
      * @param value the value of the attribute.
      */
-    public void addAttribute(String name, String value) {
-        final String current = attributeMap.put(name, value);
-        if (null == current) {
-            attributeMap.put(name, value);
+    public void addAttribute(String attributeName, String value) {
+        final String current = attributeMap.put(attributeName, value);
+        if (current == null) {
+            attributeMap.put(attributeName, value);
         }
         else {
-            attributeMap.put(name, current + "," + value);
+            attributeMap.put(attributeName, current + "," + value);
         }
     }
 

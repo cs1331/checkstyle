@@ -57,11 +57,15 @@ import com.puppycrawl.tools.checkstyle.checks.AbstractFormatCheck;
  * Limitations:  This check does not consider conditionals
  * inside the SuppressWarnings annotation. <br>
  * For example:
- * {@code @SuppressWarnings((false) ? (true) ? "unchecked" : "foo" : "unused")}
+ * {@code @SuppressWarnings((false) ? (true) ? "unchecked" : "foo" : "unused")}.
  * According to the above example, the "unused" warning is being suppressed
  * not the "unchecked" or "foo" warnings.  All of these warnings will be
  * considered and matched against regardless of what the conditional
  * evaluates to.
+ * <br>
+ * The check also does not support code like {@code @SuppressWarnings("un" + "used")},
+ * {@code @SuppressWarnings((String) "unused")} or
+ * {@code @SuppressWarnings({('u' + (char)'n') + (""+("used" + (String)"")),})}.
  * </p>
  *
  * <p>
@@ -111,13 +115,11 @@ public class SuppressWarningsCheck extends AbstractFormatCheck {
         super("^$|^\\s+$");
     }
 
-    /** {@inheritDoc} */
     @Override
     public final int[] getDefaultTokens() {
-        return this.getAcceptableTokens();
+        return getAcceptableTokens();
     }
 
-    /** {@inheritDoc} */
     @Override
     public final int[] getAcceptableTokens() {
         return new int[] {
@@ -134,24 +136,33 @@ public class SuppressWarningsCheck extends AbstractFormatCheck {
         };
     }
 
-    /** {@inheritDoc} */
     @Override
     public void visitToken(final DetailAST ast) {
-        final DetailAST annotation = this.getSuppressWarnings(ast);
+        final DetailAST annotation = getSuppressWarnings(ast);
 
         if (annotation == null) {
             return;
         }
 
         final DetailAST warningHolder =
-            this.findWarningsHolder(annotation);
+            findWarningsHolder(annotation);
 
-        DetailAST warning = warningHolder.findFirstToken(TokenTypes.EXPR);
+        final DetailAST token =
+                warningHolder.findFirstToken(TokenTypes.ANNOTATION_MEMBER_VALUE_PAIR);
+        DetailAST warning;
+
+        if (token != null) {
+            // case like '@SuppressWarnings(value = UNUSED)'
+            warning = token.findFirstToken(TokenTypes.EXPR);
+        }
+        else {
+            warning = warningHolder.findFirstToken(TokenTypes.EXPR);
+        }
 
         //rare case with empty array ex: @SuppressWarnings({})
         if (warning == null) {
             //check to see if empty warnings are forbidden -- are by default
-            this.logMatch(warningHolder.getLineNo(),
+            logMatch(warningHolder.getLineNo(),
                 warningHolder.getColumnNo(), "");
             return;
         }
@@ -163,24 +174,25 @@ public class SuppressWarningsCheck extends AbstractFormatCheck {
                     //typical case
                     case TokenTypes.STRING_LITERAL:
                         final String warningText =
-                            this.removeQuotes(warning.getFirstChild().getText());
-                        this.logMatch(warning.getLineNo(),
+                            removeQuotes(warning.getFirstChild().getText());
+                        logMatch(warning.getLineNo(),
                                 warning.getColumnNo(), warningText);
                         break;
-                        //conditional case
-                        //ex: @SuppressWarnings((false) ? (true) ? "unchecked" : "foo" : "unused")
+                    // conditional case
+                    // ex: @SuppressWarnings((false) ? (true) ? "unchecked" : "foo" : "unused")
                     case TokenTypes.QUESTION:
-                        this.walkConditional(fChild);
+                        walkConditional(fChild);
                         break;
-                        //param in constant case
-                        //ex: public static final String UNCHECKED = "unchecked";
-                        //@SuppressWarnings(UNCHECKED) or @SuppressWarnings(SomeClass.UNCHECKED)
+                    // param in constant case
+                    // ex: public static final String UNCHECKED = "unchecked";
+                    // @SuppressWarnings(UNCHECKED) or @SuppressWarnings(SomeClass.UNCHECKED)
                     case TokenTypes.IDENT:
                     case TokenTypes.DOT:
                         break;
                     default:
-                        throw new IllegalStateException("Should never get here, type: "
-                                + fChild.getType() + " text: " + fChild.getText());
+                        // Known limitation: cases like @SuppressWarnings("un" + "used") or
+                        // @SuppressWarnings((String) "unused") are not properly supported,
+                        // but they should not cause exceptions.
                 }
             }
             warning = warning.getNextSibling();
@@ -195,13 +207,13 @@ public class SuppressWarningsCheck extends AbstractFormatCheck {
      * @param ast the AST
      * @return the {@link SuppressWarnings SuppressWarnings} annotation
      */
-    private DetailAST getSuppressWarnings(DetailAST ast) {
+    private static DetailAST getSuppressWarnings(DetailAST ast) {
         final DetailAST annotation = AnnotationUtility.getAnnotation(
-            ast, SuppressWarningsCheck.SUPPRESS_WARNINGS);
+            ast, SUPPRESS_WARNINGS);
 
         return annotation != null ? annotation
             : AnnotationUtility.getAnnotation(
-                ast, SuppressWarningsCheck.FQ_SUPPRESS_WARNINGS);
+                ast, FQ_SUPPRESS_WARNINGS);
     }
 
     /**
@@ -214,9 +226,9 @@ public class SuppressWarningsCheck extends AbstractFormatCheck {
      */
     private void logMatch(final int lineNo,
         final int colNum, final String warningText) {
-        final Matcher matcher = this.getRegexp().matcher(warningText);
+        final Matcher matcher = getRegexp().matcher(warningText);
         if (matcher.matches()) {
-            this.log(lineNo, colNum,
+            log(lineNo, colNum,
                     MSG_KEY_SUPPRESSED_WARNING_NOT_ALLOWED, warningText);
         }
     }
@@ -227,7 +239,7 @@ public class SuppressWarningsCheck extends AbstractFormatCheck {
      * @param annotation the annotation
      * @return a Token representing the expr.
      */
-    private DetailAST findWarningsHolder(final DetailAST annotation) {
+    private static DetailAST findWarningsHolder(final DetailAST annotation) {
         final DetailAST annValuePair =
             annotation.findFirstToken(TokenTypes.ANNOTATION_MEMBER_VALUE_PAIR);
         final DetailAST annArrayInit;
@@ -260,11 +272,7 @@ public class SuppressWarningsCheck extends AbstractFormatCheck {
      * @param warning the warning string
      * @return the string without two quotes
      */
-    private String removeQuotes(final String warning) {
-        assert warning != null : "the warning was null";
-        assert warning.charAt(0) == '"';
-        assert warning.charAt(warning.length() - 1) == '"';
-
+    private static String removeQuotes(final String warning) {
         return warning.substring(1, warning.length() - 1);
     }
 
@@ -279,13 +287,13 @@ public class SuppressWarningsCheck extends AbstractFormatCheck {
     private void walkConditional(final DetailAST cond) {
         if (cond.getType() != TokenTypes.QUESTION) {
             final String warningText =
-                this.removeQuotes(cond.getText());
-            this.logMatch(cond.getLineNo(), cond.getColumnNo(), warningText);
+                removeQuotes(cond.getText());
+            logMatch(cond.getLineNo(), cond.getColumnNo(), warningText);
             return;
         }
 
-        this.walkConditional(this.getCondLeft(cond));
-        this.walkConditional(this.getCondRight(cond));
+        walkConditional(getCondLeft(cond));
+        walkConditional(getCondRight(cond));
     }
 
     /**
@@ -296,7 +304,7 @@ public class SuppressWarningsCheck extends AbstractFormatCheck {
      * @return either the value
      * or another conditional
      */
-    private DetailAST getCondLeft(final DetailAST cond) {
+    private static DetailAST getCondLeft(final DetailAST cond) {
         final DetailAST colon = cond.findFirstToken(TokenTypes.COLON);
         return colon.getPreviousSibling();
     }
@@ -309,7 +317,7 @@ public class SuppressWarningsCheck extends AbstractFormatCheck {
      * @return either the value
      * or another conditional
      */
-    private DetailAST getCondRight(final DetailAST cond) {
+    private static DetailAST getCondRight(final DetailAST cond) {
         final DetailAST colon = cond.findFirstToken(TokenTypes.COLON);
         return colon.getNextSibling();
     }

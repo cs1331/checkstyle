@@ -19,10 +19,11 @@
 
 package com.puppycrawl.tools.checkstyle.checks.indentation;
 
-import static com.puppycrawl.tools.checkstyle.checks.indentation.ExpressionHandler.MSG_CHILD_ERROR;
-import static com.puppycrawl.tools.checkstyle.checks.indentation.ExpressionHandler.MSG_CHILD_ERROR_MULTI;
-import static com.puppycrawl.tools.checkstyle.checks.indentation.ExpressionHandler.MSG_ERROR;
-import static com.puppycrawl.tools.checkstyle.checks.indentation.ExpressionHandler.MSG_ERROR_MULTI;
+import static com.puppycrawl.tools.checkstyle.checks.indentation.AbstractExpressionHandler.MSG_CHILD_ERROR;
+import static com.puppycrawl.tools.checkstyle.checks.indentation.AbstractExpressionHandler.MSG_CHILD_ERROR_MULTI;
+import static com.puppycrawl.tools.checkstyle.checks.indentation.AbstractExpressionHandler.MSG_ERROR;
+import static com.puppycrawl.tools.checkstyle.checks.indentation.AbstractExpressionHandler.MSG_ERROR_MULTI;
+import static org.junit.Assert.assertEquals;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -33,13 +34,12 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
-import com.puppycrawl.tools.checkstyle.api.Configuration;
 import com.puppycrawl.tools.checkstyle.Utils;
+import com.puppycrawl.tools.checkstyle.api.Configuration;
 
 /**
  *
@@ -172,7 +172,7 @@ public class IndentationCheckTest extends BaseCheckTestSupport {
         final int tabWidth = Integer.parseInt(config.getAttribute("tabWidth"));
         Integer[] linesWithWarn =
                         getLinesWithWarnAndCheckComments(filePath, tabWidth);
-        Assert.assertEquals("Expected warning count in UT does not match warn"
+        assertEquals("Expected warning count in UT does not match warn"
                         + " comment count in input file", linesWithWarn.length
                         + warnCountCorrection,
                         expected.length);
@@ -183,6 +183,15 @@ public class IndentationCheckTest extends BaseCheckTestSupport {
                     String[] expected)
                     throws Exception {
         verifyWarns(config, filePath, expected, 0);
+    }
+
+    @Test
+    public void testThrowsIndentProperty() {
+        IndentationCheck indentationCheck = new IndentationCheck();
+
+        indentationCheck.setThrowsIndent(1);
+
+        assertEquals(1, indentationCheck.getThrowsIndent());
     }
 
     @Test
@@ -439,6 +448,27 @@ public class IndentationCheckTest extends BaseCheckTestSupport {
             "41: " + getCheckMessage(MSG_CHILD_ERROR_MULTI, "label", 6, "8, 12"),
         };
         verifyWarns(checkConfig, getPath("indentation/InputInvalidLabelIndent.java"), expected);
+    }
+
+    @Test
+    public void testInvalidLabelWithWhileLoop() throws Exception {
+        final DefaultConfiguration checkConfig = createCheckConfig(IndentationCheck.class);
+
+        checkConfig.addAttribute("arrayInitIndent", "4");
+        checkConfig.addAttribute("basicOffset", "4");
+        checkConfig.addAttribute("braceAdjustment", "0");
+        checkConfig.addAttribute("caseIndent", "4");
+        checkConfig.addAttribute("forceStrictCondition", "false");
+        checkConfig.addAttribute("lineWrappingIndentation", "4");
+        checkConfig.addAttribute("tabWidth", "4");
+        checkConfig.addAttribute("throwsIndent", "4");
+        final String[] expected = {
+            "18: " + getCheckMessage(MSG_CHILD_ERROR_MULTI, "label", 9, "4, 8"),
+            "19: " + getCheckMessage(MSG_CHILD_ERROR_MULTI, "label", 9, "8, 12"),
+            "19: " + getCheckMessage(MSG_ERROR_MULTI, "while", 9, "8, 12"),
+        };
+        verifyWarns(checkConfig, getPath("indentation/InputInvalidLabelWithWhileLoopIndent.java"),
+            expected);
     }
 
     @Test
@@ -1078,6 +1108,25 @@ public class IndentationCheckTest extends BaseCheckTestSupport {
     }
 
     @Test
+    public void testInvalidInvalidAnonymousClass() throws Exception {
+        final DefaultConfiguration checkConfig = createCheckConfig(IndentationCheck.class);
+
+        checkConfig.addAttribute("arrayInitIndent", "4");
+        checkConfig.addAttribute("basicOffset", "4");
+        checkConfig.addAttribute("braceAdjustment", "0");
+        checkConfig.addAttribute("caseIndent", "4");
+        checkConfig.addAttribute("forceStrictCondition", "false");
+        checkConfig.addAttribute("lineWrappingIndentation", "4");
+        checkConfig.addAttribute("tabWidth", "4");
+        checkConfig.addAttribute("throwsIndent", "4");
+        final String fname = getPath("indentation/InputInvalidAnonymousClassIndent.java");
+        final String[] expected = {
+            "28: " + getCheckMessage(MSG_ERROR_MULTI, "method def rcurly", 17, "12, 16"),
+        };
+        verifyWarns(checkConfig, fname, expected);
+    }
+
+    @Test
     public void testInvalidForWithChecker()
         throws Exception {
         final DefaultConfiguration checkConfig = createCheckConfig(IndentationCheck.class);
@@ -1180,7 +1229,6 @@ public class IndentationCheckTest extends BaseCheckTestSupport {
         };
         verifyWarns(checkConfig, fname, expected);
     }
-
 
     @Test
     public void testValidWhileWithChecker()
@@ -1372,6 +1420,17 @@ public class IndentationCheckTest extends BaseCheckTestSupport {
     }
 
     @Test
+    public void testInvalidImportIndent() throws Exception {
+        final DefaultConfiguration checkConfig = createCheckConfig(IndentationCheck.class);
+        checkConfig.addAttribute("basicOffset", "8");
+        checkConfig.addAttribute("tabWidth", "4");
+        final String[] expected = {
+            "4: " + getCheckMessage(MSG_CHILD_ERROR, "import", 2, 8),
+        };
+        verifyWarns(checkConfig, getPath("indentation/InputInvalidImportIndent.java"), expected);
+    }
+
+    @Test
     public void testValidAssignWithChecker() throws Exception {
         final DefaultConfiguration checkConfig = createCheckConfig(IndentationCheck.class);
 
@@ -1468,5 +1527,45 @@ public class IndentationCheckTest extends BaseCheckTestSupport {
         final String[] expected = {
         };
         verifyWarns(checkConfig, getPath("indentation/InputSynchronizedMethod.java"), expected);
+    }
+
+    @Test
+    public void testAnonymousClassInMethod() throws Exception {
+        final DefaultConfiguration checkConfig = createCheckConfig(IndentationCheck.class);
+        checkConfig.addAttribute("tabWidth", "8");
+        checkConfig.addAttribute("basicOffset", "2");
+        checkConfig.addAttribute("braceAdjustment", "0");
+        checkConfig.addAttribute("caseIndent", "2");
+        checkConfig.addAttribute("lineWrappingIndentation", "4");
+        checkConfig.addAttribute("throwsIndent", "4");
+        checkConfig.addAttribute("arrayInitIndent", "2");
+        final String[] expected = {
+            "19: " + getCheckMessage(MSG_ERROR, "method def modifier", 8, 2),
+            "20: " + getCheckMessage(MSG_CHILD_ERROR, "method def", 16, 4),
+            "21: " + getCheckMessage(MSG_ERROR_MULTI, "method def modifier", 24, "18, 20, 22"),
+            "23: " + getCheckMessage(MSG_CHILD_ERROR_MULTI, "method def", 32, "20, 22, 24"),
+            "24: " + getCheckMessage(MSG_ERROR_MULTI, "method def rcurly",  24, "18, 20, 22"),
+            "26: " + getCheckMessage(MSG_ERROR, "method def rcurly", 8, 2),
+        };
+        verifyWarns(checkConfig, getPath("indentation/InputAnonymousClassInMethod.java"), expected);
+    }
+
+    @Test
+    public void testAnnotationDefinition() throws Exception {
+        final DefaultConfiguration checkConfig = createCheckConfig(IndentationCheck.class);
+        checkConfig.addAttribute("tabWidth", "4");
+        final String[] expected = {
+        };
+        verifyWarns(checkConfig, getPath("indentation/InputAnnotationDefinition.java"), expected);
+    }
+
+    @Test
+    public void testPackageDeclaration() throws Exception {
+        final DefaultConfiguration checkConfig = createCheckConfig(IndentationCheck.class);
+        checkConfig.addAttribute("tabWidth", "4");
+        final String[] expected = {
+            "1: " + getCheckMessage(MSG_ERROR, "package def", 1, 0),
+        };
+        verifyWarns(checkConfig, getPath("indentation/InputPackageDeclaration.java"), expected);
     }
 }

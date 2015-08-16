@@ -19,12 +19,16 @@
 
 package com.puppycrawl.tools.checkstyle.checks.imports;
 
-import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
-import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
+import static com.puppycrawl.tools.checkstyle.checks.imports.IllegalImportCheck.MSG_KEY;
+import static org.junit.Assert.assertArrayEquals;
+
 import java.io.File;
+
 import org.junit.Test;
 
-import static com.puppycrawl.tools.checkstyle.checks.imports.IllegalImportCheck.MSG_KEY;
+import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
+import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
+import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
 public class IllegalImportCheckTest extends BaseCheckTestSupport {
     @Test
@@ -53,5 +57,15 @@ public class IllegalImportCheckTest extends BaseCheckTestSupport {
         };
         verify(checkConfig, getPath("imports" + File.separator + "InputIllegalImportCheck.java"),
                 expected);
+    }
+
+    @Test
+    public void testGetAcceptableTokens() {
+        IllegalImportCheck testCheckObject =
+                new IllegalImportCheck();
+        int[] actual = testCheckObject.getAcceptableTokens();
+        int[] expected = new int[]{TokenTypes.IMPORT, TokenTypes.STATIC_IMPORT};
+
+        assertArrayEquals(expected, actual);
     }
 }

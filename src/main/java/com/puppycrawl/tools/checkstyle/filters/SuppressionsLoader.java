@@ -66,7 +66,7 @@ public final class SuppressionsLoader
     private final FilterSet filterChain = new FilterSet();
 
     /**
-     * Creates a new <code>SuppressionsLoader</code> instance.
+     * Creates a new {@code SuppressionsLoader} instance.
      * @throws ParserConfigurationException if an error occurs
      * @throws SAXException if an error occurs
      */
@@ -91,10 +91,6 @@ public final class SuppressionsLoader
         throws SAXException {
         if ("suppress".equals(qName)) {
             //add SuppressElement filter to the filter chain
-            final String files = atts.getValue("files");
-            if (files == null) {
-                throw new SAXException("missing files attribute");
-            }
             final String checks = atts.getValue("checks");
             final String modId = atts.getValue("id");
             if (checks == null && modId == null) {
@@ -102,6 +98,7 @@ public final class SuppressionsLoader
             }
             final SuppressElement suppress;
             try {
+                final String files = atts.getValue("files");
                 suppress = new SuppressElement(files);
                 if (modId != null) {
                     suppress.setModuleId(modId);
@@ -110,7 +107,7 @@ public final class SuppressionsLoader
                     suppress.setChecks(checks);
                 }
             }
-            catch (final PatternSyntaxException e) {
+            catch (final PatternSyntaxException ignored) {
                 throw new SAXException("invalid files or checks format");
             }
             final String lines = atts.getValue("lines");
@@ -139,10 +136,7 @@ public final class SuppressionsLoader
             final URL url = new URL(filename);
             uri = url.toURI();
         }
-        catch (final MalformedURLException ex) {
-            uri = null;
-        }
-        catch (final URISyntaxException ex) {
+        catch (final MalformedURLException | URISyntaxException ignored) {
             // URL violating RFC 2396
             uri = null;
         }
@@ -162,7 +156,7 @@ public final class SuppressionsLoader
                     uri = configUrl.toURI();
                 }
                 catch (final URISyntaxException e) {
-                    throw new CheckstyleException("unable to find " + filename);
+                    throw new CheckstyleException("unable to find " + filename, e);
                 }
             }
         }
@@ -189,10 +183,7 @@ public final class SuppressionsLoader
         catch (final FileNotFoundException e) {
             throw new CheckstyleException("unable to find " + sourceName, e);
         }
-        catch (final ParserConfigurationException e) {
-            throw new CheckstyleException("unable to parse " + sourceName, e);
-        }
-        catch (final SAXException e) {
+        catch (final ParserConfigurationException | SAXException e) {
             throw new CheckstyleException("unable to parse "
                     + sourceName + " - " + e.getMessage(), e);
         }

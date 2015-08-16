@@ -19,6 +19,10 @@
 
 package com.puppycrawl.tools.checkstyle.checks.metrics;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.Set;
+
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.puppycrawl.tools.checkstyle.api.Check;
@@ -26,9 +30,6 @@ import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.FullIdent;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import com.puppycrawl.tools.checkstyle.checks.CheckUtils;
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.Set;
 
 /**
  * Base class for coupling calculation.
@@ -77,7 +78,7 @@ public abstract class AbstractClassCouplingCheck extends Check {
      * @param defaultMax default value for allowed complexity.
      */
     protected AbstractClassCouplingCheck(int defaultMax) {
-        setMax(defaultMax);
+        max = defaultMax;
     }
 
     @Override
@@ -136,7 +137,7 @@ public abstract class AbstractClassCouplingCheck extends Check {
                 context.visitLiteralThrows(ast);
                 break;
             default:
-                throw new IllegalStateException(ast.toString());
+                throw new IllegalArgumentException("Unknown type: " + ast);
         }
     }
 
@@ -234,8 +235,8 @@ public abstract class AbstractClassCouplingCheck extends Check {
          * @param ast type to process.
          */
         public void visitType(DetailAST ast) {
-            final String className = CheckUtils.createFullType(ast).getText();
-            context.addReferencedClassName(className);
+            final String fullTypeName = CheckUtils.createFullType(ast).getText();
+            context.addReferencedClassName(fullTypeName);
         }
 
         /**
@@ -251,17 +252,17 @@ public abstract class AbstractClassCouplingCheck extends Check {
          * @param ast a node which represents referenced class.
          */
         private void addReferencedClassName(DetailAST ast) {
-            final String className = FullIdent.createFullIdent(ast).getText();
-            addReferencedClassName(className);
+            final String fullIdentName = FullIdent.createFullIdent(ast).getText();
+            addReferencedClassName(fullIdentName);
         }
 
         /**
          * Adds new referenced class.
-         * @param className class name of the referenced class.
+         * @param referencedClassName class name of the referenced class.
          */
-        private void addReferencedClassName(String className) {
-            if (isSignificant(className)) {
-                referencedClassNames.add(className);
+        private void addReferencedClassName(String referencedClassName) {
+            if (isSignificant(referencedClassName)) {
+                referencedClassNames.add(referencedClassName);
             }
         }
 
@@ -279,13 +280,12 @@ public abstract class AbstractClassCouplingCheck extends Check {
 
         /**
          * Checks if given class shouldn't be ignored and not from java.lang.
-         * @param className class to check.
+         * @param candidateClassName class to check.
          * @return true if we should count this class.
          */
-        private boolean isSignificant(String className) {
-            return className.length() > 0
-                    && !excludedClasses.contains(className)
-                    && !className.startsWith("java.lang.");
+        private boolean isSignificant(String candidateClassName) {
+            return !excludedClasses.contains(candidateClassName)
+                    && !candidateClassName.startsWith("java.lang.");
         }
     }
 }

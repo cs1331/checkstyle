@@ -19,15 +19,14 @@
 
 package com.puppycrawl.tools.checkstyle.checks.indentation;
 
-import com.google.common.collect.Maps;
-import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.Set;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import com.google.common.collect.Maps;
+import com.puppycrawl.tools.checkstyle.Utils;
+import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
 /**
  * Factory for handlers. Looks up constructor via reflection.
@@ -35,9 +34,6 @@ import org.apache.commons.logging.LogFactory;
  * @author jrichard
  */
 public class HandlerFactory {
-    /** Logger for indentation check. */
-    private static final Log LOG = LogFactory.getLog(HandlerFactory.class);
-
     /**
      * Registered handlers.
      */
@@ -45,7 +41,7 @@ public class HandlerFactory {
         Maps.newHashMap();
 
     /** cache for created method call handlers */
-    private final Map<DetailAST, ExpressionHandler> createdHandlers =
+    private final Map<DetailAST, AbstractExpressionHandler> createdHandlers =
         Maps.newHashMap();
 
     /** Creates a HandlerFactory. */
@@ -90,19 +86,12 @@ public class HandlerFactory {
      *                the handler to register
      */
     private void register(int type, Class<?> handlerClass) {
-        try {
-            final Constructor<?> ctor = handlerClass
-                .getConstructor(new Class[] {IndentationCheck.class,
-                    DetailAST.class, // current AST
-                    ExpressionHandler.class, // parent
-                });
-            typeHandlers.put(type, ctor);
-        }
-        catch (final NoSuchMethodException | SecurityException e) {
-            final String message = "couldn't find ctor for " + handlerClass;
-            LOG.debug(message, e);
-            throw new RuntimeException(message);
-        }
+        final Constructor<?> ctor = Utils.getConstructor(handlerClass,
+                IndentationCheck.class,
+                DetailAST.class, // current AST
+                AbstractExpressionHandler.class // parent
+        );
+        typeHandlers.put(type, ctor);
     }
 
     /**
@@ -126,7 +115,8 @@ public class HandlerFactory {
         final int[] types = new int[typeSet.size()];
         int index = 0;
         for (final Integer val : typeSet) {
-            types[index++] = val;
+            types[index] = val;
+            index++;
         }
 
         return types;
@@ -141,9 +131,9 @@ public class HandlerFactory {
      *
      * @return the ExpressionHandler for ast
      */
-    public ExpressionHandler getHandler(IndentationCheck indentCheck,
-        DetailAST ast, ExpressionHandler parent) {
-        final ExpressionHandler handler =
+    public AbstractExpressionHandler getHandler(IndentationCheck indentCheck,
+        DetailAST ast, AbstractExpressionHandler parent) {
+        final AbstractExpressionHandler handler =
             createdHandlers.get(ast);
         if (handler != null) {
             return handler;
@@ -153,29 +143,10 @@ public class HandlerFactory {
             return createMethodCallHandler(indentCheck, ast, parent);
         }
 
-        ExpressionHandler expHandler = null;
-        try {
-            final Constructor<?> handlerCtor =
-                typeHandlers.get(ast.getType());
-            if (handlerCtor != null) {
-                expHandler = (ExpressionHandler) handlerCtor.newInstance(
-                        indentCheck, ast, parent);
-            }
-        }
-        catch (final InstantiationException | InvocationTargetException e) {
-            final String message = "couldn't instantiate constructor for " + ast;
-            LOG.debug(message, e);
-            throw new RuntimeException(message);
-        }
-        catch (final IllegalAccessException e) {
-            final String message = "couldn't access constructor for " + ast;
-            LOG.debug(message, e);
-            throw new RuntimeException(message);
-        }
-        if (expHandler == null) {
-            throw new RuntimeException("no handler for type " + ast.getType());
-        }
-        return expHandler;
+        final Constructor<?> handlerCtor =
+            typeHandlers.get(ast.getType());
+        return (AbstractExpressionHandler) Utils.invokeConstructor(
+            handlerCtor, indentCheck, ast, parent);
     }
 
     /**
@@ -187,14 +158,14 @@ public class HandlerFactory {
      *
      * @return new instance.
      */
-    ExpressionHandler createMethodCallHandler(IndentationCheck indentCheck,
-        DetailAST ast, ExpressionHandler parent) {
-        ExpressionHandler theParent = parent;
+    AbstractExpressionHandler createMethodCallHandler(IndentationCheck indentCheck,
+        DetailAST ast, AbstractExpressionHandler parent) {
+        AbstractExpressionHandler theParent = parent;
         DetailAST astNode = ast.getFirstChild();
-        while (astNode != null && astNode.getType() == TokenTypes.DOT) {
+        while (astNode.getType() == TokenTypes.DOT) {
             astNode = astNode.getFirstChild();
         }
-        if (astNode != null && isHandledType(astNode.getType())) {
+        if (isHandledType(astNode.getType())) {
             theParent = getHandler(indentCheck, astNode, theParent);
             createdHandlers.put(astNode, theParent);
         }

@@ -19,11 +19,13 @@
 
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
-import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
-import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
+import static com.puppycrawl.tools.checkstyle.checks.coding.CovariantEqualsCheck.MSG_KEY;
+
+import org.junit.Assert;
 import org.junit.Test;
 
-import static com.puppycrawl.tools.checkstyle.checks.coding.CovariantEqualsCheck.MSG_KEY;
+import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
+import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 
 public class CovariantEqualsCheckTest
     extends BaseCheckTestSupport {
@@ -42,5 +44,12 @@ public class CovariantEqualsCheckTest
         };
         verify(checkConfig, getPath("InputCovariant.java"), expected);
     }
-}
 
+    @Test
+    public void testTokensNotNull() {
+        CovariantEqualsCheck check = new CovariantEqualsCheck();
+        Assert.assertNotNull(check.getAcceptableTokens());
+        Assert.assertNotNull(check.getDefaultTokens());
+        Assert.assertNotNull(check.getRequiredTokens());
+    }
+}

@@ -53,18 +53,19 @@ public class XMLLogger
                                               "quot", };
 
     /** close output stream in auditFinished */
-    private boolean closeStream;
+    private final boolean closeStream;
 
     /** helper writer that allows easy encoding and printing */
     private PrintWriter writer;
 
     /**
-     * Creates a new <code>XMLLogger</code> instance.
+     * Creates a new {@code XMLLogger} instance.
      * Sets the output to a defined stream.
      * @param os the stream to write logs to.
      * @param closeStream close oS in auditFinished
+     * @throws UnsupportedEncodingException is UTF-8 is not supported
      */
-    public XMLLogger(OutputStream os, boolean closeStream) {
+    public XMLLogger(OutputStream os, boolean closeStream) throws UnsupportedEncodingException {
         setOutputStream(os);
         this.closeStream = closeStream;
     }
@@ -72,19 +73,13 @@ public class XMLLogger
     /**
      * sets the OutputStream
      * @param oS the OutputStream to use
+     * @throws UnsupportedEncodingException is UTF-8 is not supported
      **/
-    private void setOutputStream(OutputStream oS) {
-        try {
-            final OutputStreamWriter osw = new OutputStreamWriter(oS, "UTF-8");
-            writer = new PrintWriter(osw);
-        }
-        catch (final UnsupportedEncodingException e) {
-            // unlikely to happen...
-            throw new ExceptionInInitializerError(e);
-        }
+    private void setOutputStream(OutputStream oS) throws UnsupportedEncodingException {
+        final OutputStreamWriter osw = new OutputStreamWriter(oS, "UTF-8");
+        writer = new PrintWriter(osw);
     }
 
-    /** {@inheritDoc} */
     @Override
     public void auditStarted(AuditEvent evt) {
         writer.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
@@ -97,7 +92,6 @@ public class XMLLogger
         writer.println("<checkstyle version=\"" + version + "\">");
     }
 
-    /** {@inheritDoc} */
     @Override
     public void auditFinished(AuditEvent evt) {
         writer.println("</checkstyle>");
@@ -109,22 +103,19 @@ public class XMLLogger
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void fileStarted(AuditEvent evt) {
         writer.println("<file name=\"" + encode(evt.getFileName()) + "\">");
     }
 
-    /** {@inheritDoc} */
     @Override
     public void fileFinished(AuditEvent evt) {
         writer.println("</file>");
     }
 
-    /** {@inheritDoc} */
     @Override
     public void addError(AuditEvent evt) {
-        if (SeverityLevel.IGNORE != evt.getSeverityLevel()) {
+        if (evt.getSeverityLevel() != SeverityLevel.IGNORE) {
             writer.print("<error" + " line=\"" + evt.getLine() + "\"");
             if (evt.getColumn() > 0) {
                 writer.print(" column=\"" + evt.getColumn() + "\"");
@@ -141,7 +132,6 @@ public class XMLLogger
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void addException(AuditEvent evt, Throwable throwable) {
         final StringWriter sw = new StringWriter();
@@ -160,7 +150,7 @@ public class XMLLogger
      * @param value the value to escape.
      * @return the escaped value if necessary.
      */
-    public String encode(String value) {
+    public static String encode(String value) {
         final StringBuilder sb = new StringBuilder();
         for (int i = 0; i < value.length(); i++) {
             final char c = value.charAt(i);
@@ -199,7 +189,7 @@ public class XMLLogger
      * @param ent the possible entity to look for.
      * @return whether the given argument a character or entity reference
      */
-    public boolean isReference(String ent) {
+    public static boolean isReference(String ent) {
         if (ent.charAt(0) != '&' || !Utils.endsWithChar(ent, ';')) {
             return false;
         }
@@ -216,7 +206,7 @@ public class XMLLogger
                     ent.substring(prefixLength, ent.length() - 1), radix);
                 return true;
             }
-            catch (final NumberFormatException nfe) {
+            catch (final NumberFormatException ignored) {
                 return false;
             }
         }

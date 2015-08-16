@@ -19,15 +19,13 @@
 
 package com.puppycrawl.tools.checkstyle.checks;
 
+import java.util.regex.Pattern;
+
+import com.puppycrawl.tools.checkstyle.Utils;
 import com.puppycrawl.tools.checkstyle.api.Check;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.FullIdent;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.Utils;
-
-import java.util.regex.Pattern;
-
-import org.apache.commons.beanutils.ConversionException;
 
 /**
  * Detects uncommented main methods. Basically detects
@@ -64,11 +62,9 @@ public class UncommentedMainCheck
 
     /**
      * Set the excluded classes pattern.
-     * @param excludedClasses a <code>String</code> value
-     * @throws ConversionException if unable to create Pattern object
+     * @param excludedClasses a {@code String} value
      */
-    public void setExcludedClasses(String excludedClasses)
-        throws ConversionException {
+    public void setExcludedClasses(String excludedClasses) {
         this.excludedClasses = excludedClasses;
         excludedClassesPattern = Utils.createPattern(excludedClasses);
     }
@@ -115,6 +111,7 @@ public class UncommentedMainCheck
 
     @Override
     public void visitToken(DetailAST ast) {
+
         switch (ast.getType()) {
             case TokenTypes.PACKAGE_DEF:
                 visitPackageDef(ast);
@@ -155,7 +152,7 @@ public class UncommentedMainCheck
 
     /**
      * Checks method definition if this is
-     * <code>public static void main(String[])</code>.
+     * {@code public static void main(String[])}.
      * @param method method definition node
      */
     private void visitMethodDef(DetailAST method) {
@@ -186,7 +183,7 @@ public class UncommentedMainCheck
      * @param method the METHOD_DEF node
      * @return true if check passed, false otherwise
      */
-    private boolean checkName(DetailAST method) {
+    private static boolean checkName(DetailAST method) {
         final DetailAST ident = method.findFirstToken(TokenTypes.IDENT);
         return "main".equals(ident.getText());
     }
@@ -196,7 +193,7 @@ public class UncommentedMainCheck
      * @param method the METHOD_DEF node
      * @return true if check passed, false otherwise
      */
-    private boolean checkModifiers(DetailAST method) {
+    private static boolean checkModifiers(DetailAST method) {
         final DetailAST modifiers =
             method.findFirstToken(TokenTypes.MODIFIERS);
 
@@ -205,22 +202,22 @@ public class UncommentedMainCheck
     }
 
     /**
-     * Checks that return type is <code>void</code>.
+     * Checks that return type is {@code void}.
      * @param method the METHOD_DEF node
      * @return true if check passed, false otherwise
      */
-    private boolean checkType(DetailAST method) {
+    private static boolean checkType(DetailAST method) {
         final DetailAST type =
             method.findFirstToken(TokenTypes.TYPE).getFirstChild();
         return type.getType() == TokenTypes.LITERAL_VOID;
     }
 
     /**
-     * Checks that method has only <code>String[]</code> param
+     * Checks that method has only {@code String[]} param
      * @param method the METHOD_DEF node
      * @return true if check passed, false otherwise
      */
-    private boolean checkParams(DetailAST method) {
+    private static boolean checkParams(DetailAST method) {
         final DetailAST params = method.findFirstToken(TokenTypes.PARAMETERS);
         if (params.getChildCount() != 1) {
             return false;
@@ -235,13 +232,8 @@ public class UncommentedMainCheck
 
         final DetailAST arrayType = arrayDecl.getFirstChild();
 
-        if (arrayType.getType() == TokenTypes.IDENT
-            || arrayType.getType() == TokenTypes.DOT) {
-            final FullIdent type = FullIdent.createFullIdent(arrayType);
-            return "String".equals(type.getText())
-                    || "java.lang.String".equals(type.getText());
-        }
-
-        return false;
+        final FullIdent type = FullIdent.createFullIdent(arrayType);
+        return "String".equals(type.getText())
+                || "java.lang.String".equals(type.getText());
     }
 }

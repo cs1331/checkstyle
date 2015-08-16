@@ -1,32 +1,31 @@
 [![][travis img]][travis]
+[![][appveyor img]][appveyor]
 [![][coverage img]][coverage]
 [![][mavenbadge img]][mavenbadge]
 [![][versioneye img]][versioneye]
 [![][sonar img]][sonar]
 
-
 Members chat: [![][gitter img]][gitter]
 Contributors chat: [![https://gitter.im/checkstyle/checkstyle](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/checkstyle/checkstyle?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-![](https://raw.githubusercontent.com/checkstyle/checkstyle/master/src/site/resources/images/logo.png)
+![](https://raw.githubusercontent.com/checkstyle/resources/master/img/checkstyle-logos/checkstyle-logo-260x99.png)
 
 Checkstyle is a tool for
 checking Java source code for adherence to a Code Standard or set of validation rules (best practices).
 
-The latest version can be found at [SourceForge downloads](https://sourceforge.net/projects/checkstyle/files/checkstyle/) or at [Maven repo](http://repo1.maven.org/maven2/com/puppycrawl/tools/checkstyle/).
+The latest version can be found at [SourceForge downloads](http://sourceforge.net/projects/checkstyle/files/checkstyle/) or at [Maven repo](http://repo1.maven.org/maven2/com/puppycrawl/tools/checkstyle/).
 
 Documentation is available in HTML format, see http://checkstyle.sourceforge.net/checks.html.
 
 Continuous integration and Quality reports
 ======================
-Travis: [![][travis img]][travis]
+Travis (Linux build): [![][travis img]][travis]
+Appveyor (Windows build): [![][appveyor img]][appveyor]
 
 Quality reports: http://checkstyle.sourceforge.net/project-reports.html
 
 Feedback/Support
 ========
-
-[![https://gitter.im/checkstyle/checkstyle](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/checkstyle/checkstyle?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Please send any feedback to https://groups.google.com/forum/?hl=en#!forum/checkstyle
 
@@ -58,15 +57,17 @@ The software uses the Google Guava Libraries
 these packages are in the file named "LICENSE.apache20" in this
 directory.
 
-
 [travis]:http://travis-ci.org/checkstyle/checkstyle
 [travis img]:https://secure.travis-ci.org/checkstyle/checkstyle.png
+
+[appveyor]:https://ci.appveyor.com/project/checkstyle/checkstyle
+[appveyor img]:https://ci.appveyor.com/api/projects/status/rw6bw3dl9kph6ucc?svg=true
 
 [sonar]:http://nemo.sonarqube.org/dashboard/index/com.puppycrawl.tools:checkstyle
 [sonar img]:https://dev.eclipse.org/sonar/images/logo.png?1400775536
 
-[coverage]:https://coveralls.io/r/checkstyle/checkstyle
-[coverage img]:https://coveralls.io/repos/checkstyle/checkstyle/badge.svg
+[coverage]:http://codecov.io/github/checkstyle/checkstyle?branch=master
+[coverage img]:http://codecov.io/github/checkstyle/checkstyle/coverage.svg?branch=master
 
 [license]:LICENSE
 [license img]:https://img.shields.io/badge/license-GNU%20LGPL%20v2.1-blue.svg

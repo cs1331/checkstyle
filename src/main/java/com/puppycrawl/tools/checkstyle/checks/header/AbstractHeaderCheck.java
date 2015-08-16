@@ -35,14 +35,14 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.List;
 
-import com.google.common.io.Closeables;
 import org.apache.commons.beanutils.ConversionException;
+import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.google.common.io.Closeables;
 import com.puppycrawl.tools.checkstyle.api.AbstractFileSetCheck;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * Abstract super class for header checks.
@@ -58,7 +58,6 @@ public abstract class AbstractHeaderCheck extends AbstractFileSetCheck {
 
     /** the lines of the header file. */
     private final List<String> readerLines = Lists.newArrayList();
-
 
     /**
      * Return the header lines to check against.
@@ -84,11 +83,13 @@ public abstract class AbstractHeaderCheck extends AbstractFileSetCheck {
     /**
      * Set the header file to check against.
      * @param fileName the file that contains the header to check against.
+     * @throws CheckstyleException if fileName is empty.
      */
-    public void setHeaderFile(String fileName) {
-        // Handle empty param
+    public void setHeaderFile(String fileName) throws CheckstyleException {
         if (StringUtils.isBlank(fileName)) {
-            return;
+            throw new CheckstyleException(
+                "property 'headerFile' is missing or invalid in module "
+                    + getConfiguration().getName());
         }
 
         filename = fileName;
@@ -128,10 +129,7 @@ public abstract class AbstractHeaderCheck extends AbstractFileSetCheck {
             final URL url = new URL(filename);
             uri = url.toURI();
         }
-        catch (final MalformedURLException ex) {
-            uri = null;
-        }
-        catch (final URISyntaxException ex) {
+        catch (final MalformedURLException | URISyntaxException ignored) {
             // URL violating RFC 2396
             uri = null;
         }
@@ -150,7 +148,7 @@ public abstract class AbstractHeaderCheck extends AbstractFileSetCheck {
                     }
                     uri = configUrl.toURI();
                 }
-                catch (final URISyntaxException e) {
+                catch (final URISyntaxException ignored) {
                     throw new FileNotFoundException(filename);
                 }
             }
@@ -206,11 +204,11 @@ public abstract class AbstractHeaderCheck extends AbstractFileSetCheck {
         final LineNumberReader lnr = new LineNumberReader(headerReader);
         readerLines.clear();
         while (true) {
-            final String l = lnr.readLine();
-            if (l == null) {
+            final String line = lnr.readLine();
+            if (line == null) {
                 break;
             }
-            readerLines.add(l);
+            readerLines.add(line);
         }
         postprocessHeaderLines();
     }
@@ -220,6 +218,7 @@ public abstract class AbstractHeaderCheck extends AbstractFileSetCheck {
      * This implementation does nothing.
      */
     protected void postprocessHeaderLines() {
+        // No code by default
     }
 
     @Override
@@ -228,9 +227,7 @@ public abstract class AbstractHeaderCheck extends AbstractFileSetCheck {
             loadHeaderFile();
         }
         if (readerLines.isEmpty()) {
-            throw new CheckstyleException(
-                    "property 'headerFile' is missing or invalid in module "
-                    + getConfiguration().getName());
+            setHeader(null);
         }
     }
 }

@@ -21,8 +21,8 @@ package com.puppycrawl.tools.checkstyle.checks.naming;
 
 import java.util.regex.Pattern;
 
-import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.ScopeUtils;
+import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
 /**
@@ -30,7 +30,7 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  * Checks that local, non-final variable names conform to a format specified
  * by the format property. A catch parameter is considered to be
  * a local variable. The format is a
- * {@link java.util.regex.Pattern regular expression}
+ * {@link Pattern regular expression}
  * and defaults to
  * <strong>^[a-z][a-zA-Z0-9]*$</strong>.
  * </p>
@@ -74,14 +74,14 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 public class LocalVariableNameCheck
     extends AbstractNameCheck {
     /** Regexp for one-char loop variables. */
-    private static Pattern sSingleChar = Pattern.compile("^[a-z]$");
+    private static final Pattern SINGLE_CHAR = Pattern.compile("^[a-z]$");
 
     /**
      * Allow one character name for initialization expression in FOR loop.
      */
     private boolean allowOneCharVarInForLoop;
 
-    /** Creates a new <code>LocalVariableNameCheck</code> instance. */
+    /** Creates a new {@code LocalVariableNameCheck} instance. */
     public LocalVariableNameCheck() {
         super("^[a-z][a-zA-Z0-9]*$");
     }
@@ -111,12 +111,11 @@ public class LocalVariableNameCheck
         if (allowOneCharVarInForLoop && isForLoopVariable(ast)) {
             final String variableName =
                     ast.findFirstToken(TokenTypes.IDENT).getText();
-            return !sSingleChar.matcher(variableName).find();
+            return !SINGLE_CHAR.matcher(variableName).find();
         }
         final DetailAST modifiersAST =
             ast.findFirstToken(TokenTypes.MODIFIERS);
-        final boolean isFinal = modifiersAST != null
-            && modifiersAST.branchContains(TokenTypes.FINAL);
+        final boolean isFinal = modifiersAST.branchContains(TokenTypes.FINAL);
         return !isFinal && ScopeUtils.isLocalVariableDef(ast);
     }
 
@@ -125,7 +124,7 @@ public class LocalVariableNameCheck
      * @param variableDef variable definition.
      * @return true if a variable is the loop's one.
      */
-    private boolean isForLoopVariable(DetailAST variableDef) {
+    private static boolean isForLoopVariable(DetailAST variableDef) {
         final int parentType = variableDef.getParent().getType();
         return parentType == TokenTypes.FOR_INIT
                 || parentType == TokenTypes.FOR_EACH_CLAUSE;

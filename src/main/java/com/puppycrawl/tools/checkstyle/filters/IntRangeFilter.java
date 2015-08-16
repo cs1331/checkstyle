@@ -33,7 +33,7 @@ class IntRangeFilter implements IntFilter {
     private final Integer upperBound;
 
     /**
-     * Constructs a <code>IntRangeFilter</code> with a
+     * Constructs a {@code IntRangeFilter} with a
      * lower bound and an upper bound for the range.
      * @param lowerBound the lower bound of the range.
      * @param upperBound the upper bound of the range.
@@ -43,7 +43,6 @@ class IntRangeFilter implements IntFilter {
         this.upperBound = upperBound;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean accept(int intValue) {
         return lowerBound.compareTo(intValue) <= 0
@@ -63,8 +62,8 @@ class IntRangeFilter implements IntFilter {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        final IntRangeFilter that = (IntRangeFilter) o;
-        return Objects.equals(lowerBound, that.lowerBound)
-                && Objects.equals(upperBound, that.upperBound);
+        final IntRangeFilter intRangeFilter = (IntRangeFilter) o;
+        return Objects.equals(lowerBound, intRangeFilter.lowerBound)
+                && Objects.equals(upperBound, intRangeFilter.upperBound);
     }
 }

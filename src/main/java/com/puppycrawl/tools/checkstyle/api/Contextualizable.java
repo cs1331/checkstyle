@@ -19,13 +19,15 @@
 
 package com.puppycrawl.tools.checkstyle.api;
 
-
 /**
- * A Component that needs context information from it's container to work.
+ * A Component that needs context information from it's container(parent object) to work.
  * The container will create a Context object and pass it to this
- * Contextualizable. Contextualization will occur before configuration. The
- * general idea of Context/Contextualizable was taken from <a target="_top"
- * href="http://jakarta.apache.org/avalon/">Jakarta's Avalon framework</a>.
+ * Contextualizable. Contextualization will occur before configuration.
+ * Note: Configuring of object mean copy user defined properties to object.
+ * Contextualizing is inheriting some properties from parent that are provided by user
+ * to parent object or created by parent object.
+ * The general idea of Context/Contextualizable was taken from <a target="_top"
+ * href="http://avalon.apache.org/closed.html">Jakarta's Avalon framework</a>.
  * @author lkuehne
  */
 public interface Contextualizable {

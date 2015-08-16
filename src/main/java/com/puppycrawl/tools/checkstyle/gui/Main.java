@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2002  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,51 +19,64 @@
 
 package com.puppycrawl.tools.checkstyle.gui;
 
-import java.awt.*;
+import java.awt.EventQueue;
 import java.io.File;
 
 import javax.swing.JFrame;
+import javax.swing.WindowConstants;
 
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 
 /**
  * Entry point for starting the checkstyle GUI.
  */
-public class Main {
+public final class Main {
     /**
      * Main frame
      */
-    static JFrame frame;
+    private static JFrame frame;
 
     /**
-     * Entry point
+     * Hidden constructor of the current utility class.
+     */
+    private Main() {
+        // no code
+    }
+
+    /**
+     * Entry point.
+     * @param args the command line arguments.
      */
     public static void main(String... args) {
         frame = new JFrame("CheckStyle");
         final ParseTreeInfoPanel panel = new ParseTreeInfoPanel();
         frame.getContentPane().add(panel);
         if (args.length >= 1) {
-            final File f = new File(args[0]);
-            panel.openFile(f, frame);
+            final File file = new File(args[0]);
+            panel.openFile(file, frame);
         }
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
-        Runnable runner = new FrameShower(frame);
+        final Runnable runner = new FrameShower(frame);
         EventQueue.invokeLater(runner);
     }
 
     /**
-     * Method is used for testing inthe past
-     * @param ast
+     * Method is used for testing in the past.
+     * @param ast tree to display
      */
     public static void displayAst(DetailAST ast) {
-        JFrame frame = new JFrame("CheckStyle");
+        final JFrame testFrame = new JFrame("CheckStyle");
         final ParseTreeInfoPanel panel = new ParseTreeInfoPanel();
-        frame.getContentPane().add(panel);
-        panel.openAst(ast, frame);
-        frame.setSize(1500, 800);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setVisible(true);
+        testFrame.getContentPane().add(panel);
+        panel.openAst(ast, testFrame);
+        testFrame.setSize(1500, 800);
+        testFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        testFrame.setVisible(true);
+    }
+
+    static JFrame getFrame() {
+        return frame;
     }
 
     /**
@@ -73,7 +86,7 @@ public class Main {
         /**
          * frame
          */
-        final JFrame frame;
+        private final JFrame frame;
 
         /**
          * contstructor
@@ -85,6 +98,7 @@ public class Main {
         /**
          * display a frame
          */
+        @Override
         public void run() {
             frame.pack();
             frame.setVisible(true);

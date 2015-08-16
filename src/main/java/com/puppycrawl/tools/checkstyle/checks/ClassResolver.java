@@ -19,6 +19,7 @@
 
 package com.puppycrawl.tools.checkstyle.checks;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -37,7 +38,7 @@ public class ClassResolver {
     private final ClassLoader loader;
 
     /**
-     * Creates a new <code>ClassResolver</code> instance.
+     * Creates a new {@code ClassResolver} instance.
      *
      * @param loader the ClassLoader to load classes with.
      * @param pkg the name of the package the class may belong to
@@ -46,8 +47,8 @@ public class ClassResolver {
     public ClassResolver(ClassLoader loader, String pkg, Set<String> imports) {
         this.loader = loader;
         this.pkg = pkg;
-        this.imports = imports;
-        imports.add("java.lang.*");
+        this.imports = new HashSet<>(imports);
+        this.imports.add("java.lang.*");
     }
 
     /**
@@ -86,37 +87,67 @@ public class ClassResolver {
         }
 
         // See if in the package
-        if (!"".equals(pkg)) {
+        if (pkg != null && !pkg.isEmpty()) {
             clazz = resolveQualifiedName(pkg + "." + name);
             if (clazz != null) {
                 return clazz;
             }
         }
 
-        //inner class of this class???
-        if (!"".equals(currentClass)) {
-            final String innerClass = (!"".equals(pkg) ? pkg + "." : "")
-                + currentClass + "$" + name;
-            if (isLoadable(innerClass)) {
-                return safeLoad(innerClass);
-            }
+        // see if inner class of this class
+        clazz = resolveInnerClass(name, currentClass);
+        if (clazz != null) {
+            return clazz;
         }
 
-        // try star imports
+        clazz = resolveByStarImports(name);
+        if (clazz != null) {
+            return clazz;
+        }
+
+        // Giving up, the type is unknown, so load the class to generate an
+        // exception
+        return safeLoad(name);
+    }
+
+    /**
+     * see if inner class of this class
+     * @param name name of the search Class to search
+     * @param currentClass class where search in
+     * @return class if found , or null if not resolved
+     * @throws ClassNotFoundException  if an error occurs
+     */
+    private Class<?> resolveInnerClass(String name, String currentClass)
+            throws ClassNotFoundException {
+        Class<?> clazz = null;
+        if (!currentClass.isEmpty()) {
+            final String innerClass = (pkg.isEmpty() ? "" : pkg + ".")
+                + currentClass + "$" + name;
+            if (isLoadable(innerClass)) {
+                clazz = safeLoad(innerClass);
+            }
+        }
+        return clazz;
+    }
+
+    /**
+     * try star imports
+     * @param name name of the Class to search
+     * @return  class if found , or null if not resolved
+     */
+    private Class<?> resolveByStarImports(String name) {
+        Class<?> clazz = null;
         for (String imp : imports) {
             if (imp.endsWith(".*")) {
                 final String fqn = imp.substring(0, imp.lastIndexOf('.') + 1)
                     + name;
                 clazz = resolveQualifiedName(fqn);
                 if (clazz != null) {
-                    return clazz;
+                    break;
                 }
             }
         }
-
-        // Giving up, the type is unknown, so load the class to generate an
-        // exception
-        return safeLoad(name);
+        return clazz;
     }
 
     /**
@@ -128,7 +159,7 @@ public class ClassResolver {
             safeLoad(name);
             return true;
         }
-        catch (final ClassNotFoundException e) {
+        catch (final ClassNotFoundException | NoClassDefFoundError ignored) {
             return false;
         }
     }
@@ -137,11 +168,12 @@ public class ClassResolver {
      * Will load a specified class is such a way that it will NOT be
      * initialised.
      * @param name name of the class to load
-     * @return the <code>Class</code> for the specified class
+     * @return the {@code Class} for the specified class
      * @throws ClassNotFoundException if an error occurs
+     * @throws NoClassDefFoundError if an error occurs
      */
     public Class<?> safeLoad(String name)
-        throws ClassNotFoundException {
+        throws ClassNotFoundException, NoClassDefFoundError {
         // The next line will load the class using the specified class
         // loader. The magic is having the "false" parameter. This means the
         // class will not be initialised. Very, very important.
@@ -171,7 +203,7 @@ public class ClassResolver {
         catch (final ClassNotFoundException ex) {
             // we shouldn't get this exception here,
             // so this is unexpected runtime exception
-            throw new RuntimeException(ex);
+            throw new IllegalStateException(ex);
         }
 
         return null;

@@ -19,12 +19,13 @@
 
 package com.puppycrawl.tools.checkstyle.checks;
 
+import java.util.List;
+
 import com.google.common.collect.Lists;
 import com.puppycrawl.tools.checkstyle.Utils;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.FullIdent;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import java.util.List;
 
 /**
  * Contains utility methods for the checks.
@@ -46,7 +47,6 @@ public final class CheckUtils {
 
     /** prevent instances */
     private CheckUtils() {
-        throw new UnsupportedOperationException();
     }
 
     /**
@@ -114,9 +114,9 @@ public final class CheckUtils {
     }
 
     /**
-     * Creates <code>FullIdent</code> for given type node.
+     * Creates {@code FullIdent} for given type node.
      * @param typeAST a type node.
-     * @return <code>FullIdent</code> for given type.
+     * @return {@code FullIdent} for given type.
      */
     public static FullIdent createFullType(DetailAST typeAST) {
         final DetailAST arrayDeclAST =
@@ -128,7 +128,7 @@ public final class CheckUtils {
 
     /**
      * @param typeAST a type node (no array)
-     * @return <code>FullIdent</code> for given type.
+     * @return {@code FullIdent} for given type.
      */
     private static FullIdent createFullTypeNoArrays(DetailAST typeAST) {
         return FullIdent.createFullIdent(typeAST.getFirstChild());
@@ -139,7 +139,7 @@ public final class CheckUtils {
      * type. Returns 0 for types other than float, double, int, and long.
      * @param text the string to be parsed.
      * @param type the token type of the text. Should be a constant of
-     * {@link com.puppycrawl.tools.checkstyle.api.TokenTypes}.
+     * {@link TokenTypes}.
      * @return the double value represented by the string argument.
      */
     public static double parseDouble(String text, int type) {
@@ -164,7 +164,7 @@ public final class CheckUtils {
                 if (Utils.endsWithChar(txt, 'L') || Utils.endsWithChar(txt, 'l')) {
                     txt = txt.substring(0, txt.length() - 1);
                 }
-                if (txt.length() > 0) {
+                if (!txt.isEmpty()) {
                     if (type == TokenTypes.NUM_INT) {
                         result = parseInt(txt, radix);
                     }
@@ -221,18 +221,6 @@ public final class CheckUtils {
             result += digit;
         }
         return result;
-    }
-
-    /**
-     * Returns the value represented by the specified string of the specified
-     * type. Returns 0 for types other than float, double, int, and long.
-     * @param text the string to be parsed.
-     * @param type the token type of the text. Should be a constant of
-     * {@link com.puppycrawl.tools.checkstyle.api.TokenTypes}.
-     * @return the float value represented by the string argument.
-     */
-    public static double parseFloat(String text, int type) {
-        return (float) parseDouble(text, type);
     }
 
     /**

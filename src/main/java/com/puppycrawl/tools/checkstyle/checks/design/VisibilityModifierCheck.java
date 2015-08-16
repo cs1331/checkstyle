@@ -27,15 +27,14 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import antlr.collections.AST;
-
 import com.google.common.collect.ImmutableList;
 import com.puppycrawl.tools.checkstyle.AnnotationUtility;
+import com.puppycrawl.tools.checkstyle.ScopeUtils;
+import com.puppycrawl.tools.checkstyle.Utils;
 import com.puppycrawl.tools.checkstyle.api.Check;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.FullIdent;
-import com.puppycrawl.tools.checkstyle.ScopeUtils;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.Utils;
 
 /**
  * Checks visibility of class members. Only static final, immutable or annotated
@@ -55,36 +54,37 @@ import com.puppycrawl.tools.checkstyle.Utils;
  * which ignore variables in consideration, if user will provide short annotation name
  * that type will match to any named the same type without consideration of package,
  * list by default:
+ * </p>
  * <ul>
  * <li>org.junit.Rule</li>
  * <li>com.google.common.annotations.VisibleForTesting</li>
  * </ul>
- * </p>
  * <p>
  * For example such public field will be skipped by default value of list above:
  * </p>
- * <p>
- * <code>
- * <pre> @org.junit.Rule
+ *
+ * <pre>
+ * {@code @org.junit.Rule
  * public TemporaryFolder publicJUnitRule = new TemporaryFolder();
+ * }
  * </pre>
- * </code>
- * </p>
+ *
  * <p>
  * <b>allowPublicImmutableFields</b> - which allows immutable fields be
  * declared as public if defined in final class. Default value is <b>true</b>
  * </p>
  * <p>
  * Field is known to be immutable if:
+ * </p>
  * <ul>
  * <li>It's declared as final</li>
  * <li>Has either a primitive type or instance of class user defined to be immutable
  * (such as String, ImmutableCollection from Guava and etc)</li>
  * </ul>
- * </p>
  * <p>
  * Classes known to be immutable are listed in <b>immutableClassCanonicalNames</b> by their
  * <b>canonical</b> names. List by default:
+ * </p>
  * <ul>
  * <li>java.lang.String</li>
  * <li>java.lang.Integer</li>
@@ -107,6 +107,7 @@ import com.puppycrawl.tools.checkstyle.Utils;
  * <li>java.net.Inet6Address</li>
  * <li>java.net.InetSocketAddress</li>
  * </ul>
+ * <p>
  * User can override this list via adding <b>canonical</b> class names to
  * <b>immutableClassCanonicalNames</b>, if user will provide short class name all
  * that type will match to any named the same type without consideration of package.
@@ -130,9 +131,9 @@ import com.puppycrawl.tools.checkstyle.Utils;
  * <p>
  * Default Check's configuration will pass the code below:
  * </p>
- * <p>
+ *
  * <pre>
- * <code>
+ * {@code
  * public final class ImmutableClass
  * {
  *     public final int intValue; // No warning
@@ -147,9 +148,9 @@ import com.puppycrawl.tools.checkstyle.Utils;
  *         this.notes = notes;
  *     }
  * }
- * </code>
+ * }
  * </pre>
- * </p>
+ *
  * <p>
  * To configure the Check passing fields of type com.google.common.collect.ImmutableSet and
  * java.util.List:
@@ -160,9 +161,9 @@ import com.puppycrawl.tools.checkstyle.Utils;
  *   com.google.common.collect.ImmutableSet&quot;/&gt;
  * &lt;/module&gt;
  * </p>
- * <p>
+ *
  * <pre>
- * <code>
+ * {@code
  * public final class ImmutableClass
  * {
  *     public final ImmutableSet&lt;String&gt; includes; // No warning
@@ -178,53 +179,55 @@ import com.puppycrawl.tools.checkstyle.Utils;
  *         this.notes = notes;
  *     }
  * }
- * </code>
+ * }
  * </pre>
- * </p>
+ *
  * <p>
  * To configure the Check passing fields annotated with
- * <pre>@com.annotation.CustomAnnotation</pre>:
  * </p>
+ * <pre>@com.annotation.CustomAnnotation</pre>:
+
  * <p>
  * &lt;module name=&quot;VisibilityModifier&quot;&gt;
  *   &lt;property name=&quot;ignoreAnnotationCanonicalNames&quot; value=&quot;
  *   com.annotation.CustomAnnotation&quot;/&gt;
  * &lt;/module&gt;
  * </p>
- * <p>
- * <code>
- * <pre> @com.annotation.CustomAnnotation
+ *
+ * <pre>
+ * {@code @com.annotation.CustomAnnotation
  * String customAnnotated; // No warning
- * </pre>
- * <pre> @CustomAnnotation
+ * }
+ * {@code @CustomAnnotation
  * String shortCustomAnnotated; // No warning
+ * }
  * </pre>
- * </code>
- * </p>
+ *
  * <p>
  * To configure the Check passing fields annotated with short annotation name
- * <pre>@CustomAnnotation</pre>:
  * </p>
+ * <pre>@CustomAnnotation</pre>:
+ *
  * <p>
  * &lt;module name=&quot;VisibilityModifier&quot;&gt;
  *   &lt;property name=&quot;ignoreAnnotationCanonicalNames&quot;
  *   value=&quot;CustomAnnotation&quot;/&gt;
  * &lt;/module&gt;
  * </p>
- * <p>
- * <code>
- * <pre> @CustomAnnotation
+ *
+ * <pre>
+ * {@code @CustomAnnotation
  * String customAnnotated; // No warning
- * </pre>
- * <pre> @com.annotation.CustomAnnotation
+ * }
+ * {@code @com.annotation.CustomAnnotation
  * String customAnnotated1; // No warning
- * </pre>
- * <pre> @mypackage.annotation.CustomAnnotation
+ * }
+ * {@code @mypackage.annotation.CustomAnnotation
  * String customAnnotatedAnotherPackage; // another package but short name matches
  *                                       // so no violation
+ * }
  * </pre>
- * </code>
- * </p>
+ *
  *
  * @author <a href="mailto:nesterenko-aleksey@list.ru">Aleksey Nesterenko</a>
  */
@@ -293,7 +296,7 @@ public class VisibilityModifierCheck
             new ArrayList<>(DEFAULT_IGNORE_ANNOTATIONS);
 
     /** List of ignore annotations short names. */
-    private List<String> ignoreAnnotationShortNames =
+    private final List<String> ignoreAnnotationShortNames =
             getClassShortNames(DEFAULT_IGNORE_ANNOTATIONS);
 
     /** Allows immutable fields to be declared as public. */
@@ -364,7 +367,7 @@ public class VisibilityModifierCheck
      * @param allow user's value.
      */
     public void setAllowPublicImmutableFields(boolean allow) {
-        this.allowPublicImmutableFields = allow;
+        allowPublicImmutableFields = allow;
     }
 
     /**
@@ -491,9 +494,9 @@ public class VisibilityModifierCheck
     /**
      * Checks if current import is star import. E.g.:
      * <p>
-     * <code>
+     * {@code
      * import java.util.*;
-     * </code>
+     * }
      * </p>
      * @param importAst {@link TokenTypes#IMPORT Import}
      * @return true if it is star import
@@ -520,24 +523,51 @@ public class VisibilityModifierCheck
     private boolean hasProperAccessModifier(DetailAST variableDef, String variableName) {
         boolean result = true;
 
-        final Set<String> mods = getModifiers(variableDef);
-        final String variableScope = getVisibilityScope(mods);
+        final String variableScope = getVisibilityScope(variableDef);
 
         if (!"private".equals(variableScope)) {
-            final DetailAST classDef = variableDef.getParent().getParent();
-            final Set<String> classModifiers = getModifiers(classDef);
-
             result =
-                mods.contains("static") && mods.contains("final")
+                isStaticFinalVariable(variableDef)
                 || isPackageAllowed() && "package".equals(variableScope)
                 || isProtectedAllowed() && "protected".equals(variableScope)
-                || "public".equals(variableScope)
-                   && getPublicMemberRegexp().matcher(variableName).find()
+                || isIgnoredPublicMember(variableName, variableScope)
                    || allowPublicImmutableFields
-                      && classModifiers.contains("final") && isImmutableField(variableDef);
+                      && isImmutableFieldDefinedInFinalClass(variableDef);
         }
 
         return result;
+    }
+
+    /**
+     * Checks whether variable has static final modifiers.
+     * @param variableDef Variable definition node.
+     * @return true of variable has static final modifiers.
+     */
+    private static boolean isStaticFinalVariable(DetailAST variableDef) {
+        final Set<String> modifiers = getModifiers(variableDef);
+        return modifiers.contains("static") && modifiers.contains("final");
+    }
+
+    /**
+     * Checks whether variable belongs to public members that should be ignored.
+     * @param variableName Variable's name.
+     * @param variableScope Variable's scope.
+     * @return true if variable belongs to public members that should be ignored.
+     */
+    private boolean isIgnoredPublicMember(String variableName, String variableScope) {
+        return "public".equals(variableScope)
+            && getPublicMemberRegexp().matcher(variableName).find();
+    }
+
+    /**
+     * Checks whether immutable field is defined in final class.
+     * @param variableDef Variable definition node.
+     * @return true if immutable field is defined in final class.
+     */
+    private boolean isImmutableFieldDefinedInFinalClass(DetailAST variableDef) {
+        final DetailAST classDef = variableDef.getParent().getParent();
+        final Set<String> classModifiers = getModifiers(classDef);
+        return classModifiers.contains("final") && isImmutableField(variableDef);
     }
 
     /**
@@ -560,11 +590,12 @@ public class VisibilityModifierCheck
     }
 
     /**
-     * Returns the visibility scope specified with a set of modifiers.
-     * @param modifiers the set of modifier Strings
+     * Returns the visibility scope for the variable.
+     * @param variableDef Variable definition node.
      * @return one of "public", "private", "protected", "package"
      */
-    private static String getVisibilityScope(Set<String> modifiers) {
+    private static String getVisibilityScope(DetailAST variableDef) {
+        final Set<String> modifiers = getModifiers(variableDef);
         String accessModifier = "package";
         for (final String modifier : EXPLICIT_MODS) {
             if (modifiers.contains(modifier)) {
@@ -610,7 +641,7 @@ public class VisibilityModifierCheck
      * @return String representation of given type's name.
      */
     private static String getTypeName(DetailAST type, boolean isCanonicalName) {
-        String typeName = "";
+        String typeName;
         if (isCanonicalName) {
             typeName = getCanonicalName(type);
         }
@@ -704,10 +735,9 @@ public class VisibilityModifierCheck
      * @return short name of class.
      */
     private static String getClassShortName(String canonicalClassName) {
-        final String shortClassName = canonicalClassName
+        return canonicalClassName
                 .substring(canonicalClassName.lastIndexOf('.') + 1,
                 canonicalClassName.length());
-        return shortClassName;
     }
 
     /**

@@ -19,21 +19,22 @@
 
 package com.puppycrawl.tools.checkstyle.checks.annotation;
 
+import static com.puppycrawl.tools.checkstyle.checks.annotation.MissingOverrideCheck.MSG_KEY_ANNOTATION_MISSING_OVERRIDE;
+import static com.puppycrawl.tools.checkstyle.checks.annotation.MissingOverrideCheck.MSG_KEY_TAG_NOT_VALID_ON;
+
 import java.io.File;
+
+import org.junit.Assert;
+import org.junit.Test;
 
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
-
-import org.junit.Test;
-
-import static com.puppycrawl.tools.checkstyle.checks.annotation.MissingOverrideCheck.MSG_KEY_ANNOTATION_MISSING_OVERRIDE;
-import static com.puppycrawl.tools.checkstyle.checks.annotation.MissingOverrideCheck.MSG_KEY_TAG_NOT_VALID_ON;
+import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
 public class MissingOverrideCheckTest extends BaseCheckTestSupport {
     /**
      * This tests that classes not extending anything explicitly will be correctly
      * flagged for only including the inheritDoc tag.
-     * @throws Exception
      */
     @Test
     public void testBadOverrideFromObject() throws Exception {
@@ -53,7 +54,6 @@ public class MissingOverrideCheckTest extends BaseCheckTestSupport {
     /**
      * This tests that classes not extending anything explicitly will be correctly
      * flagged for only including the inheritDoc tag even in Java 5 compatibility mode.
-     * @throws Exception
      */
     @Test
     public void testBadOverrideFromObjectJ5Compat() throws Exception {
@@ -73,7 +73,6 @@ public class MissingOverrideCheckTest extends BaseCheckTestSupport {
     /**
      * This tests classes that are extending things explicitly will be correctly
      * flagged for only including the inheritDoc tag.
-     * @throws Exception
      */
     @Test
     public void testBadOverrideFromOther() throws Exception {
@@ -94,7 +93,6 @@ public class MissingOverrideCheckTest extends BaseCheckTestSupport {
     /**
      * This tests classes that are extending things explicitly will NOT be flagged while in
      * Java 5 compatibility mode.
-     * @throws Exception
      */
     @Test
     public void testBadOverrideFromOtherJ5Compat() throws Exception {
@@ -110,7 +108,6 @@ public class MissingOverrideCheckTest extends BaseCheckTestSupport {
     /**
      * This tests anonymous inner classes that are overriding methods are correctly flagged
      * for only including the inheritDoc tag.
-     * @throws Exception
      */
     @Test
     public void testBadAnnonOverride() throws Exception {
@@ -128,7 +125,6 @@ public class MissingOverrideCheckTest extends BaseCheckTestSupport {
     /**
      * This tests anonymous inner classes that are overriding methods are NOT flagged while in
      * Java 5 compatibility mode.
-     * @throws Exception
      */
     @Test
     public void testBadAnnonOverrideJ5Compat() throws Exception {
@@ -142,7 +138,6 @@ public class MissingOverrideCheckTest extends BaseCheckTestSupport {
 
     /**
      * Tests that inheritDoc misuse is properly flagged or missing Javadocs do not cause a problem.
-     * @throws Exception
      */
     @Test
     public void testNotOverride() throws Exception {
@@ -158,7 +153,6 @@ public class MissingOverrideCheckTest extends BaseCheckTestSupport {
     /**
      * This tests that classes not extending anything explicitly will be correctly
      * flagged for only including the inheritDoc tag.
-     * @throws Exception
      */
     @Test
     public void testGoodOverrideFromObject() throws Exception {
@@ -174,7 +168,6 @@ public class MissingOverrideCheckTest extends BaseCheckTestSupport {
     /**
      * This tests that classes not extending anything explicitly will be correctly
      * flagged for only including the inheritDoc tag even in Java 5 compatibility mode.
-     * @throws Exception
      */
     @Test
     public void testGoodOverrideFromObjectJ5Compat() throws Exception {
@@ -190,7 +183,6 @@ public class MissingOverrideCheckTest extends BaseCheckTestSupport {
     /**
      * This tests classes that are extending things explicitly will be correctly
      * flagged for only including the inheritDoc tag.
-     * @throws Exception
      */
     @Test
     public void testGoodOverrideFromOther() throws Exception {
@@ -204,7 +196,6 @@ public class MissingOverrideCheckTest extends BaseCheckTestSupport {
     /**
      * This tests classes that are extending things explicitly will NOT be flagged while in
      * Java 5 compatibility mode.
-     * @throws Exception
      */
     @Test
     public void testGoodOverrideFromOtherJ5Compat() throws Exception {
@@ -220,7 +211,6 @@ public class MissingOverrideCheckTest extends BaseCheckTestSupport {
     /**
      * This tests anonymous inner classes that are overriding methods are correctly flagged
      * for only including the inheritDoc tag.
-     * @throws Exception
      */
     @Test
     public void testGoodAnnonOverride() throws Exception {
@@ -234,7 +224,6 @@ public class MissingOverrideCheckTest extends BaseCheckTestSupport {
     /**
      * This tests anonymous inner classes that are overriding methods are NOT flagged while in
      * Java 5 compatibility mode.
-     * @throws Exception
      */
     @Test
     public void testGoodAnnonOverrideJ5Compat() throws Exception {
@@ -244,5 +233,14 @@ public class MissingOverrideCheckTest extends BaseCheckTestSupport {
         };
 
         verify(checkConfig, getPath("annotation" + File.separator + "GoodAnnonOverride.java"), expected);
+    }
+
+    @Test
+    public void testGetAcceptableTockens() throws Exception {
+        int[] expectedTokens = {TokenTypes.METHOD_DEF };
+        MissingOverrideCheck check = new MissingOverrideCheck();
+        int[] actual = check.getAcceptableTokens();
+        Assert.assertTrue(actual.length == 1);
+        Assert.assertArrayEquals(expectedTokens, actual);
     }
 }

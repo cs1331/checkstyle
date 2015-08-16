@@ -37,4 +37,22 @@ public class InputTypeParamsTags<A,B1,C456 extends Comparable>
     public <L> void doSomethingElse2(L aAnEl)
     {
     }
+
+    /**
+     * Example inner class.
+     * @param <A> documented parameter
+     * @param <C> extra parameter
+     */
+
+    public static class InnerClass<A,B>
+    {
+    }
+
+    /**
+     * Some explanation.
+     * @param <Z The wrong type param
+     */
+    public <Z> void unclosedGenericParam()
+    {
+    }
 }

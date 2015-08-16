@@ -24,6 +24,7 @@ import static com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocTypeCheck.MI
 import static com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocTypeCheck.TAG_FORMAT;
 import static com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocTypeCheck.UNKNOWN_TAG;
 import static com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocTypeCheck.UNUSED_TAG;
+import static org.junit.Assert.assertArrayEquals;
 
 import java.io.File;
 
@@ -32,6 +33,7 @@ import org.junit.Test;
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.api.Scope;
+import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
 /**
  * @author Oliver.Burn
@@ -42,6 +44,22 @@ import com.puppycrawl.tools.checkstyle.api.Scope;
  * Window>Preferences>Java>Code Generation.
  */
 public class JavadocTypeCheckTest extends BaseCheckTestSupport {
+
+    @Test
+    public void testGetAcceptableTokens() {
+        JavadocTypeCheck javadocTypeCheck = new JavadocTypeCheck();
+
+        int[] actual = javadocTypeCheck.getAcceptableTokens();
+        int[] expected = new int[]{
+            TokenTypes.INTERFACE_DEF,
+            TokenTypes.CLASS_DEF,
+            TokenTypes.ENUM_DEF,
+            TokenTypes.ANNOTATION_DEF,
+        };
+
+        assertArrayEquals(expected, actual);
+    }
+
     @Test
     public void testTags() throws Exception {
         final DefaultConfiguration checkConfig =
@@ -301,6 +319,8 @@ public class JavadocTypeCheckTest extends BaseCheckTestSupport {
         final String[] expected = {
             "7:4: " + getCheckMessage(UNUSED_TAG, "@param", "<D123>"),
             "11: " + getCheckMessage(MISSING_TAG, "@param <C456>"),
+            "44:8: " + getCheckMessage(UNUSED_TAG, "@param", "<C>"),
+            "47: " + getCheckMessage(MISSING_TAG, "@param <B>"),
         };
         verify(checkConfig, getPath("InputTypeParamsTags.java"), expected);
     }
@@ -312,6 +332,7 @@ public class JavadocTypeCheckTest extends BaseCheckTestSupport {
         checkConfig.addAttribute("allowMissingParamTags", "true");
         final String[] expected = {
             "7:4: " + getCheckMessage(UNUSED_TAG, "@param", "<D123>"),
+            "44:8: " + getCheckMessage(UNUSED_TAG, "@param", "<C>"),
         };
         verify(checkConfig, getPath("InputTypeParamsTags.java"), expected);
     }
@@ -336,7 +357,7 @@ public class JavadocTypeCheckTest extends BaseCheckTestSupport {
         final String[] expected = {
         };
         verify(checkConfig,
-               getPath("javadoc" + File.separator + "InputBadTag.java"),
-               expected);
+                getPath("javadoc" + File.separator + "InputBadTag.java"),
+                expected);
     }
 }

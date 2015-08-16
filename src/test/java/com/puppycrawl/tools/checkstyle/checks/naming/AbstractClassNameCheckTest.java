@@ -19,15 +19,17 @@
 
 package com.puppycrawl.tools.checkstyle.checks.naming;
 
-import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
-import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
+import static com.puppycrawl.tools.checkstyle.checks.naming.AbstractClassNameCheck.ILLEGAL_ABSTRACT_CLASS_NAME;
+import static com.puppycrawl.tools.checkstyle.checks.naming.AbstractClassNameCheck.NO_ABSTRACT_CLASS_MODIFIER;
+
 import java.io.File;
+
+import org.junit.Assert;
 import org.junit.Test;
 
-import static com.puppycrawl.tools.checkstyle.checks.naming.AbstractClassNameCheck
-.ILLEGAL_ABSTRACT_CLASS_NAME;
-import static com.puppycrawl.tools.checkstyle.checks.naming.AbstractClassNameCheck
-.NO_ABSTRACT_CLASS_MODIFIER;
+import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
+import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
+import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
 public class AbstractClassNameCheckTest extends BaseCheckTestSupport {
     @Test
@@ -37,13 +39,12 @@ public class AbstractClassNameCheckTest extends BaseCheckTestSupport {
         checkConfig.addAttribute("ignoreName", "false");
         checkConfig.addAttribute("ignoreModifier", "true");
 
-        final String pattern = "^Abstract.+$|^.*Factory$";
+        final String pattern = "^Abstract.+$";
 
         final String[] expected = {
             "3:1: " + getCheckMessage(ILLEGAL_ABSTRACT_CLASS_NAME, "InputAbstractClassName", pattern),
             "6:1: " + getCheckMessage(ILLEGAL_ABSTRACT_CLASS_NAME, "NonAbstractClassName", pattern),
-            "9:1: " + getCheckMessage(ILLEGAL_ABSTRACT_CLASS_NAME, "FactoryWithBadName", pattern),
-            "13:5: " + getCheckMessage(ILLEGAL_ABSTRACT_CLASS_NAME, "NonAbstractInnerClass", pattern),
+            "10:5: " + getCheckMessage(ILLEGAL_ABSTRACT_CLASS_NAME, "NonAbstractInnerClass", pattern),
         };
 
         verify(checkConfig, getPath("naming" + File.separator + "InputAbstractClassName.java"), expected);
@@ -56,10 +57,8 @@ public class AbstractClassNameCheckTest extends BaseCheckTestSupport {
         checkConfig.addAttribute("ignoreModifier", "false");
 
         final String[] expected = {
-            "26:1: " + getCheckMessage(NO_ABSTRACT_CLASS_MODIFIER, "AbstractClass"),
-            "29:1: " + getCheckMessage(NO_ABSTRACT_CLASS_MODIFIER, "Class1Factory"),
-            "33:5: " + getCheckMessage(NO_ABSTRACT_CLASS_MODIFIER, "AbstractInnerClass"),
-            "38:5: " + getCheckMessage(NO_ABSTRACT_CLASS_MODIFIER, "WellNamedFactory"),
+            "18:1: " + getCheckMessage(NO_ABSTRACT_CLASS_MODIFIER, "AbstractClass"),
+            "22:5: " + getCheckMessage(NO_ABSTRACT_CLASS_MODIFIER, "AbstractInnerClass"),
         };
 
         verify(checkConfig, getPath("naming" + File.separator + "InputAbstractClassName.java"), expected);
@@ -71,17 +70,14 @@ public class AbstractClassNameCheckTest extends BaseCheckTestSupport {
         checkConfig.addAttribute("ignoreName", "false");
         checkConfig.addAttribute("ignoreModifier", "false");
 
-        final String pattern = "^Abstract.+$|^.*Factory$";
+        final String pattern = "^Abstract.+$";
 
         final String[] expected = {
             "3:1: " + getCheckMessage(ILLEGAL_ABSTRACT_CLASS_NAME, "InputAbstractClassName", pattern),
             "6:1: " + getCheckMessage(ILLEGAL_ABSTRACT_CLASS_NAME, "NonAbstractClassName", pattern),
-            "9:1: " + getCheckMessage(ILLEGAL_ABSTRACT_CLASS_NAME, "FactoryWithBadName", pattern),
-            "13:5: " + getCheckMessage(ILLEGAL_ABSTRACT_CLASS_NAME, "NonAbstractInnerClass", pattern),
-            "26:1: " + getCheckMessage(NO_ABSTRACT_CLASS_MODIFIER, "AbstractClass"),
-            "29:1: " + getCheckMessage(NO_ABSTRACT_CLASS_MODIFIER, "Class1Factory"),
-            "33:5: " + getCheckMessage(NO_ABSTRACT_CLASS_MODIFIER, "AbstractInnerClass"),
-            "38:5: " + getCheckMessage(NO_ABSTRACT_CLASS_MODIFIER, "WellNamedFactory"),
+            "10:5: " + getCheckMessage(ILLEGAL_ABSTRACT_CLASS_NAME, "NonAbstractInnerClass", pattern),
+            "18:1: " + getCheckMessage(NO_ABSTRACT_CLASS_MODIFIER, "AbstractClass"),
+            "22:5: " + getCheckMessage(NO_ABSTRACT_CLASS_MODIFIER, "AbstractInnerClass"),
         };
 
         verify(checkConfig, getPath("naming" + File.separator + "InputAbstractClassName.java"), expected);
@@ -90,8 +86,6 @@ public class AbstractClassNameCheckTest extends BaseCheckTestSupport {
     @Test
     public void testFalsePositive() throws Exception {
         final DefaultConfiguration checkConfig = createCheckConfig(AbstractClassNameCheck.class);
-//        checkConfig.addAttribute("ignoreName", "false");
-//        checkConfig.addAttribute("ignoreModifier", "false");
 
         final String[] expected = {
             "9:5: " + getCheckMessage(NO_ABSTRACT_CLASS_MODIFIER, "AbstractClass"),
@@ -99,5 +93,27 @@ public class AbstractClassNameCheckTest extends BaseCheckTestSupport {
 
         verify(checkConfig, getPath("naming" + File.separator
                  + "InputAbstractClassNameFormerFalsePositive.java"), expected);
+    }
+
+    @Test
+    public void testGetAcceptableTokens() {
+        AbstractClassNameCheck classNameCheckObj = new AbstractClassNameCheck();
+        int[] actual = classNameCheckObj.getAcceptableTokens();
+        int[] expected = new int[] {
+            TokenTypes.CLASS_DEF,
+        };
+        Assert.assertNotNull(actual);
+        Assert.assertArrayEquals(expected, actual);
+    }
+
+    @Test
+    public void testGetRequiredTokens() {
+        AbstractClassNameCheck classNameCheckObj = new AbstractClassNameCheck();
+        int[] actual = classNameCheckObj.getRequiredTokens();
+        int[] expected = new int[] {
+            TokenTypes.CLASS_DEF,
+        };
+        Assert.assertNotNull(actual);
+        Assert.assertArrayEquals(expected, actual);
     }
 }

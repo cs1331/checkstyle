@@ -19,12 +19,13 @@
 
 package com.puppycrawl.tools.checkstyle;
 
-import com.google.common.collect.Sets;
-import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
+import java.util.Set;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.util.Set;
+import com.google.common.collect.Sets;
+import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 
 /**
  * A factory for creating objects from package names and names.
@@ -42,7 +43,7 @@ class PackageObjectFactory implements ModuleFactory {
     private final ClassLoader moduleClassLoader;
 
     /**
-     * Creates a new <code>PackageObjectFactory</code> instance.
+     * Creates a new {@code PackageObjectFactory} instance.
      * @param packageNames the list of package names to use
      * @param moduleClassLoader class loader used to load Checkstyle
      *          core and custom modules
@@ -73,7 +74,7 @@ class PackageObjectFactory implements ModuleFactory {
      * an instance of a classname obtained by concatenating the given
      * to a package name from a given list of package names.
      * @param name the name of a class.
-     * @return the <code>Object</code>
+     * @return the {@code Object}
      * @throws CheckstyleException if an error occurs.
      */
     private Object doMakeObject(String name)
@@ -104,17 +105,17 @@ class PackageObjectFactory implements ModuleFactory {
     /**
      * Creates a new instance of a named class.
      * @param className the name of the class to instantiate.
-     * @return the <code>Object</code> created by loader.
+     * @return the {@code Object} created by loader.
      * @throws CheckstyleException if an error occurs.
      */
     private Object createObject(String className)
         throws CheckstyleException {
         try {
             final Class<?> clazz = Class.forName(className, true, moduleClassLoader);
-            return clazz.newInstance();
+            return clazz.getDeclaredConstructor().newInstance();
         }
-        catch (final ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-            throw new CheckstyleException("Unable to find class for " + className, e);
+        catch (final ReflectiveOperationException exception) {
+            throw new CheckstyleException("Unable to find class for " + className, exception);
         }
     }
 
@@ -125,7 +126,7 @@ class PackageObjectFactory implements ModuleFactory {
      * an instance of a classname obtained by concatenating the given name
      * to a package name from a given list of package names.
      * @param name the name of a class.
-     * @return the <code>Object</code> created by loader.
+     * @return the {@code Object} created by loader.
      * @throws CheckstyleException if an error occurs.
      */
     @Override
@@ -134,7 +135,7 @@ class PackageObjectFactory implements ModuleFactory {
         try {
             return doMakeObject(name);
         }
-        catch (final CheckstyleException ex) {
+        catch (final CheckstyleException ignored) {
             //try again with suffix "Check"
             try {
                 return doMakeObject(name + "Check");

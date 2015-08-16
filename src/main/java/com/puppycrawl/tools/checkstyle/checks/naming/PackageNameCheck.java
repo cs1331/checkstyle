@@ -49,7 +49,7 @@ import com.puppycrawl.tools.checkstyle.checks.AbstractFormatCheck;
  * </pre>
  * <p>
  * An example of how to configure the check for package names that begin with
- * <code>com.puppycrawl.tools.checkstyle</code> is:
+ * {@code com.puppycrawl.tools.checkstyle} is:
  * </p>
  * <pre>
  * &lt;module name="PackageName"&gt;
@@ -63,7 +63,7 @@ import com.puppycrawl.tools.checkstyle.checks.AbstractFormatCheck;
 public class PackageNameCheck
     extends AbstractFormatCheck {
     /**
-     * Creates a new <code>PackageNameCheck</code> instance.
+     * Creates a new {@code PackageNameCheck} instance.
      */
     public PackageNameCheck() {
         // Uppercase letters seem rather uncommon, but they're allowed in

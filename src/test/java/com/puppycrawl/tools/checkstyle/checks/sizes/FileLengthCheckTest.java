@@ -19,15 +19,16 @@
 
 package com.puppycrawl.tools.checkstyle.checks.sizes;
 
+import static com.puppycrawl.tools.checkstyle.checks.sizes.FileLengthCheck.MSG_KEY;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+
+import org.junit.Test;
 
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 import com.puppycrawl.tools.checkstyle.api.Configuration;
-import org.junit.Test;
-
-import static com.puppycrawl.tools.checkstyle.checks.sizes.FileLengthCheck.MSG_KEY;
 
 public class FileLengthCheckTest
     extends BaseCheckTestSupport {
@@ -78,5 +79,31 @@ public class FileLengthCheckTest
         }
     }
 
+    @Test
+    public void testNoAlarmByExtension() throws Exception {
+        DefaultConfiguration checkConfig =
+                createCheckConfig(FileLengthCheck.class);
+        checkConfig.addAttribute("fileExtensions", "txt");
+        final String[] expected = {};
 
+        verify(createChecker(checkConfig),
+                getPath("InputSimple.java"),
+                getPath("InputSimple.java"), expected);
+    }
+
+    @Test
+    public void testExtensions() throws Exception {
+        FileLengthCheck check = new FileLengthCheck();
+        check.setFileExtensions("java");
+        assertEquals("extension should be the same", ".java", check.getFileExtensions()[0]);
+        check.setFileExtensions(".java");
+        assertEquals("extension should be the same", ".java", check.getFileExtensions()[0]);
+        try {
+            check.setFileExtensions((String[]) null);
+            fail();
+        }
+        catch (IllegalArgumentException ex) {
+            assertEquals("Extensions array can not be null", ex.getMessage());
+        }
+    }
 }

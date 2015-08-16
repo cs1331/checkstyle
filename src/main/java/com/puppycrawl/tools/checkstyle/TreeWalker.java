@@ -20,6 +20,7 @@
 package com.puppycrawl.tools.checkstyle;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.AbstractMap.SimpleEntry;
@@ -67,7 +68,7 @@ public final class TreeWalker
      * State of AST.
      * Indicates whether tree contains certain nodes.
      */
-    private static enum AstState {
+    private enum AstState {
         /**
          * Ordinary tree.
          */
@@ -103,7 +104,7 @@ public final class TreeWalker
     private int tabWidth = DEFAULT_TAB_WIDTH;
 
     /** cache file **/
-    private PropertyCacheFile cache = new PropertyCacheFile(null, null);
+    private PropertyCacheFile cache;
 
     /** class loader to resolve classes with. **/
     private ClassLoader classLoader;
@@ -115,7 +116,7 @@ public final class TreeWalker
     private ModuleFactory moduleFactory;
 
     /**
-     * Creates a new <code>TreeWalker</code> instance.
+     * Creates a new {@code TreeWalker} instance.
      */
     public TreeWalker() {
         setFileExtensions("java");
@@ -126,10 +127,14 @@ public final class TreeWalker
         this.tabWidth = tabWidth;
     }
 
-    /** @param fileName the cache file */
-    public void setCacheFile(String fileName) {
+    /** @param fileName the cache file
+     *  @throws IOException if there are some problems with file loading
+     */
+    public void setCacheFile(String fileName) throws IOException {
         final Configuration configuration = getConfiguration();
         cache = new PropertyCacheFile(configuration, fileName);
+
+        cache.load();
     }
 
     /** @param classLoader class loader to resolve classes with. */
@@ -165,12 +170,12 @@ public final class TreeWalker
             throw new CheckstyleException(
                 "TreeWalker is not allowed as a parent of " + name);
         }
-        final Check c = (Check) module;
-        c.contextualize(childContext);
-        c.configure(childConf);
-        c.init();
+        final Check check = (Check) module;
+        check.contextualize(childContext);
+        check.configure(childConf);
+        check.init();
 
-        registerCheck(c);
+        registerCheck(check);
     }
 
     @Override
@@ -178,8 +183,9 @@ public final class TreeWalker
         // check if already checked and passed the file
         final String fileName = file.getPath();
         final long timestamp = file.lastModified();
-        if (cache.alreadyChecked(fileName, timestamp)
-                 || !Utils.fileExtensionMatches(file, getFileExtensions())) {
+        if (cache != null
+                && (cache.inCache(fileName, timestamp)
+                    || !Utils.fileExtensionMatches(file, getFileExtensions()))) {
             return;
         }
 
@@ -188,7 +194,7 @@ public final class TreeWalker
         try {
             final FileText text = FileText.fromLines(file, lines);
             final FileContents contents = new FileContents(text);
-            final DetailAST rootAST = TreeWalker.parse(contents);
+            final DetailAST rootAST = parse(contents);
 
             getMessageCollector().reset();
 
@@ -203,10 +209,7 @@ public final class TreeWalker
                      fileName);
             LOG.error(exceptionMsg);
             final RecognitionException re = tre.recog;
-            String message = "TokenStreamRecognitionException occured";
-            if (re != null) {
-                message = re.getMessage();
-            }
+            final String message = re.getMessage();
             getMessageCollector().add(createLocalizedMessage(message));
         }
         // RecognitionException and any other (need to check if needed)
@@ -216,8 +219,8 @@ public final class TreeWalker
             getMessageCollector().add(createLocalizedMessage(ex.getMessage()));
         }
 
-        if (getMessageCollector().size() == 0) {
-            cache.checkedOk(fileName, timestamp);
+        if (cache != null && getMessageCollector().size() == 0) {
+            cache.put(fileName, timestamp);
         }
     }
 
@@ -234,7 +237,7 @@ public final class TreeWalker
                 "general.exception",
                 new String[] {message },
                 getId(),
-                this.getClass(), null);
+                getClass(), null);
     }
 
     /**
@@ -246,7 +249,10 @@ public final class TreeWalker
         throws CheckstyleException {
         final int[] tokens;
         final Set<String> checkTokens = check.getTokenNames();
-        if (!checkTokens.isEmpty()) {
+        if (checkTokens.isEmpty()) {
+            tokens = check.getDefaultTokens();
+        }
+        else {
             tokens = check.getRequiredTokens();
 
             //register configured tokens
@@ -263,9 +269,6 @@ public final class TreeWalker
                                 + " in check " + check);
                 }
             }
-        }
-        else {
-            tokens = check.getDefaultTokens();
         }
         for (int element : tokens) {
             registerCheck(element, check);
@@ -341,9 +344,9 @@ public final class TreeWalker
             checks = ordinaryChecks;
         }
 
-        for (Check ch : checks) {
-            ch.setFileContents(contents);
-            ch.beginTree(rootAST);
+        for (Check check : checks) {
+            check.setFileContents(contents);
+            check.beginTree(rootAST);
         }
     }
 
@@ -362,8 +365,8 @@ public final class TreeWalker
             checks = ordinaryChecks;
         }
 
-        for (Check ch : checks) {
-            ch.finishTree(rootAST);
+        for (Check check : checks) {
+            check.finishTree(rootAST);
         }
     }
 
@@ -389,8 +392,8 @@ public final class TreeWalker
             visitors = tokenToOrdinaryChecks.get(tokenType);
         }
 
-        for (Check c : visitors) {
-            c.visitToken(ast);
+        for (Check check : visitors) {
+            check.visitToken(ast);
         }
     }
 
@@ -417,8 +420,8 @@ public final class TreeWalker
             visitors = tokenToOrdinaryChecks.get(tokenType);
         }
 
-        for (Check ch : visitors) {
-            ch.leaveToken(ast);
+        for (Check check : visitors) {
+            check.leaveToken(ast);
         }
     }
 
@@ -460,13 +463,20 @@ public final class TreeWalker
 
     @Override
     public void destroy() {
-        for (Check c : ordinaryChecks) {
-            c.destroy();
+        for (Check check : ordinaryChecks) {
+            check.destroy();
         }
-        for (Check c : commentChecks) {
-            c.destroy();
+        for (Check check : commentChecks) {
+            check.destroy();
         }
-        cache.destroy();
+        if (cache != null) {
+            try {
+                cache.persist();
+            }
+            catch (IOException e) {
+                throw new IllegalStateException("Unable to persist cache file", e);
+            }
+        }
         super.destroy();
     }
 
@@ -565,15 +575,10 @@ public final class TreeWalker
         if (ast1.getLineNo() > ast2.getLineNo()) {
             return true;
         }
-        else if (ast1.getLineNo() < ast2.getLineNo()) {
+        if (ast1.getLineNo() < ast2.getLineNo()) {
             return false;
         }
-        else {
-            if (ast1.getColumnNo() > ast2.getColumnNo()) {
-                return true;
-            }
-        }
-        return false;
+        return ast1.getColumnNo() > ast2.getColumnNo();
     }
 
     /**
@@ -584,13 +589,11 @@ public final class TreeWalker
      * @return DetailAST of comment node.
      */
     private static DetailAST createCommentAstFromToken(Token token) {
-        switch (token.getType()) {
-            case TokenTypes.SINGLE_LINE_COMMENT:
-                return createSlCommentNode(token);
-            case TokenTypes.BLOCK_COMMENT_BEGIN:
-                return createBlockCommentNode(token);
-            default:
-                throw new IllegalArgumentException("Unknown comment type");
+        if (token.getType() == TokenTypes.SINGLE_LINE_COMMENT) {
+            return createSlCommentNode(token);
+        }
+        else {
+            return createBlockCommentNode(token);
         }
     }
 

@@ -25,8 +25,11 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import com.puppycrawl.tools.checkstyle.Utils;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.DetailNode;
 import com.puppycrawl.tools.checkstyle.api.JavadocTagInfo;
@@ -50,36 +53,30 @@ public final class JavadocUtils {
 
         final Field[] fields = JavadocTokenTypes.class.getDeclaredFields();
 
-        String[] tempTokenValueToName = new String[0];
+        String[] tempTokenValueToName = ArrayUtils.EMPTY_STRING_ARRAY;
 
-        for (final Field f : fields) {
+        for (final Field field : fields) {
 
             // Only process public int fields.
-            if (!Modifier.isPublic(f.getModifiers())
-                    || f.getType() != Integer.TYPE) {
+            if (!Modifier.isPublic(field.getModifiers())
+                    || field.getType() != Integer.TYPE) {
                 continue;
             }
 
-            final String name = f.getName();
+            final String name = field.getName();
 
-            try {
-                final int tokenValue = f.getInt(name);
-                builder.put(name, tokenValue);
-                if (tokenValue > tempTokenValueToName.length - 1) {
-                    final String[] temp = new String[tokenValue + 1];
-                    System.arraycopy(tempTokenValueToName, 0, temp, 0, tempTokenValueToName.length);
-                    tempTokenValueToName = temp;
-                }
-                if (tokenValue == -1) {
-                    tempTokenValueToName[0] = name;
-                }
-                else {
-                    tempTokenValueToName[tokenValue] = name;
-                }
+            final int tokenValue = Utils.getIntFromField(field, name);
+            builder.put(name, tokenValue);
+            if (tokenValue > tempTokenValueToName.length - 1) {
+                final String[] temp = new String[tokenValue + 1];
+                System.arraycopy(tempTokenValueToName, 0, temp, 0, tempTokenValueToName.length);
+                tempTokenValueToName = temp;
             }
-            catch (Exception e) {
-                throw new IllegalStateException(
-                    "Failed to instantiate collection of Javadoc tokens", e);
+            if (tokenValue == -1) {
+                tempTokenValueToName[0] = name;
+            }
+            else {
+                tempTokenValueToName[tokenValue] = name;
             }
         }
 
@@ -90,7 +87,6 @@ public final class JavadocUtils {
     /** prevent instantiation */
     private JavadocUtils() {
     }
-
 
     /**
      * Gets validTags from a given piece of Javadoc.
@@ -136,33 +132,31 @@ public final class JavadocUtils {
                 final Matcher commentMatcher = commentPattern.matcher(s);
                 final String commentContents;
                 final int commentOffset; // offset including comment characters
-                if (!commentMatcher.find()) {
-                    commentContents = s; // No leading asterisks, still valid
-                    commentOffset = 0;
-                }
-                else {
+                if (commentMatcher.find()) {
                     commentContents = commentMatcher.group(1);
                     commentOffset = commentMatcher.start(1) - 1;
+                }
+                else {
+                    commentContents = s; // No leading asterisks, still valid
+                    commentOffset = 0;
                 }
                 final Pattern tagPattern = Pattern.compile(".*?\\{@(\\p{Alpha}+)\\s+(.*?)\\}");
                 final Matcher tagMatcher = tagPattern.matcher(commentContents);
                 while (tagMatcher.find()) {
-                    if (tagMatcher.groupCount() == 2) {
-                        final String tagName = tagMatcher.group(1);
-                        final String tagValue = tagMatcher.group(2).trim();
-                        final int line = cmt.getStartLineNo() + i;
-                        int col = commentOffset + tagMatcher.start(1) - 1;
-                        if (i == 0) {
-                            col += cmt.getStartColNo();
-                        }
-                        if (JavadocTagInfo.isValidName(tagName)) {
-                            tags.add(new JavadocTag(line, col, tagName,
-                                    tagValue));
-                        }
-                        else {
-                            invalidTags.add(new InvalidJavadocTag(line, col,
-                                    tagName));
-                        }
+                    final String tagName = tagMatcher.group(1);
+                    final String tagValue = tagMatcher.group(2).trim();
+                    final int line = cmt.getStartLineNo() + i;
+                    int col = commentOffset + tagMatcher.start(1) - 1;
+                    if (i == 0) {
+                        col += cmt.getStartColNo();
+                    }
+                    if (JavadocTagInfo.isValidName(tagName)) {
+                        tags.add(new JavadocTag(line, col, tagName,
+                                tagValue));
+                    }
+                    else {
+                        invalidTags.add(new InvalidJavadocTag(line, col,
+                                tagName));
                     }
                     // else Error: Unexpected match count for inline Javadoc
                     // tag!
@@ -239,19 +233,21 @@ public final class JavadocUtils {
 
     /**
      * Returns the first child token that has a specified type.
-     * @param node
+     * @param detailNode
      *        Javadoc AST node
      * @param type
      *        the token type to match
      * @return the matching token, or null if no match
      */
-    public static DetailNode findFirstToken(DetailNode node, int type) {
+    public static DetailNode findFirstToken(DetailNode detailNode, int type) {
         DetailNode retVal = null;
-        for (DetailNode i = getFirstChild(node); i != null; i = getNextSibling(i)) {
-            if (i.getType() == type) {
-                retVal = i;
+        DetailNode node = getFirstChild(detailNode);
+        while (node != null) {
+            if (node.getType() == type) {
+                retVal = node;
                 break;
             }
+            node = getNextSibling(node);
         }
         return retVal;
     }
@@ -275,7 +271,7 @@ public final class JavadocUtils {
      */
     public static boolean branchContains(DetailNode node, int type) {
         DetailNode curNode = node;
-        while (curNode != null) {
+        while (true) {
 
             if (type == curNode.getType()) {
                 return true;
@@ -318,18 +314,31 @@ public final class JavadocUtils {
     }
 
     /**
+     * Gets next sibling of specified node with the specified type.
+     *
+     * @param node DetailNode
+     * @param tokenType javadoc token type
+     * @return next sibling.
+     */
+    public static DetailNode getNextSibling(DetailNode node, int tokenType) {
+        DetailNode nextSibling = getNextSibling(node);
+        while (nextSibling != null && nextSibling.getType() != tokenType) {
+            nextSibling = getNextSibling(nextSibling);
+        }
+        return nextSibling;
+    }
+
+    /**
      * Gets previous sibling of specified node.
      * @param node DetailNode
      * @return previous sibling
      */
     public static DetailNode getPreviousSibling(DetailNode node) {
         final DetailNode parent = node.getParent();
-        if (parent != null) {
-            final int previousSiblingIndex = node.getIndex() - 1;
-            final DetailNode[] children = parent.getChildren();
-            if (previousSiblingIndex >= 0) {
-                return children[previousSiblingIndex];
-            }
+        final int previousSiblingIndex = node.getIndex() - 1;
+        final DetailNode[] children = parent.getChildren();
+        if (previousSiblingIndex >= 0) {
+            return children[previousSiblingIndex];
         }
         return null;
     }
@@ -365,7 +374,25 @@ public final class JavadocUtils {
         if (id == null) {
             throw new IllegalArgumentException("Unknown javdoc token name. Given name " + name);
         }
-        return id.intValue();
+        return id;
+    }
+
+    /**
+     * Gets tag name from javadocTagSection.
+     *
+     * @param javadocTagSection to get tag name from.
+     * @return name, of the javadocTagSection's tag.
+     */
+    public static String getTagName(DetailNode javadocTagSection) {
+        String javadocTagName;
+        if (javadocTagSection.getType() == JavadocTokenTypes.JAVADOC_INLINE_TAG) {
+            javadocTagName = getNextSibling(
+                    getFirstChild(javadocTagSection)).getText();
+        }
+        else {
+            javadocTagName = getFirstChild(javadocTagSection).getText();
+        }
+        return javadocTagName;
     }
 
 }

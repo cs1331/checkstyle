@@ -36,7 +36,7 @@ public abstract class AbstractFileSetCheck
     extends AbstractViolationReporter
     implements FileSetCheck {
     /** The dispatcher errors are fired to. */
-    private MessageDispatcher dispatcher;
+    private MessageDispatcher messageDispatcher;
 
     /** the file extensions that are accepted by this filter */
     private String[] fileExtensions = {};
@@ -51,22 +51,21 @@ public abstract class AbstractFileSetCheck
      */
     protected abstract void processFiltered(File file, List<String> lines);
 
-    /** {@inheritDoc} */
     @Override
     public void init() {
+        // No code by default, should be overridden only by demand at subclasses
     }
 
-    /** {@inheritDoc} */
     @Override
     public void destroy() {
+        // No code by default, should be overridden only by demand at subclasses
     }
 
-    /** {@inheritDoc} */
     @Override
     public void beginProcessing(String charset) {
+        // No code by default, should be overridden only by demand at subclasses
     }
 
-    /** {@inheritDoc} */
     @Override
     public final SortedSet<LocalizedMessage> process(File file,
                                                    List<String> lines) {
@@ -78,15 +77,14 @@ public abstract class AbstractFileSetCheck
         return getMessageCollector().getMessages();
     }
 
-    /** {@inheritDoc} */
     @Override
     public void finishProcessing() {
+        // No code by default, should be overridden only by demand at subclasses
     }
 
-    /** {@inheritDoc} */
     @Override
-    public final void setMessageDispatcher(MessageDispatcher dispatcher) {
-        this.dispatcher = dispatcher;
+    public final void setMessageDispatcher(MessageDispatcher messageDispatcher) {
+        this.messageDispatcher = messageDispatcher;
     }
 
     /**
@@ -96,7 +94,7 @@ public abstract class AbstractFileSetCheck
      * @return the current MessageDispatcher.
      */
     protected final MessageDispatcher getMessageDispatcher() {
-        return dispatcher;
+        return messageDispatcher;
     }
 
     /**
@@ -111,12 +109,12 @@ public abstract class AbstractFileSetCheck
      * Sets the file extensions that identify the files that pass the
      * filter of this FileSetCheck.
      * @param extensions the set of file extensions. A missing
-     * initial '.' character of an extension is automatically added.
+     *         initial '.' character of an extension is automatically added.
+     * @throws IllegalArgumentException is arument is null
      */
     public final void setFileExtensions(String... extensions) {
         if (extensions == null) {
-            fileExtensions = null;
-            return;
+            throw new IllegalArgumentException("Extensions array can not be null");
         }
 
         fileExtensions = new String[extensions.length];
@@ -158,13 +156,13 @@ public abstract class AbstractFileSetCheck
                                  args,
                                  getSeverityLevel(),
                                  getId(),
-                                 this.getClass(),
-                                 this.getCustomMessages().get(key)));
+                                 getClass(),
+                                 getCustomMessages().get(key)));
     }
 
     /**
      * Notify all listeners about the errors in a file.
-     * Calls <code>MessageDispatcher.fireErrors()</code> with
+     * Calls {@code MessageDispatcher.fireErrors()} with
      * all logged errors and than clears errors' list.
      * @param fileName the audited file
      */

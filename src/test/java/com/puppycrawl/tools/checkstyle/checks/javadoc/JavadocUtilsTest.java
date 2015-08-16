@@ -32,6 +32,7 @@ import org.junit.Test;
 import com.puppycrawl.tools.checkstyle.api.Comment;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.JavadocTagInfo;
+import com.puppycrawl.tools.checkstyle.api.JavadocTokenTypes;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
 public class JavadocUtilsTest {
@@ -73,7 +74,7 @@ public class JavadocUtilsTest {
         final Comment comment = new Comment(text, 1, 1, text[0].length());
         final List<JavadocTag> tags = JavadocUtils.getJavadocTags(
             comment, JavadocUtils.JavadocTagType.ALL).getValidTags();
-        assertEquals("List link text", tags.get(0).getArg1());
+        assertEquals("List link text", tags.get(0).getFirstArg());
     }
 
     @Test
@@ -84,7 +85,7 @@ public class JavadocUtilsTest {
         final Comment comment = new Comment(text, 1, 1, text[0].length());
         final List<JavadocTag> tags = JavadocUtils.getJavadocTags(
             comment, JavadocUtils.JavadocTagType.ALL).getValidTags();
-        assertEquals("List#add(Object)", tags.get(0).getArg1());
+        assertEquals("List#add(Object)", tags.get(0).getFirstArg());
     }
 
     @Test
@@ -183,5 +184,46 @@ public class JavadocUtilsTest {
     @Test
     public void testIsProperUtilsClass() throws ReflectiveOperationException {
         assertUtilsClassHasPrivateConstructor(JavadocUtils.class);
+    }
+
+    @Test
+    public void testBranchContains() {
+        JavadocNodeImpl node = new JavadocNodeImpl();
+        JavadocNodeImpl firstChild = new JavadocNodeImpl();
+        JavadocNodeImpl secondChild = new JavadocNodeImpl();
+
+        node.setType(JavadocTokenTypes.JAVADOC);
+        firstChild.setType(JavadocTokenTypes.BODY_TAG_OPEN);
+        secondChild.setType(JavadocTokenTypes.CODE_LITERAL);
+
+        node.setChildren(firstChild, secondChild);
+        assertFalse(JavadocUtils.branchContains(node, JavadocTokenTypes.AUTHOR_LITERAL));
+
+        firstChild.setParent(node);
+        secondChild.setParent(node);
+        assertFalse(JavadocUtils.branchContains(node, JavadocTokenTypes.AUTHOR_LITERAL));
+
+        secondChild.setType(JavadocTokenTypes.AUTHOR_LITERAL);
+        assertTrue(JavadocUtils.branchContains(node, JavadocTokenTypes.AUTHOR_LITERAL));
+    }
+
+    @Test
+    public void testGetTokenNameForId() {
+        assertEquals("EOF", JavadocUtils.getTokenName(JavadocTokenTypes.EOF));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetTokenNameForLargeId() {
+        JavadocUtils.getTokenName(20074);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetTokenNameForInvalidId() {
+        JavadocUtils.getTokenName(100);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetTokenIdThatIsUnknown() {
+        JavadocUtils.getTokenId("");
     }
 }

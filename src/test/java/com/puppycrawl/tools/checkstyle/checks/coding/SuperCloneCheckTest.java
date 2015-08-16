@@ -19,11 +19,15 @@
 
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
-import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
-import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
+import static com.puppycrawl.tools.checkstyle.checks.coding.AbstractSuperCheck.MSG_KEY;
+
+import java.io.File;
+
+import org.junit.Assert;
 import org.junit.Test;
 
-import static com.puppycrawl.tools.checkstyle.checks.coding.AbstractSuperCheck.MSG_KEY;
+import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
+import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 
 public class SuperCloneCheckTest
     extends BaseCheckTestSupport {
@@ -37,5 +41,25 @@ public class SuperCloneCheckTest
             "60:48: " + getCheckMessage(MSG_KEY, "clone", "super.clone"),
         };
         verify(checkConfig, getPath("coding/InputClone.java"), expected);
+    }
+
+    @Test
+    public void testAntoherInputFile() throws Exception {
+        final DefaultConfiguration checkConfig =
+            createCheckConfig(SuperCloneCheck.class);
+        final String[] expected = {
+            "13:8: " + getCheckMessage(MSG_KEY, "clone", "super.clone"),
+            "19:8: " + getCheckMessage(MSG_KEY, "clone", "super.clone"),
+        };
+        verify(checkConfig, new File("src/test/resources-noncompilable/com/puppycrawl/tools/"
+                + "checkstyle/coding/InputSuperCloneCheck.java").getCanonicalPath(), expected);
+    }
+
+    @Test
+    public void testTokensNotNull() {
+        SuperCloneCheck check = new SuperCloneCheck();
+        Assert.assertNotNull(check.getAcceptableTokens());
+        Assert.assertNotNull(check.getDefaultTokens());
+        Assert.assertNotNull(check.getRequiredTokens());
     }
 }

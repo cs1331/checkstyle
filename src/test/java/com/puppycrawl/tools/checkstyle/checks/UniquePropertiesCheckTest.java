@@ -19,6 +19,9 @@
 
 package com.puppycrawl.tools.checkstyle.checks;
 
+import static com.puppycrawl.tools.checkstyle.checks.UniquePropertiesCheck.IO_EXCEPTION_KEY;
+import static com.puppycrawl.tools.checkstyle.checks.UniquePropertiesCheck.MSG_KEY;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -36,9 +39,6 @@ import com.puppycrawl.tools.checkstyle.BaseFileSetCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.api.LocalizedMessage;
 
-import static com.puppycrawl.tools.checkstyle.checks.UniquePropertiesCheck.IO_EXCEPTION_KEY;
-import static com.puppycrawl.tools.checkstyle.checks.UniquePropertiesCheck.MSG_KEY;
-
 /**
  * JUnit tests for Unique Properties check.
  */
@@ -53,8 +53,6 @@ public class UniquePropertiesCheckTest extends BaseFileSetCheckTestSupport {
 
     /**
      * Tests the ordinal work of a check.
-     * @throws Exception
-     *             on error occurres
      */
     @Test
     public void testDefault() throws Exception {
@@ -73,26 +71,21 @@ public class UniquePropertiesCheckTest extends BaseFileSetCheckTestSupport {
     /**
      * Tests the {@link UniquePropertiesCheck#getLineNumber(List, String)}
      * method return value
-     * @throws Exception
-     *             on error occurs
      */
     @Test
     public void testNotFoundKey() throws Exception {
-        final UniquePropertiesCheck check = new UniquePropertiesCheck();
         final List<String> testStrings = new ArrayList<>(3);
         testStrings.add("");
         testStrings.add("0 = 0");
         testStrings.add("445");
         final int stringNumber =
-                check.getLineNumber(testStrings,
+                UniquePropertiesCheck.getLineNumber(testStrings,
                         "some key");
         Assert.assertEquals(stringNumber, 0);
     }
 
     /**
      * Tests IO exception, that can orrur during reading of properties file.
-     * @throws Exception
-     *             on error occurs
      */
     @Test
     public void testIOException() throws Exception {
@@ -118,12 +111,10 @@ public class UniquePropertiesCheckTest extends BaseFileSetCheckTestSupport {
     /**
      * Method generates FileNotFound exception details. It tries to open file,
      * that does not exist.
-     * @param file
+     * @param file to be opened
      * @return detail message of {@link FileNotFoundException}
-     * @throws Exception
-     *             on file exists
      */
-    private String getFileNotFoundDetail(File file) throws Exception {
+    private static String getFileNotFoundDetail(File file) throws Exception {
         // Create exception to know detail message we should wait in
         // LocalisedMessage
         try {

@@ -41,7 +41,7 @@ public class SeverityMatchFilter
 
     /**
      * Sets the severity level.  The string should be one of the names
-     * defined in the <code>SeverityLevel</code> class.
+     * defined in the {@code SeverityLevel} class.
      *
      * @param severity  The new severity level
      * @see SeverityLevel
@@ -59,7 +59,6 @@ public class SeverityMatchFilter
         this.acceptOnMatch = acceptOnMatch;
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean accept(AuditEvent event) {
         final boolean result = severityLevel == event.getSeverityLevel();

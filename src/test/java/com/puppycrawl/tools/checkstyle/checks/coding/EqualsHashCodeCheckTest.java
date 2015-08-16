@@ -19,11 +19,13 @@
 
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
-import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
-import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
+import static com.puppycrawl.tools.checkstyle.checks.coding.EqualsHashCodeCheck.MSG_KEY;
+
+import org.junit.Assert;
 import org.junit.Test;
 
-import static com.puppycrawl.tools.checkstyle.checks.coding.EqualsHashCodeCheck.MSG_KEY;
+import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
+import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 
 public class EqualsHashCodeCheckTest
     extends BaseCheckTestSupport {
@@ -37,5 +39,22 @@ public class EqualsHashCodeCheckTest
             "191:9: " + getCheckMessage(MSG_KEY),
         };
         verify(checkConfig, getPath("InputSemantic.java"), expected);
+    }
+
+    @Test
+    public void testBooleanMethods() throws Exception {
+        final DefaultConfiguration checkConfig =
+            createCheckConfig(EqualsHashCodeCheck.class);
+        final String[] expected = {
+        };
+        verify(checkConfig, getPath("coding/InputEqualsHashCodeCheck.java"), expected);
+    }
+
+    @Test
+    public void testTokensNotNull() {
+        EqualsHashCodeCheck check = new EqualsHashCodeCheck();
+        Assert.assertNotNull(check.getAcceptableTokens());
+        Assert.assertNotNull(check.getDefaultTokens());
+        Assert.assertNotNull(check.getRequiredTokens());
     }
 }

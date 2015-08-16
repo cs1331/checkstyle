@@ -19,22 +19,22 @@
 
 package com.puppycrawl.tools.checkstyle.checks.imports;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import com.google.common.collect.Sets;
+import com.puppycrawl.tools.checkstyle.Utils;
 import com.puppycrawl.tools.checkstyle.api.Check;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.FileContents;
 import com.puppycrawl.tools.checkstyle.api.FullIdent;
 import com.puppycrawl.tools.checkstyle.api.TextBlock;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.Utils;
 import com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocTag;
 import com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocUtils;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * <p>
@@ -227,7 +227,7 @@ public class UnusedImportsCheck extends Check {
      * @param cmt The javadoc block to parse
      * @return a set of classes referenced in the javadoc block
      */
-    private Set<String> processJavadoc(TextBlock cmt) {
+    private static Set<String> processJavadoc(TextBlock cmt) {
         final Set<String> references = new HashSet<>();
         // process all the @link type tags
         // INLINEs inside BLOCKs get hidden when using ALL
@@ -242,7 +242,7 @@ public class UnusedImportsCheck extends Check {
                 : getValidTags(cmt, JavadocUtils.JavadocTagType.BLOCK)) {
             if (tag.canReferenceImports()) {
                 references.addAll(
-                        matchPattern(tag.getArg1(), FIRST_CLASS_NAME));
+                        matchPattern(tag.getFirstArg(), FIRST_CLASS_NAME));
             }
         }
         return references;
@@ -254,7 +254,7 @@ public class UnusedImportsCheck extends Check {
      * @param tagType The type of tags we're interested in
      * @return the list of tags
      */
-    private List<JavadocTag> getValidTags(TextBlock cmt,
+    private static List<JavadocTag> getValidTags(TextBlock cmt,
             JavadocUtils.JavadocTagType tagType) {
         return JavadocUtils.getJavadocTags(cmt, tagType).getValidTags();
     }
@@ -264,9 +264,9 @@ public class UnusedImportsCheck extends Check {
      * @param tag The javadoc tag to parse
      * @return A list of references found in this tag
      */
-    private Set<String> processJavadocTag(JavadocTag tag) {
+    private static Set<String> processJavadocTag(JavadocTag tag) {
         final Set<String> references = new HashSet<>();
-        final String identifier = tag.getArg1().trim();
+        final String identifier = tag.getFirstArg().trim();
         for (Pattern pattern : new Pattern[]
         {FIRST_CLASS_NAME, ARGUMENT_NAME}) {
             references.addAll(matchPattern(identifier, pattern));
@@ -281,7 +281,7 @@ public class UnusedImportsCheck extends Check {
      * @param pattern The Pattern used to extract the texts
      * @return A list of texts which matched the pattern
      */
-    private Set<String> matchPattern(String identifier, Pattern pattern) {
+    private static Set<String> matchPattern(String identifier, Pattern pattern) {
         final Set<String> references = new HashSet<>();
         final Matcher matcher = pattern.matcher(identifier);
         while (matcher.find()) {

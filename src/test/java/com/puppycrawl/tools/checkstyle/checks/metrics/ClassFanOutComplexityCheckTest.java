@@ -19,12 +19,17 @@
 
 package com.puppycrawl.tools.checkstyle.checks.metrics;
 
-import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
-import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
+import static com.puppycrawl.tools.checkstyle.checks.metrics.ClassFanOutComplexityCheck.MSG_KEY;
+import static org.junit.Assert.fail;
+
 import java.io.File;
+
+import org.junit.Assert;
 import org.junit.Test;
 
-import static com.puppycrawl.tools.checkstyle.checks.metrics.ClassFanOutComplexityCheck.MSG_KEY;
+import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
+import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
+import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
 public class ClassFanOutComplexityCheckTest extends BaseCheckTestSupport {
     @Test
@@ -35,6 +40,7 @@ public class ClassFanOutComplexityCheckTest extends BaseCheckTestSupport {
 
         String[] expected = {
             "6:1: " + getCheckMessage(MSG_KEY, 3, 0),
+            "38:1: " + getCheckMessage(MSG_KEY, 1, 0),
         };
 
         verify(checkConfig,
@@ -52,5 +58,42 @@ public class ClassFanOutComplexityCheckTest extends BaseCheckTestSupport {
         };
 
         verify(checkConfig, getPath("Input15Extensions.java"), expected);
+    }
+
+    @Test
+    public void testDefaultConfiguration() throws Exception {
+        DefaultConfiguration checkConfig =
+            createCheckConfig(ClassFanOutComplexityCheck.class);
+        String[] expected = {
+        };
+
+        try {
+            createChecker(checkConfig);
+            verify(checkConfig,
+                getPath("metrics" + File.separator + "ClassCouplingCheckTestInput.java"),
+                expected);
+        }
+        catch (Exception ex) {
+            //Exception is not expected
+            fail();
+        }
+    }
+
+    @Test
+    public void testGetAcceptableTokens() {
+        ClassFanOutComplexityCheck classFanOutComplexityCheckObj = new ClassFanOutComplexityCheck();
+        int[] actual = classFanOutComplexityCheckObj.getAcceptableTokens();
+        int[] expected = new int[] {
+            TokenTypes.PACKAGE_DEF,
+            TokenTypes.CLASS_DEF,
+            TokenTypes.INTERFACE_DEF,
+            TokenTypes.ENUM_DEF,
+            TokenTypes.TYPE,
+            TokenTypes.LITERAL_NEW,
+            TokenTypes.LITERAL_THROWS,
+            TokenTypes.ANNOTATION_DEF,
+        };
+        Assert.assertNotNull(actual);
+        Assert.assertArrayEquals(expected, actual);
     }
 }

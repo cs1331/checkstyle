@@ -19,9 +19,9 @@
 
 package com.puppycrawl.tools.checkstyle.checks.blocks;
 
+import com.puppycrawl.tools.checkstyle.Utils;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.Utils;
 import com.puppycrawl.tools.checkstyle.checks.AbstractOptionCheck;
 
 /**
@@ -93,10 +93,19 @@ public class LeftCurlyCheck
      */
     public static final String MSG_KEY_LINE_BREAK_AFTER = "line.break.after";
 
-    /** default maximum line length */
+    /**
+     * Default maximum line length.
+     * @deprecated since 6.10 release, option maxLineLength is not required for the Check.
+     */
+    @Deprecated
     private static final int DEFAULT_MAX_LINE_LENGTH = 80;
 
-    /** maxLineLength **/
+    /**
+     * Maximum line length.
+     * @deprecated since 6.10 release, option is not required for the Check.
+     */
+    @Deprecated
+    @SuppressWarnings("unused")
     private int maxLineLength = DEFAULT_MAX_LINE_LENGTH;
 
     /** If true, Check will ignore enums*/
@@ -113,9 +122,19 @@ public class LeftCurlyCheck
      * Sets the maximum line length used in calculating the placement of the
      * left curly brace.
      * @param maxLineLength the max allowed line length
+     * @deprecated since 6.10 release, option is not required for the Check.
      */
+    @Deprecated
     public void setMaxLineLength(int maxLineLength) {
         this.maxLineLength = maxLineLength;
+    }
+
+    /**
+     * Sets whether check should ignore enums when left curly brace policy is EOL.
+     * @param ignoreEnums check's option for ignoring enums.
+     */
+    public void setIgnoreEnums(boolean ignoreEnums) {
+        this.ignoreEnums = ignoreEnums;
     }
 
     @Override
@@ -168,28 +187,26 @@ public class LeftCurlyCheck
 
     @Override
     public void visitToken(DetailAST ast) {
-        final DetailAST startToken;
-        final DetailAST brace;
+        DetailAST startToken;
+        DetailAST brace;
 
         switch (ast.getType()) {
-            case TokenTypes.CTOR_DEF :
-            case TokenTypes.METHOD_DEF :
+            case TokenTypes.CTOR_DEF:
+            case TokenTypes.METHOD_DEF:
                 startToken = skipAnnotationOnlyLines(ast);
                 brace = ast.findFirstToken(TokenTypes.SLIST);
                 break;
-
-            case TokenTypes.INTERFACE_DEF :
-            case TokenTypes.CLASS_DEF :
-            case TokenTypes.ANNOTATION_DEF :
-            case TokenTypes.ENUM_DEF :
-            case TokenTypes.ENUM_CONSTANT_DEF :
+            case TokenTypes.INTERFACE_DEF:
+            case TokenTypes.CLASS_DEF:
+            case TokenTypes.ANNOTATION_DEF:
+            case TokenTypes.ENUM_DEF:
+            case TokenTypes.ENUM_CONSTANT_DEF:
                 startToken = skipAnnotationOnlyLines(ast);
                 final DetailAST objBlock = ast.findFirstToken(TokenTypes.OBJBLOCK);
                 brace = objBlock == null
-                    ? null
-                    : objBlock.getFirstChild();
+                        ? null
+                        : objBlock.getFirstChild();
                 break;
-
             case TokenTypes.LITERAL_WHILE:
             case TokenTypes.LITERAL_CATCH:
             case TokenTypes.LITERAL_SYNCHRONIZED:
@@ -197,47 +214,45 @@ public class LeftCurlyCheck
             case TokenTypes.LITERAL_TRY:
             case TokenTypes.LITERAL_FINALLY:
             case TokenTypes.LITERAL_DO:
-            case TokenTypes.LITERAL_IF :
-            case TokenTypes.STATIC_INIT :
+            case TokenTypes.LITERAL_IF:
+            case TokenTypes.STATIC_INIT:
                 startToken = ast;
                 brace = ast.findFirstToken(TokenTypes.SLIST);
                 break;
-
-            case TokenTypes.LITERAL_ELSE :
+            case TokenTypes.LITERAL_ELSE:
                 startToken = ast;
                 final DetailAST candidate = ast.getFirstChild();
-                brace =
-                    candidate.getType() == TokenTypes.SLIST
-                    ? candidate
-                    : null; // silently ignore
+                brace = candidate.getType() == TokenTypes.SLIST
+                        ? candidate
+                        : null; // silently ignore
                 break;
+            default:
+                // ATTENTION! We have default here, but we expect case TokenTypes.METHOD_DEF,
+                // TokenTypes.LITERAL_FOR, TokenTypes.LITERAL_WHILE, TokenTypes.LITERAL_DO only.
+                // It has been done to improve coverage to 100%. I couldn't replace it with
+                // if-else-if block because code was ugly and didn't pass pmd check.
 
-            case TokenTypes.LITERAL_SWITCH :
                 startToken = ast;
                 brace = ast.findFirstToken(TokenTypes.LCURLY);
                 break;
-
-            default :
-                startToken = null;
-                brace = null;
         }
 
-        if (brace != null && startToken != null) {
+        if (brace != null) {
             verifyBrace(brace, startToken);
         }
     }
 
     /**
-     * Skip lines that only contain <code>TokenTypes.ANNOTATION</code>s.
-     * If the received <code>DetailAST</code>
+     * Skip lines that only contain {@code TokenTypes.ANNOTATION}s.
+     * If the received {@code DetailAST}
      * has annotations within its modifiers then first token on the line
      * of the first token afer all annotations is return. This might be
      * an annotation.
-     * Otherwise, the received <code>DetailAST</code> is returned.
-     * @param ast <code>DetailAST</code>.
-     * @return <code>DetailAST</code>.
+     * Otherwise, the received {@code DetailAST} is returned.
+     * @param ast {@code DetailAST}.
+     * @return {@code DetailAST}.
      */
-    private DetailAST skipAnnotationOnlyLines(DetailAST ast) {
+    private static DetailAST skipAnnotationOnlyLines(DetailAST ast) {
         final DetailAST modifiers = ast.findFirstToken(TokenTypes.MODIFIERS);
         if (modifiers == null) {
             return ast;
@@ -255,20 +270,19 @@ public class LeftCurlyCheck
         }
         final int lastAnnotLineNumber = lastAnnot.getLineNo();
         while (lastAnnot.getPreviousSibling() != null
-               && lastAnnot.getPreviousSibling().getLineNo()
-                    == lastAnnotLineNumber) {
+               && lastAnnot.getPreviousSibling().getLineNo() == lastAnnotLineNumber) {
             lastAnnot = lastAnnot.getPreviousSibling();
         }
         return lastAnnot;
     }
 
     /**
-     * Find the last token of type <code>TokenTypes.ANNOTATION</code>
+     * Find the last token of type {@code TokenTypes.ANNOTATION}
      * under the given set of modifiers.
-     * @param modifiers <code>DetailAST</code>.
-     * @return <code>DetailAST</code> or null if there are no annotations.
+     * @param modifiers {@code DetailAST}.
+     * @return {@code DetailAST} or null if there are no annotations.
      */
-    private DetailAST findLastAnnotation(DetailAST modifiers) {
+    private static DetailAST findLastAnnotation(DetailAST modifiers) {
         DetailAST annot = modifiers.findFirstToken(TokenTypes.ANNOTATION);
         while (annot != null && annot.getNextSibling() != null
                && annot.getNextSibling().getType() == TokenTypes.ANNOTATION) {
@@ -287,50 +301,59 @@ public class LeftCurlyCheck
                              final DetailAST startToken) {
         final String braceLine = getLine(brace.getLineNo() - 1);
 
-        // calculate the previous line length without trailing whitespace. Need
-        // to handle the case where there is no previous line, cause the line
-        // being check is the first line in the file.
-        final int prevLineLen = brace.getLineNo() == 1
-            ? maxLineLength
-            : Utils.lengthMinusTrailingWhitespace(getLine(brace.getLineNo() - 2));
-
         // Check for being told to ignore, or have '{}' which is a special case
         if (braceLine.length() <= brace.getColumnNo() + 1
                 || braceLine.charAt(brace.getColumnNo() + 1) != '}') {
             if (getAbstractOption() == LeftCurlyOption.NL) {
                 if (!Utils.whitespaceBefore(brace.getColumnNo(), braceLine)) {
-                    log(brace.getLineNo(), brace.getColumnNo(),
-                        MSG_KEY_LINE_NEW, "{");
+                    log(brace, MSG_KEY_LINE_NEW, "{", brace.getColumnNo() + 1);
                 }
             }
             else if (getAbstractOption() == LeftCurlyOption.EOL) {
-                if (Utils.whitespaceBefore(brace.getColumnNo(), braceLine)
-                    && prevLineLen + 2 <= maxLineLength) {
-                    log(brace.getLineNo(), brace.getColumnNo(),
-                        MSG_KEY_LINE_PREVIOUS, "{");
-                }
-                if (!hasLineBreakAfter(brace)) {
-                    log(brace.getLineNo(), brace.getColumnNo(), MSG_KEY_LINE_BREAK_AFTER);
-                }
+
+                validateEol(brace, braceLine);
             }
-            else if (getAbstractOption() == LeftCurlyOption.NLOW
-                    && startToken.getLineNo() != brace.getLineNo()) {
-                // not on the same line
-                if (startToken.getLineNo() + 1 == brace.getLineNo()) {
-                    if (!Utils.whitespaceBefore(brace.getColumnNo(), braceLine)) {
-                        log(brace.getLineNo(), brace.getColumnNo(),
-                                MSG_KEY_LINE_NEW, "{");
-                    }
-                    else if (prevLineLen + 2 <= maxLineLength) {
-                        log(brace.getLineNo(), brace.getColumnNo(),
-                                MSG_KEY_LINE_PREVIOUS, "{");
-                    }
-                }
-                else if (!Utils.whitespaceBefore(brace.getColumnNo(), braceLine)) {
-                    log(brace.getLineNo(), brace.getColumnNo(),
-                            MSG_KEY_LINE_NEW, "{");
-                }
+            else if (startToken.getLineNo() != brace.getLineNo()) {
+
+                validateNewLinePosion(brace, startToken, braceLine);
+
             }
+        }
+    }
+
+    /**
+     * validate EOL case
+     * @param brace brase AST
+     * @param braceLine line content
+     */
+    private void validateEol(DetailAST brace, String braceLine) {
+        if (Utils.whitespaceBefore(brace.getColumnNo(), braceLine)) {
+            log(brace, MSG_KEY_LINE_PREVIOUS, "{", brace.getColumnNo() + 1);
+        }
+        if (!hasLineBreakAfter(brace)) {
+            log(brace, MSG_KEY_LINE_BREAK_AFTER, "{", brace.getColumnNo() + 1);
+        }
+    }
+
+    /**
+     * validate token on new Line position
+     * @param brace brace AST
+     * @param startToken start Token
+     * @param braceLine content of line with Brace
+     */
+    private void validateNewLinePosion(DetailAST brace, DetailAST startToken,
+                                       String braceLine) {
+        // not on the same line
+        if (startToken.getLineNo() + 1 == brace.getLineNo()) {
+            if (!Utils.whitespaceBefore(brace.getColumnNo(), braceLine)) {
+                log(brace, MSG_KEY_LINE_NEW, "{", brace.getColumnNo() + 1);
+            }
+            else {
+                log(brace, MSG_KEY_LINE_PREVIOUS, "{", brace.getColumnNo() + 1);
+            }
+        }
+        else if (!Utils.whitespaceBefore(brace.getColumnNo(), braceLine)) {
+            log(brace, MSG_KEY_LINE_NEW, "{", brace.getColumnNo() + 1);
         }
     }
 
@@ -352,10 +375,8 @@ public class LeftCurlyCheck
                 nextToken = leftCurly.getNextSibling();
             }
         }
-        if (nextToken != null && nextToken.getType() != TokenTypes.RCURLY
-                && leftCurly.getLineNo() == nextToken.getLineNo()) {
-            return false;
-        }
-        return true;
+        return nextToken == null
+                || nextToken.getType() == TokenTypes.RCURLY
+                || leftCurly.getLineNo() != nextToken.getLineNo();
     }
 }

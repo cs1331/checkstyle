@@ -19,16 +19,17 @@
 
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
-import com.puppycrawl.tools.checkstyle.api.Check;
-import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import com.puppycrawl.tools.checkstyle.ScopeUtils;
-import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-
 import java.util.ArrayDeque;
+import java.util.Arrays;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
+import com.puppycrawl.tools.checkstyle.ScopeUtils;
+import com.puppycrawl.tools.checkstyle.api.Check;
+import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
 /**
  * <p>
@@ -63,11 +64,11 @@ import java.util.Map;
  * </pre>
  * <p>Example:</p>
  * <p>
- * <code>
+ * {@code
  * for (int number : myNumbers) { // violation
  *    System.out.println(number);
  * }
- * </code>
+ * }
  * </p>
  * @author k_gibbs, r_auckenthaler
  */
@@ -79,11 +80,38 @@ public class FinalLocalVariableCheck extends Check {
      */
     public static final String MSG_KEY = "final.variable";
 
+    /**
+     * Assign operators types.
+     */
+    private static final int[] ASSIGN_OPERATOR_TYPES = {
+        TokenTypes.POST_INC,
+        TokenTypes.POST_DEC,
+        TokenTypes.ASSIGN,
+        TokenTypes.PLUS_ASSIGN,
+        TokenTypes.MINUS_ASSIGN,
+        TokenTypes.STAR_ASSIGN,
+        TokenTypes.DIV_ASSIGN,
+        TokenTypes.MOD_ASSIGN,
+        TokenTypes.SR_ASSIGN,
+        TokenTypes.BSR_ASSIGN,
+        TokenTypes.SL_ASSIGN,
+        TokenTypes.BAND_ASSIGN,
+        TokenTypes.BXOR_ASSIGN,
+        TokenTypes.BOR_ASSIGN,
+        TokenTypes.INC,
+        TokenTypes.DEC,
+    };
+
     /** Scope Stack */
     private final Deque<Map<String, DetailAST>> scopeStack = new ArrayDeque<>();
 
     /** Controls whether to check enhanced for-loop variable. */
     private boolean validateEnhancedForLoopVariable;
+
+    static {
+        // Array sorting for binary search
+        Arrays.sort(ASSIGN_OPERATOR_TYPES);
+    }
 
     /**
      * Whether to check enhanced for-loop variable or not.
@@ -152,44 +180,42 @@ public class FinalLocalVariableCheck extends Check {
                 break;
 
             case TokenTypes.PARAMETER_DEF:
-                if (ScopeUtils.inInterfaceBlock(ast)
-                    || inAbstractOrNativeMethod(ast)
-                    || inLambda(ast)) {
-                    break;
+                if (!inLambda(ast)
+                        && !ast.branchContains(TokenTypes.FINAL)
+                        && !inAbstractOrNativeMethod(ast)
+                        && !ScopeUtils.inInterfaceBlock(ast)) {
+                    insertVariable(ast);
                 }
+                break;
             case TokenTypes.VARIABLE_DEF:
                 if (ast.getParent().getType() != TokenTypes.OBJBLOCK
-                    && shouldCheckEnhancedForLoopVariable(ast)
-                    && isVariableInForInit(ast)) {
+                        && !isVariableInForInit(ast)
+                        && shouldCheckEnhancedForLoopVariable(ast)
+                        && !ast.branchContains(TokenTypes.FINAL)) {
                     insertVariable(ast);
                 }
                 break;
 
             case TokenTypes.IDENT:
                 final int parentType = ast.getParent().getType();
-                if ((TokenTypes.POST_DEC == parentType
-                        || TokenTypes.DEC == parentType
-                        || TokenTypes.POST_INC == parentType
-                        || TokenTypes.INC == parentType
-                        || TokenTypes.ASSIGN == parentType
-                        || TokenTypes.PLUS_ASSIGN == parentType
-                        || TokenTypes.MINUS_ASSIGN == parentType
-                        || TokenTypes.DIV_ASSIGN == parentType
-                        || TokenTypes.STAR_ASSIGN == parentType
-                        || TokenTypes.MOD_ASSIGN == parentType
-                        || TokenTypes.SR_ASSIGN == parentType
-                        || TokenTypes.BSR_ASSIGN == parentType
-                        || TokenTypes.SL_ASSIGN == parentType
-                        || TokenTypes.BXOR_ASSIGN == parentType
-                        || TokenTypes.BOR_ASSIGN == parentType
-                        || TokenTypes.BAND_ASSIGN == parentType)
+                if (isAssignOperator(parentType)
                         && ast.getParent().getFirstChild() == ast) {
                     removeVariable(ast);
                 }
                 break;
 
             default:
+                throw new IllegalStateException("Incorrect token type");
         }
+    }
+
+    /**
+     * is Arithmetic operator
+     * @param parentType token AST
+     * @return true is token type is in arithmetic operator
+     */
+    private static boolean isAssignOperator(int parentType) {
+        return Arrays.binarySearch(ASSIGN_OPERATOR_TYPES, parentType) >= 0;
     }
 
     /**
@@ -206,16 +232,16 @@ public class FinalLocalVariableCheck extends Check {
      * Checks if current variable is defined in
      *  {@link TokenTypes#FOR_INIT for-loop init}, e.g.:
      * <p>
-     * <code>
+     * {@code
      * for (int i = 0, j = 0; i < j; i++) { . . . }
-     * </code>
+     * }
      * </p>
-     * <code>i, j</code> are defined in {@link TokenTypes#FOR_INIT for-loop init}
+     * {@code i, j} are defined in {@link TokenTypes#FOR_INIT for-loop init}
      * @param variableDef variable definition node.
      * @return true if variable is defined in {@link TokenTypes#FOR_INIT for-loop init}
      */
     private static boolean isVariableInForInit(DetailAST variableDef) {
-        return variableDef.getParent().getType() != TokenTypes.FOR_INIT;
+        return variableDef.getParent().getType() == TokenTypes.FOR_INIT;
     }
 
     /**
@@ -224,17 +250,18 @@ public class FinalLocalVariableCheck extends Check {
      * @return true if ast is a descendant of an abstract or native method.
      */
     private static boolean inAbstractOrNativeMethod(DetailAST ast) {
+        boolean abstractOrNative = false;
         DetailAST parent = ast.getParent();
-        while (parent != null) {
+        while (parent != null && !abstractOrNative) {
             if (parent.getType() == TokenTypes.METHOD_DEF) {
                 final DetailAST modifiers =
                     parent.findFirstToken(TokenTypes.MODIFIERS);
-                return modifiers.branchContains(TokenTypes.ABSTRACT)
+                abstractOrNative = modifiers.branchContains(TokenTypes.ABSTRACT)
                         || modifiers.branchContains(TokenTypes.LITERAL_NATIVE);
             }
             parent = parent.getParent();
         }
-        return false;
+        return abstractOrNative;
     }
 
     /**
@@ -247,15 +274,48 @@ public class FinalLocalVariableCheck extends Check {
     }
 
     /**
+     * Find the Class or Constructor or Method in which it is defined.
+     * @param ast Variable for which we want to find the scope in which it is defined
+     * @return ast The Class or Constructor or Method in which it is defined.
+     */
+    private static DetailAST findClassOrConstructorOrMethodInWhichItIsDefined(DetailAST ast) {
+        DetailAST astTraverse = ast;
+        while (!(astTraverse.getType() == TokenTypes.METHOD_DEF
+                || astTraverse.getType() == TokenTypes.CLASS_DEF
+                || astTraverse.getType() == TokenTypes.CTOR_DEF)) {
+            astTraverse = astTraverse.getParent();
+        }
+        return astTraverse;
+    }
+
+    /**
+     * Check if both the Variable are same.
+     * @param ast1 Variable to compare
+     * @param ast2 Variable to compare
+     * @return true if both the variable are same, otherwise false
+     */
+    private static boolean isSameVariables(DetailAST ast1, DetailAST ast2) {
+        final DetailAST classOrMethodOfAst1 =
+            findClassOrConstructorOrMethodInWhichItIsDefined(ast1);
+        final DetailAST classOrMethodOfAst2 =
+            findClassOrConstructorOrMethodInWhichItIsDefined(ast2);
+
+        final String identifierOfAst1 =
+            classOrMethodOfAst1.findFirstToken(TokenTypes.IDENT).getText();
+        final String identifierOfAst2 =
+            classOrMethodOfAst2.findFirstToken(TokenTypes.IDENT).getText();
+
+        return identifierOfAst1.equals(identifierOfAst2);
+    }
+
+    /**
      * Inserts a variable at the topmost scope stack
      * @param ast the variable to insert
      */
     private void insertVariable(DetailAST ast) {
-        if (!ast.branchContains(TokenTypes.FINAL)) {
-            final Map<String, DetailAST> state = scopeStack.peek();
-            final DetailAST astNode = ast.findFirstToken(TokenTypes.IDENT);
-            state.put(astNode.getText(), astNode);
-        }
+        final Map<String, DetailAST> state = scopeStack.peek();
+        final DetailAST astNode = ast.findFirstToken(TokenTypes.IDENT);
+        state.put(astNode.getText(), astNode);
     }
 
     /**
@@ -266,8 +326,9 @@ public class FinalLocalVariableCheck extends Check {
         final Iterator<Map<String, DetailAST>> iterator = scopeStack.descendingIterator();
         while (iterator.hasNext()) {
             final Map<String, DetailAST> state = iterator.next();
-            final Object obj = state.remove(ast.getText());
-            if (obj != null) {
+            final DetailAST storedVariable = state.get(ast.getText());
+            if (storedVariable != null && isSameVariables(storedVariable, ast)) {
+                state.remove(ast.getText());
                 break;
             }
         }
@@ -286,8 +347,8 @@ public class FinalLocalVariableCheck extends Check {
             case TokenTypes.INSTANCE_INIT:
             case TokenTypes.METHOD_DEF:
                 final Map<String, DetailAST> state = scopeStack.pop();
-                for (DetailAST var : state.values()) {
-                    log(var.getLineNo(), var.getColumnNo(), MSG_KEY, var
+                for (DetailAST node : state.values()) {
+                    log(node.getLineNo(), node.getColumnNo(), MSG_KEY, node
                         .getText());
                 }
                 break;

@@ -19,17 +19,24 @@
 
 package com.puppycrawl.tools.checkstyle;
 
-import com.google.common.collect.ImmutableMap;
-import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import org.apache.commons.beanutils.ConversionException;
-
+import java.io.Closeable;
 import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ResourceBundle;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+
+import org.apache.commons.beanutils.ConversionException;
+import org.apache.commons.lang3.ArrayUtils;
+
+import com.google.common.collect.ImmutableCollection;
+import com.google.common.collect.ImmutableMap;
+import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
 /**
  * Contains utility methods.
@@ -43,43 +50,52 @@ public final class Utils {
     /** maps from a token value to name */
     private static final String[] TOKEN_VALUE_TO_NAME;
 
+    /** Array of all token IDs */
+    private static final int[] TOKEN_IDS;
+
     // initialise the constants
     static {
         final ImmutableMap.Builder<String, Integer> builder =
                 ImmutableMap.builder();
         final Field[] fields = TokenTypes.class.getDeclaredFields();
-        String[] tempTokenValueToName = new String[0];
-        for (final Field f : fields) {
+        String[] tempTokenValueToName = ArrayUtils.EMPTY_STRING_ARRAY;
+        for (final Field field : fields) {
             // Only process the int declarations.
-            if (f.getType() != Integer.TYPE) {
+            if (field.getType() != Integer.TYPE) {
                 continue;
             }
 
-            final String name = f.getName();
-            try {
-                final int tokenValue = f.getInt(name);
-                builder.put(name, tokenValue);
-                if (tokenValue > tempTokenValueToName.length - 1) {
-                    final String[] temp = new String[tokenValue + 1];
-                    System.arraycopy(tempTokenValueToName, 0,
-                            temp, 0, tempTokenValueToName.length);
-                    tempTokenValueToName = temp;
-                }
-                tempTokenValueToName[tokenValue] = name;
+            final String name = field.getName();
+            final int tokenValue = getIntFromField(field, name);
+            builder.put(name, tokenValue);
+            if (tokenValue > tempTokenValueToName.length - 1) {
+                final String[] temp = new String[tokenValue + 1];
+                System.arraycopy(tempTokenValueToName, 0,
+                        temp, 0, tempTokenValueToName.length);
+                tempTokenValueToName = temp;
             }
-            catch (final IllegalArgumentException | IllegalAccessException e) {
-                throw new IllegalStateException(
-                        "Failed to instantiate collection of Java tokens", e);
-            }
+            tempTokenValueToName[tokenValue] = name;
         }
 
         TOKEN_NAME_TO_VALUE = builder.build();
         TOKEN_VALUE_TO_NAME = tempTokenValueToName;
+        final ImmutableCollection<Integer> values = TOKEN_NAME_TO_VALUE.values();
+        final Integer[] ids = values.toArray(new Integer[values.size()]);
+        TOKEN_IDS = ArrayUtils.toPrimitive(ids);
     }
-
 
     /** stop instances being created **/
     private Utils() {
+    }
+
+    /**
+     * Get all token IDs that are available in TokenTypes.
+     * @return array of token IDs
+     */
+    public static int[] getAllTokenIds() {
+        final int[] safeCopy = new int[TOKEN_IDS.length];
+        System.arraycopy(TOKEN_IDS, 0, safeCopy, 0, TOKEN_IDS.length);
+        return safeCopy;
     }
 
     /**
@@ -157,17 +173,17 @@ public final class Utils {
      * Returns the length of a String prefix with tabs expanded.
      * Each tab is counted as the number of characters is takes to
      * jump to the next tab stop.
-     * @param string the input String
+     * @param inputString the input String
      * @param toIdx index in string (exclusive) where the calculation stops
      * @param tabWidth the distance between tab stop position.
      * @return the length of string.substring(0, toIdx) with tabs expanded.
      */
-    public static int lengthExpandedTabs(String string,
+    public static int lengthExpandedTabs(String inputString,
                                          int toIdx,
                                          int tabWidth) {
         int len = 0;
         for (int idx = 0; idx < toIdx; idx++) {
-            if (string.charAt(idx) == '\t') {
+            if (inputString.charAt(idx) == '\t') {
                 len = (len / tabWidth + 1) * tabWidth;
             }
             else {
@@ -187,7 +203,7 @@ public final class Utils {
         try {
             Pattern.compile(pattern);
         }
-        catch (final PatternSyntaxException e) {
+        catch (final PatternSyntaxException ignored) {
             return false;
         }
         return true;
@@ -199,8 +215,7 @@ public final class Utils {
      * @return a created regexp object
      * @throws ConversionException if unable to create Pattern object.
      **/
-    public static Pattern createPattern(String pattern)
-        throws ConversionException {
+    public static Pattern createPattern(String pattern) {
         try {
             return Pattern.compile(pattern);
         }
@@ -237,34 +252,36 @@ public final class Utils {
 
     /**
      * Tests if this string starts with the specified prefix.
-     * <p/>
+     * <p>
      * It is faster version of {@link String#startsWith(String)} optimized for one-character
      * prefixes at the expense of some readability. Suggested by SimplifyStartsWith PMD rule:
      * http://pmd.sourceforge.net/pmd-5.3.1/pmd-java/rules/java/optimizations.html#SimplifyStartsWith
+     * </p>
      *
-     * @param string the <code>String</code> to check
+     * @param value the {@code String} to check
      * @param prefix the prefix to find
-     * @return <code>true</code> if the <code>char</code> is a prefix of the given
-     * <code>String</code>; <code>false</code> otherwise.
+     * @return {@code true} if the {@code char} is a prefix of the given
+     * {@code String}; {@code false} otherwise.
      */
-    public static boolean startsWithChar(String string, char prefix) {
-        return string.length() > 0 && string.charAt(0) == prefix;
+    public static boolean startsWithChar(String value, char prefix) {
+        return !value.isEmpty() && value.charAt(0) == prefix;
     }
 
     /**
      * Tests if this string ends with the specified suffix.
-     * <p/>
+     * <p>
      * It is faster version of {@link String#endsWith(String)} optimized for one-character
      * suffixes at the expense of some readability. Suggested by SimplifyStartsWith PMD rule:
      * http://pmd.sourceforge.net/pmd-5.3.1/pmd-java/rules/java/optimizations.html#SimplifyStartsWith
+     * </p>
      *
-     * @param string the <code>String</code> to check
+     * @param value the {@code String} to check
      * @param suffix the suffix to find
-     * @return <code>true</code> if the <code>char</code> is a suffix of the given
-     * <code>String</code>; <code>false</code> otherwise.
+     * @return {@code true} if the {@code char} is a suffix of the given
+     * {@code String}; {@code false} otherwise.
      */
-    public static boolean endsWithChar(String string, char suffix) {
-        return string.length() > 0 && string.charAt(string.length() - 1) == suffix;
+    public static boolean endsWithChar(String value, char suffix) {
+        return !value.isEmpty() && value.charAt(value.length() - 1) == suffix;
     }
 
     /**
@@ -293,7 +310,7 @@ public final class Utils {
         if (id == null) {
             throw new IllegalArgumentException("given name " + name);
         }
-        return id.intValue();
+        return id;
     }
 
     /**
@@ -335,5 +352,72 @@ public final class Utils {
      */
     public static boolean isCommentType(String type) {
         return isCommentType(getTokenId(type));
+    }
+
+    /**
+     * @param targetClass from which constructor is returned
+     * @param parameterTypes of constructor
+     * @return constructor of targetClass or {@link IllegalStateException} if any exception occurs
+     * @see Class#getConstructor(Class[])
+     */
+    public static Constructor<?> getConstructor(Class<?> targetClass, Class<?>... parameterTypes) {
+        try {
+            return targetClass.getConstructor(parameterTypes);
+        }
+        catch (NoSuchMethodException ex) {
+            throw new IllegalStateException(ex);
+        }
+    }
+
+    /**
+     * @param constructor to invoke
+     * @param parameters to pass to constructor
+     * @param <T> type of constructor
+     * @return new instance of class or {@link IllegalStateException} if any exception occurs
+     * @see Constructor#newInstance(Object...)
+     */
+    public static <T> T invokeConstructor(Constructor<T> constructor, Object... parameters) {
+        try {
+            return constructor.newInstance(parameters);
+        }
+        catch (InstantiationException | IllegalAccessException | InvocationTargetException ex) {
+            throw new IllegalStateException(ex);
+        }
+    }
+
+    /**
+     * Gets the value of a static or instance field of type int or of another primitive type
+     * convertible to type int via a widening conversion. Does not throw any checked exceptions.
+     * @param field from which the int should be extracted
+     * @param object to extract the int value from
+     * @return the value of the field converted to type int
+     * @throws IllegalStateException if this Field object is enforcing Java language access control
+     *         and the underlying field is inaccessible
+     * @see Field#getInt(Object)
+     */
+    public static int getIntFromField(Field field, Object object) {
+        try {
+            return field.getInt(object);
+        }
+        catch (final IllegalAccessException exception) {
+            throw new IllegalStateException(exception);
+        }
+    }
+
+    /**
+     * Closes a stream re-throwing IOException as IllegalStateException.
+     *
+     * @param closeable Closeable object
+     */
+    public static void close(Closeable closeable) {
+        if (closeable == null) {
+            return;
+        }
+        try {
+            closeable.close();
+        }
+        catch (IOException e) {
+            throw new IllegalStateException("Cannot close the stream", e);
+        }
     }
 }

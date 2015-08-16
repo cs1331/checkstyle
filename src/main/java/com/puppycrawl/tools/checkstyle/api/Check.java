@@ -22,8 +22,9 @@ package com.puppycrawl.tools.checkstyle.api;
 import java.util.Collections;
 import java.util.Set;
 
-import com.google.common.collect.Sets;
+import org.apache.commons.lang3.ArrayUtils;
 
+import com.google.common.collect.Sets;
 import com.puppycrawl.tools.checkstyle.Utils;
 
 /**
@@ -53,7 +54,7 @@ public abstract class Check extends AbstractViolationReporter {
      * The class loader to load external classes. Not initialised as this must
      * be set by my creator.
      */
-    private ClassLoader loader;
+    private ClassLoader classLoader;
 
     public boolean isCommentNodesRequired() {
         return false;
@@ -88,7 +89,7 @@ public abstract class Check extends AbstractViolationReporter {
      * @see TokenTypes
      */
     public int[] getRequiredTokens() {
-        return new int[] {};
+        return ArrayUtils.EMPTY_INT_ARRAY;
     }
 
     /**
@@ -104,7 +105,7 @@ public abstract class Check extends AbstractViolationReporter {
      * @return the set of token names
      */
     public final Set<String> getTokenNames() {
-        return tokens;
+        return Collections.unmodifiableSet(tokens);
     }
 
     /**
@@ -120,12 +121,14 @@ public abstract class Check extends AbstractViolationReporter {
      * everything required to perform it job.
      */
     public void init() {
+        // No code by default, should be overridden only by demand at subclasses
     }
 
     /**
      * Destroy the check. It is being retired from service.
      */
     public void destroy() {
+        // No code by default, should be overridden only by demand at subclasses
     }
 
     /**
@@ -134,6 +137,7 @@ public abstract class Check extends AbstractViolationReporter {
      * @param rootAST the root of the tree
      */
     public void beginTree(DetailAST rootAST) {
+        // No code by default, should be overridden only by demand at subclasses
     }
 
     /**
@@ -142,6 +146,7 @@ public abstract class Check extends AbstractViolationReporter {
      * @param rootAST the root of the tree
      */
     public void finishTree(DetailAST rootAST) {
+        // No code by default, should be overridden only by demand at subclasses
     }
 
     /**
@@ -149,6 +154,7 @@ public abstract class Check extends AbstractViolationReporter {
      * @param ast the token to process
      */
     public void visitToken(DetailAST ast) {
+        // No code by default, should be overridden only by demand at subclasses
     }
 
     /**
@@ -156,6 +162,7 @@ public abstract class Check extends AbstractViolationReporter {
      * @param ast the token leaving
      */
     public void leaveToken(DetailAST ast) {
+        // No code by default, should be overridden only by demand at subclasses
     }
 
     /**
@@ -193,10 +200,10 @@ public abstract class Check extends AbstractViolationReporter {
 
     /**
      * Set the class loader associated with the tree.
-     * @param loader the class loader
+     * @param classLoader the class loader
      */
-    public final void setClassLoader(ClassLoader loader) {
-        this.loader = loader;
+    public final void setClassLoader(ClassLoader classLoader) {
+        this.classLoader = classLoader;
     }
 
     /**
@@ -204,7 +211,7 @@ public abstract class Check extends AbstractViolationReporter {
      * @return the class loader
      */
     public final ClassLoader getClassLoader() {
-        return loader;
+        return classLoader;
     }
 
     /** @return the tab width to report errors with */
@@ -214,7 +221,7 @@ public abstract class Check extends AbstractViolationReporter {
 
     /**
      * Set the tab width to report errors with.
-     * @param tabWidth an <code>int</code> value
+     * @param tabWidth an {@code int} value
      */
     public final void setTabWidth(int tabWidth) {
         this.tabWidth = tabWidth;
@@ -230,10 +237,9 @@ public abstract class Check extends AbstractViolationReporter {
                 args,
                 getSeverityLevel(),
                 getId(),
-                this.getClass(),
-                this.getCustomMessages().get(key)));
+                getClass(),
+                getCustomMessages().get(key)));
     }
-
 
     @Override
     public final void log(int lineNo, int colNo, String key,
@@ -249,7 +255,7 @@ public abstract class Check extends AbstractViolationReporter {
                 args,
                 getSeverityLevel(),
                 getId(),
-                this.getClass(),
-                this.getCustomMessages().get(key)));
+                getClass(),
+                getCustomMessages().get(key)));
     }
 }

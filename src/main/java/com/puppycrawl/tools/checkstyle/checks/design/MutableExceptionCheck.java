@@ -19,11 +19,12 @@
 
 package com.puppycrawl.tools.checkstyle.checks.design;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
+
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import com.puppycrawl.tools.checkstyle.checks.AbstractFormatCheck;
-import java.util.ArrayDeque;
-import java.util.Deque;
 
 /**
  * <p> Ensures that exceptions (classes with names conforming to some regular
@@ -63,7 +64,7 @@ public final class MutableExceptionCheck extends AbstractFormatCheck {
 
     /**
      * Sets the format of extended class name to the specified regular expression.
-     * @param extendedClassNameFormat a <code>String</code> value
+     * @param extendedClassNameFormat a {@code String} value
      */
     public void setExtendedClassNameFormat(String extendedClassNameFormat) {
         this.extendedClassNameFormat = extendedClassNameFormat;

@@ -19,18 +19,18 @@
 
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
+import java.util.regex.Pattern;
+
 import com.puppycrawl.tools.checkstyle.Utils;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.checks.AbstractFormatCheck;
-import java.util.Set;
-import java.util.regex.Pattern;
 
 /**
  * <p>
  * Checks for illegal token text.
  * </p>
  * <p> An example of how to configure the check to forbid String literals
- * containing <code>"a href"</code> is:
+ * containing {@code "a href"} is:
  * </p>
  * <pre>
  * &lt;module name="IllegalTokenText"&gt;
@@ -73,39 +73,32 @@ public class IllegalTokenTextCheck
     }
 
     @Override
-    public void beginTree(DetailAST rootAST) {
-    }
-
-    @Override
     public int[] getDefaultTokens() {
         return new int[0];
     }
 
     @Override
     public int[] getAcceptableTokens() {
-        // Any tokens set by property 'tokens' are acceptable
-        final Set<String> tokenNames = getTokenNames();
-        final int[] result = new int[tokenNames.size()];
-        int i = 0;
-        for (final String name : tokenNames) {
-            result[i] = Utils.getTokenId(name);
-            i++;
-        }
-        return result;
+        return Utils.getAllTokenIds();
+    }
+
+    @Override
+    public int[] getRequiredTokens() {
+        return new int[0];
     }
 
     @Override
     public void visitToken(DetailAST ast) {
         final String text = ast.getText();
         if (getRegexp().matcher(text).find()) {
-            String message = getMessage();
-            if ("".equals(message)) {
-                message = MSG_KEY;
+            String customMessage = getMessage();
+            if (customMessage.isEmpty()) {
+                customMessage = MSG_KEY;
             }
             log(
                 ast.getLineNo(),
                 ast.getColumnNo(),
-                message,
+                customMessage,
                 getFormat());
         }
     }
@@ -116,7 +109,7 @@ public class IllegalTokenTextCheck
      *                 to report about violations.
      */
     public void setMessage(String message) {
-        this.message = null == message ? "" : message;
+        this.message = message == null ? "" : message;
     }
 
     /**

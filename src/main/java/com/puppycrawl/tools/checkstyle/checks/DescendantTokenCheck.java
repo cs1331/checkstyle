@@ -19,13 +19,15 @@
 
 package com.puppycrawl.tools.checkstyle.checks;
 
+import java.util.Arrays;
+import java.util.Set;
+
+import org.apache.commons.lang3.ArrayUtils;
+
 import antlr.collections.AST;
 import com.puppycrawl.tools.checkstyle.Utils;
 import com.puppycrawl.tools.checkstyle.api.Check;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
-
-import java.util.Arrays;
-import java.util.Set;
 
 /**
  * <p>
@@ -190,7 +192,7 @@ public class DescendantTokenCheck extends Check {
      */
     public static final String MSG_KEY_SUM_MAX = "descendant.token.sum.max";
 
-     /** minimum depth */
+    /** minimum depth */
     private int minimumDepth;
     /** maximum depth */
     private int maximumDepth = Integer.MAX_VALUE;
@@ -201,7 +203,7 @@ public class DescendantTokenCheck extends Check {
     /** Whether to sum the number of tokens found. */
     private boolean sumTokenCounts;
     /** limited tokens */
-    private int[] limitedTokens = new int[0];
+    private int[] limitedTokens = ArrayUtils.EMPTY_INT_ARRAY;
     /** error message when minimum count not reached */
     private String minimumMessage;
     /** error message when maximum count exceeded */
@@ -211,11 +213,11 @@ public class DescendantTokenCheck extends Check {
      * Counts of descendant tokens.
      * Indexed by (token ID - 1) for performance.
      */
-    private int[] counts = new int[0];
+    private int[] counts = ArrayUtils.EMPTY_INT_ARRAY;
 
     @Override
     public int[] getDefaultTokens() {
-        return new int[0];
+        return ArrayUtils.EMPTY_INT_ARRAY;
     }
 
     @Override
@@ -224,56 +226,75 @@ public class DescendantTokenCheck extends Check {
         Arrays.fill(counts, 0);
         countTokens(ast, 0);
 
+        if (sumTokenCounts) {
+            logAsTotal(ast);
+        }
+        else {
+            logAsSeparated(ast);
+        }
+    }
+
+    /**
+     * log violations for each Token
+     * @param ast token
+     */
+    private void logAsSeparated(DetailAST ast) {
         // name of this token
         final String name = Utils.getTokenName(ast.getType());
 
-        if (sumTokenCounts) {
-            int total = 0;
-            for (int element : limitedTokens) {
-                total += counts[element - 1];
-            }
-            if (total < minimumNumber) {
+        for (int element : limitedTokens) {
+            final int tokenCount = counts[element - 1];
+            if (tokenCount < minimumNumber) {
+                final String descendantName = Utils
+                        .getTokenName(element);
                 log(ast.getLineNo(), ast.getColumnNo(),
-                        null == minimumMessage ? MSG_KEY_SUM_MIN
+                    minimumMessage == null ? MSG_KEY_MIN
                                 : minimumMessage,
-                        String.valueOf(total),
-                        String.valueOf(minimumNumber), name);
+                        String.valueOf(tokenCount),
+                        String.valueOf(minimumNumber),
+                        name,
+                        descendantName);
             }
-            if (total > maximumNumber) {
+            if (tokenCount > maximumNumber) {
+                final String descendantName = Utils
+                        .getTokenName(element);
                 log(ast.getLineNo(), ast.getColumnNo(),
-                        null == maximumMessage ? MSG_KEY_SUM_MAX
+                    maximumMessage == null ? MSG_KEY_MAX
                                 : maximumMessage,
-                        String.valueOf(total),
+                        String.valueOf(tokenCount),
                         String.valueOf(maximumNumber),
-                        name);
+                        name,
+                        descendantName);
             }
         }
-        else {
-            for (int element : limitedTokens) {
-                final int tokenCount = counts[element - 1];
-                if (tokenCount < minimumNumber) {
-                    final String descendantName = Utils
-                            .getTokenName(element);
-                    log(ast.getLineNo(), ast.getColumnNo(),
-                            null == minimumMessage ? MSG_KEY_MIN
-                                    : minimumMessage,
-                            String.valueOf(tokenCount),
-                            String.valueOf(minimumNumber),
-                            name,
-                            descendantName);
-                }
-                if (tokenCount > maximumNumber) {
-                    final String descendantName = Utils
-                            .getTokenName(element);
-                    log(ast.getLineNo(), ast.getColumnNo(),
-                            null == maximumMessage ? MSG_KEY_MAX
-                                    : maximumMessage,
-                            String.valueOf(tokenCount),
-                            String.valueOf(maximumNumber),
-                            name,
-                            descendantName);
-                }
-            }
+    }
+
+    /**
+     * log validation as one violation
+     * @param ast curent token
+     */
+    private void logAsTotal(DetailAST ast) {
+        // name of this token
+        final String name = Utils.getTokenName(ast.getType());
+
+        int total = 0;
+        for (int element : limitedTokens) {
+            total += counts[element - 1];
+        }
+        if (total < minimumNumber) {
+            log(ast.getLineNo(), ast.getColumnNo(),
+                minimumMessage == null ? MSG_KEY_SUM_MIN
+                            : minimumMessage,
+                    String.valueOf(total),
+                    String.valueOf(minimumNumber), name);
+        }
+        if (total > maximumNumber) {
+            log(ast.getLineNo(), ast.getColumnNo(),
+                maximumMessage == null ? MSG_KEY_SUM_MAX
+                            : maximumMessage,
+                    String.valueOf(total),
+                    String.valueOf(maximumNumber),
+                    name);
         }
     }
 
@@ -307,7 +328,8 @@ public class DescendantTokenCheck extends Check {
         final int[] result = new int[tokenNames.size()];
         int i = 0;
         for (String name : tokenNames) {
-            result[i++] = Utils.getTokenId(name);
+            result[i] = Utils.getTokenId(name);
+            i++;
         }
         return result;
     }
@@ -345,10 +367,10 @@ public class DescendantTokenCheck extends Check {
         this.maximumDepth = maximumDepth;
     }
 
-   /**
-    * Sets a minimum count for descendants.
-    * @param minimumNumber the minimum count for descendants.
-    */
+    /**
+     * Sets a minimum count for descendants.
+     * @param minimumNumber the minimum count for descendants.
+     */
     public void setMinimumNumber(int minimumNumber) {
         this.minimumNumber = minimumNumber;
     }
@@ -364,7 +386,7 @@ public class DescendantTokenCheck extends Check {
     /**
      * Sets the error message for minimum count not reached.
      * @param message the error message for minimum count not reached.
-     * Used as a <code>MessageFormat</code> pattern with arguments
+     * Used as a {@code MessageFormat} pattern with arguments
      * <ul>
      * <li>{0} - token count</li>
      * <li>{1} - minimum number</li>
@@ -379,7 +401,7 @@ public class DescendantTokenCheck extends Check {
     /**
      * Sets the error message for maximum count exceeded.
      * @param message the error message for maximum count exceeded.
-     * Used as a <code>MessageFormat</code> pattern with arguments
+     * Used as a {@code MessageFormat} pattern with arguments
      * <ul>
      * <li>{0} - token count</li>
      * <li>{1} - maximum number</li>

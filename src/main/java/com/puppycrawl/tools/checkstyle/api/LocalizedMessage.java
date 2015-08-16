@@ -38,7 +38,6 @@ import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 import java.util.ResourceBundle.Control;
 
-
 /**
  * Represents a message that can be localised. The translations come from
  * message.properties files. The underlying implementation uses
@@ -92,7 +91,7 @@ public final class LocalizedMessage
     private final String customMessage;
 
     /**
-     * Creates a new <code>LocalizedMessage</code> instance.
+     * Creates a new {@code LocalizedMessage} instance.
      *
      * @param lineNo line number associated with the message
      * @param colNo column number associated with the message
@@ -116,7 +115,7 @@ public final class LocalizedMessage
         this.lineNo = lineNo;
         this.colNo = colNo;
         this.key = key;
-        this.args = null == args ? null : args.clone();
+        this.args = args == null ? null : args.clone();
         this.bundle = bundle;
         this.severityLevel = severityLevel;
         this.moduleId = moduleId;
@@ -125,7 +124,7 @@ public final class LocalizedMessage
     }
 
     /**
-     * Creates a new <code>LocalizedMessage</code> instance.
+     * Creates a new {@code LocalizedMessage} instance.
      *
      * @param lineNo line number associated with the message
      * @param colNo column number associated with the message
@@ -156,7 +155,7 @@ public final class LocalizedMessage
     }
 
     /**
-     * Creates a new <code>LocalizedMessage</code> instance.
+     * Creates a new {@code LocalizedMessage} instance.
      *
      * @param lineNo line number associated with the message
      * @param bundle resource bundle name
@@ -180,7 +179,7 @@ public final class LocalizedMessage
     }
 
     /**
-     * Creates a new <code>LocalizedMessage</code> instance. The column number
+     * Creates a new {@code LocalizedMessage} instance. The column number
      * defaults to 0.
      *
      * @param lineNo line number associated with the message
@@ -211,16 +210,16 @@ public final class LocalizedMessage
         if (object == null || getClass() != object.getClass()) {
             return false;
         }
-        final LocalizedMessage that = (LocalizedMessage) object;
-        return Objects.equals(lineNo, that.lineNo)
-                && Objects.equals(colNo, that.colNo)
-                && Objects.equals(severityLevel, that.severityLevel)
-                && Objects.equals(moduleId, that.moduleId)
-                && Objects.equals(key, that.key)
-                && Objects.equals(bundle, that.bundle)
-                && Objects.equals(sourceClass, that.sourceClass)
-                && Objects.equals(customMessage, that.customMessage)
-                && Arrays.equals(args, that.args);
+        final LocalizedMessage localizedMessage = (LocalizedMessage) object;
+        return Objects.equals(lineNo, localizedMessage.lineNo)
+                && Objects.equals(colNo, localizedMessage.colNo)
+                && Objects.equals(severityLevel, localizedMessage.severityLevel)
+                && Objects.equals(moduleId, localizedMessage.moduleId)
+                && Objects.equals(key, localizedMessage.key)
+                && Objects.equals(bundle, localizedMessage.bundle)
+                && Objects.equals(sourceClass, localizedMessage.sourceClass)
+                && Objects.equals(customMessage, localizedMessage.customMessage)
+                && Arrays.equals(args, localizedMessage.args);
     }
 
     @Override
@@ -239,9 +238,9 @@ public final class LocalizedMessage
     /** @return the translated message **/
     public String getMessage() {
 
-        final String customMessage = getCustomMessage();
-        if (customMessage != null) {
-            return customMessage;
+        final String message = getCustomMessage();
+        if (message != null) {
+            return message;
         }
 
         try {
@@ -249,11 +248,11 @@ public final class LocalizedMessage
             // the GlobalProperties object. This is because the class loader in
             // the GlobalProperties is specified by the user for resolving
             // custom classes.
-            final ResourceBundle bundle = getBundle(this.bundle);
-            final String pattern = bundle.getString(key);
+            final ResourceBundle resourceBundle = getBundle(this.bundle);
+            final String pattern = resourceBundle.getString(key);
             return MessageFormat.format(pattern, args);
         }
-        catch (final MissingResourceException ex) {
+        catch (final MissingResourceException ignored) {
             // If the Check author didn't provide i18n resource bundles
             // and logs error messages directly, this will return
             // the author's original message
@@ -263,7 +262,7 @@ public final class LocalizedMessage
 
     /**
      * Returns the formatted custom message if one is configured.
-     * @return the formatted custom message or <code>null</code>
+     * @return the formatted custom message or {@code null}
      *          if there is no custom message
      */
     private String getCustomMessage() {
@@ -284,14 +283,14 @@ public final class LocalizedMessage
      */
     private ResourceBundle getBundle(String bundleName) {
         synchronized (BUNDLE_CACHE) {
-            ResourceBundle bundle = BUNDLE_CACHE
+            ResourceBundle resourceBundle = BUNDLE_CACHE
                     .get(bundleName);
-            if (bundle == null) {
-                bundle = ResourceBundle.getBundle(bundleName, sLocale,
+            if (resourceBundle == null) {
+                resourceBundle = ResourceBundle.getBundle(bundleName, sLocale,
                         sourceClass.getClassLoader(), new UTF8Control());
-                BUNDLE_CACHE.put(bundleName, bundle);
+                BUNDLE_CACHE.put(bundleName, resourceBundle);
             }
-            return bundle;
+            return resourceBundle;
         }
     }
 
@@ -344,7 +343,6 @@ public final class LocalizedMessage
     // Interface Comparable methods
     ////////////////////////////////////////////////////////////////////////////
 
-    /** {@inheritDoc} */
     @Override
     public int compareTo(LocalizedMessage other) {
         if (getLineNo() == other.getLineNo()) {
@@ -365,14 +363,13 @@ public final class LocalizedMessage
      *
      * @author <a href="mailto:nesterenko-aleksey@list.ru">Aleksey Nesterenko</a>
      */
-    private static class UTF8Control extends Control {
+    protected static class UTF8Control extends Control {
         @Override
         public ResourceBundle newBundle(String aBaseName, Locale aLocale, String aFormat,
                  ClassLoader aLoader, boolean aReload) throws IOException {
             // The below is a copy of the default implementation.
             final String bundleName = toBundleName(aBaseName, aLocale);
             final String resourceName = toResourceName(bundleName, "properties");
-            ResourceBundle bundle = null;
             InputStream stream = null;
             if (aReload) {
                 final URL url = aLoader.getResource(resourceName);
@@ -387,11 +384,14 @@ public final class LocalizedMessage
             else {
                 stream = aLoader.getResourceAsStream(resourceName);
             }
+            ResourceBundle bundle = null;
             if (stream != null) {
-                try (Reader streamReader = new InputStreamReader(stream, "UTF-8")) {
+                final Reader streamReader = new InputStreamReader(stream, "UTF-8");
+                try {
                     // Only this line is changed to make it to read properties files as UTF-8.
                     bundle = new PropertyResourceBundle(streamReader);
-                } finally {
+                }
+                finally {
                     stream.close();
                 }
             }

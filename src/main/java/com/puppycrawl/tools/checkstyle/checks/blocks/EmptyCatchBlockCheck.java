@@ -59,18 +59,18 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  * Such empty blocks would be both suppressed:<br>
  * </p>
  * <pre>
- * <code>
+ * {@code
  * try {
  *     throw new RuntimeException();
  * } catch (RuntimeException expected) {
  * }
- * </code>
- * <code>
+ * }
+ * {@code
  * try {
  *     throw new RuntimeException();
  * } catch (RuntimeException ignore) {
  * }
- * </code>
+ * }
  * </pre>
  * <p>
  * To configure the Check to suppress empty catch block if single-line comment inside
@@ -85,13 +85,13 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  * Such empty block would be suppressed:<br>
  * </p>
  * <pre>
- * <code>
+ * {@code
  * try {
  *     throw new RuntimeException();
  * } catch (RuntimeException e) {
  *     //This is expected
  * }
- * </code>
+ * }
  * </pre>
  * <p>
  * To configure the Check to suppress empty catch block if single-line comment inside
@@ -107,20 +107,20 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  * Such empty blocks would be both suppressed:<br>
  * </p>
  * <pre>
- * <code>
+ * {@code
  * try {
  *     throw new RuntimeException();
  * } catch (RuntimeException e) {
  *     //This is expected
  * }
- * </code>
- * <code>
+ * }
+ * {@code
  * try {
  *     throw new RuntimeException();
  * } catch (RuntimeException myException) {
  *
  * }
- * </code>
+ * }
  * </pre>
  * @author <a href="mailto:nesterenko-aleksey@list.ru">Aleksey Nesterenko</a>
  */
@@ -227,9 +227,9 @@ public class EmptyCatchBlockCheck extends Check {
         else if (firstElementInBlock.getType() == TokenTypes.BLOCK_COMMENT_BEGIN) {
             commentContent = firstElementInBlock.getFirstChild().getText();
             final String[] lines = commentContent.split(System.getProperty("line.separator"));
-            for (int i = 0; i < lines.length; i++) {
-                if (!lines[i].isEmpty()) {
-                    commentContent = lines[i];
+            for (String line : lines) {
+                if (!line.isEmpty()) {
+                    commentContent = line;
                     break;
                 }
             }
@@ -245,14 +245,13 @@ public class EmptyCatchBlockCheck extends Check {
      * @return true if empty catch block is verifiable by Check.
      */
     private boolean isVerifiable(DetailAST emptyCatchAst, String commentContent) {
-        final String exceptionVariableName = getExceptionVariableName(emptyCatchAst);
+        final String variableName = getExceptionVariableName(emptyCatchAst);
         final boolean isMatchingVariableName = variableNameRegexp
-                .matcher(exceptionVariableName).find();
+                .matcher(variableName).find();
         final boolean isMatchingCommentContent = !commentContent.isEmpty()
                  && commentRegexp.matcher(commentContent).find();
         return !isMatchingVariableName && !isMatchingCommentContent;
     }
-
 
     /**
      * Checks if catch block is empty or contains only comments.

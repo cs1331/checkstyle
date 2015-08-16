@@ -19,9 +19,9 @@
 
 package com.puppycrawl.tools.checkstyle.checks.design;
 
+import com.puppycrawl.tools.checkstyle.ScopeUtils;
 import com.puppycrawl.tools.checkstyle.api.Check;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import com.puppycrawl.tools.checkstyle.ScopeUtils;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
 /**
@@ -55,13 +55,13 @@ public class InnerTypeLastCheck extends Check {
 
     @Override
     public void visitToken(DetailAST ast) {
-        /** First root class */
+        // First root class
         if (rootClass) {
             rootClass = false;
         }
         else {
             DetailAST nextSibling = ast.getNextSibling();
-            while (null != nextSibling) {
+            while (nextSibling != null) {
                 if (!ScopeUtils.inCodeBlock(ast)
                     && (nextSibling.getType() == TokenTypes.VARIABLE_DEF
                         || nextSibling.getType() == TokenTypes.METHOD_DEF)) {
@@ -75,8 +75,8 @@ public class InnerTypeLastCheck extends Check {
 
     @Override
     public void leaveToken(DetailAST ast) {
-        /** Is this a root class */
-        if (null == ast.getParent()) {
+        // Is this a root class
+        if (ast.getParent() == null) {
             rootClass = true;
         }
     }

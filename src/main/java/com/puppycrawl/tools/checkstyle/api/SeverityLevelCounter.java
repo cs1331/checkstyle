@@ -27,7 +27,7 @@ package com.puppycrawl.tools.checkstyle.api;
  */
 public final class SeverityLevelCounter implements AuditListener {
     /** The severity level to watch out for. */
-    private SeverityLevel level;
+    private final SeverityLevel level;
 
     /** Keeps track of the number of counted events. */
     private int count;
@@ -43,7 +43,6 @@ public final class SeverityLevelCounter implements AuditListener {
         this.level = level;
     }
 
-    /** {@inheritDoc} */
     @Override
     public void addError(AuditEvent evt) {
         if (level == evt.getSeverityLevel()) {
@@ -51,33 +50,31 @@ public final class SeverityLevelCounter implements AuditListener {
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void addException(AuditEvent evt, Throwable throwable) {
-        if (SeverityLevel.ERROR == level) {
+        if (level == SeverityLevel.ERROR) {
             count++;
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void auditStarted(AuditEvent evt) {
         count = 0;
     }
 
-    /** {@inheritDoc} */
     @Override
     public void fileStarted(AuditEvent evt) {
+        // No code by default, should be overridden only by demand at subclasses
     }
 
-    /** {@inheritDoc} */
     @Override
     public void auditFinished(AuditEvent evt) {
+        // No code by default, should be overridden only by demand at subclasses
     }
 
-    /** {@inheritDoc} */
     @Override
     public void fileFinished(AuditEvent evt) {
+        // No code by default, should be overridden only by demand at subclasses
     }
 
     /**

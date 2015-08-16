@@ -19,16 +19,16 @@
 
 package com.puppycrawl.tools.checkstyle.checks.sizes;
 
-import com.puppycrawl.tools.checkstyle.api.Check;
-import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import com.puppycrawl.tools.checkstyle.api.Scope;
-import com.puppycrawl.tools.checkstyle.ScopeUtils;
-import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.EnumMap;
 import java.util.Map;
+
+import com.puppycrawl.tools.checkstyle.ScopeUtils;
+import com.puppycrawl.tools.checkstyle.api.Check;
+import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import com.puppycrawl.tools.checkstyle.api.Scope;
+import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
 /**
  * Counts the methods of the type-definition and checks whether this
@@ -67,57 +67,6 @@ public final class MethodCountCheck extends Check {
      * file.
      */
     public static final String MSG_MANY_METHODS = "too.many.methods";
-
-    /**
-     * Marker class used to collect data about the number of methods per
-     * class. Objects of this class are used on the Stack to count the
-     * methods for each class and layer.
-     */
-    private static class MethodCounter {
-        /** Maintains the counts. */
-        private final Map<Scope, Integer> counts = new EnumMap<>(Scope.class);
-        /** indicated is an interface, in which case all methods are public */
-        private final boolean inInterface;
-        /** tracks the total. */
-        private int total;
-
-        /**
-         * Creates an interface.
-         * @param inInterface indicated if counter for an interface. In which
-         *        case, add all counts as public methods.
-         */
-        MethodCounter(boolean inInterface) {
-            this.inInterface = inInterface;
-        }
-
-        /**
-         * Increments to counter by one for the supplied scope.
-         * @param scope the scope counter to increment.
-         */
-        void increment(Scope scope) {
-            total++;
-            if (inInterface) {
-                counts.put(Scope.PUBLIC, 1 + value(Scope.PUBLIC));
-            }
-            else {
-                counts.put(scope, 1 + value(scope));
-            }
-        }
-
-        /**
-         * @param scope the scope counter to get the value of
-         * @return the value of a scope counter
-         */
-        int value(Scope scope) {
-            final Integer value = counts.get(scope);
-            return null == value ? 0 : value;
-        }
-
-        /** @return the total number of methods. */
-        int getTotal() {
-            return total;
-        }
-    }
 
     /** default maximum number of methods */
     private static final int DEFAULT_MAX_METHODS = 100;
@@ -158,21 +107,21 @@ public final class MethodCountCheck extends Check {
 
     @Override
     public void visitToken(DetailAST ast) {
-        if (TokenTypes.METHOD_DEF == ast.getType()) {
+        if (ast.getType() == TokenTypes.METHOD_DEF) {
             raiseCounter(ast);
         }
         else {
-            final boolean inInterface = TokenTypes.INTERFACE_DEF == ast.getType();
+            final boolean inInterface = ast.getType() == TokenTypes.INTERFACE_DEF;
             counters.push(new MethodCounter(inInterface));
         }
     }
 
     @Override
     public void leaveToken(DetailAST ast) {
-        if (TokenTypes.CLASS_DEF == ast.getType()
-            || TokenTypes.INTERFACE_DEF == ast.getType()
-            || TokenTypes.ENUM_CONSTANT_DEF == ast.getType()
-            || TokenTypes.ENUM_DEF == ast.getType()) {
+        if (ast.getType() == TokenTypes.CLASS_DEF
+            || ast.getType() == TokenTypes.INTERFACE_DEF
+            || ast.getType() == TokenTypes.ENUM_CONSTANT_DEF
+            || ast.getType() == TokenTypes.ENUM_DEF) {
             final MethodCounter counter = counters.pop();
             checkCounters(counter, ast);
         }
@@ -221,7 +170,7 @@ public final class MethodCountCheck extends Check {
     }
 
     /**
-     * Sets the maximum allowed <code>private</code> methods per type.
+     * Sets the maximum allowed {@code private} methods per type.
      * @param value the maximum allowed.
      */
     public void setMaxPrivate(int value) {
@@ -229,7 +178,7 @@ public final class MethodCountCheck extends Check {
     }
 
     /**
-     * Sets the maximum allowed <code>package</code> methods per type.
+     * Sets the maximum allowed {@code package} methods per type.
      * @param value the maximum allowed.
      */
     public void setMaxPackage(int value) {
@@ -237,7 +186,7 @@ public final class MethodCountCheck extends Check {
     }
 
     /**
-     * Sets the maximum allowed <code>protected</code> methods per type.
+     * Sets the maximum allowed {@code protected} methods per type.
      * @param value the maximum allowed.
      */
     public void setMaxProtected(int value) {
@@ -245,7 +194,7 @@ public final class MethodCountCheck extends Check {
     }
 
     /**
-     * Sets the maximum allowed <code>public</code> methods per type.
+     * Sets the maximum allowed {@code public} methods per type.
      * @param value the maximum allowed.
      */
     public void setMaxPublic(int value) {
@@ -258,5 +207,56 @@ public final class MethodCountCheck extends Check {
      */
     public void setMaxTotal(int value) {
         maxTotal = value;
+    }
+
+    /**
+     * Marker class used to collect data about the number of methods per
+     * class. Objects of this class are used on the Stack to count the
+     * methods for each class and layer.
+     */
+    private static class MethodCounter {
+        /** Maintains the counts. */
+        private final Map<Scope, Integer> counts = new EnumMap<>(Scope.class);
+        /** indicated is an interface, in which case all methods are public */
+        private final boolean inInterface;
+        /** tracks the total. */
+        private int total;
+
+        /**
+         * Creates an interface.
+         * @param inInterface indicated if counter for an interface. In which
+         *        case, add all counts as public methods.
+         */
+        MethodCounter(boolean inInterface) {
+            this.inInterface = inInterface;
+        }
+
+        /**
+         * Increments to counter by one for the supplied scope.
+         * @param scope the scope counter to increment.
+         */
+        void increment(Scope scope) {
+            total++;
+            if (inInterface) {
+                counts.put(Scope.PUBLIC, 1 + value(Scope.PUBLIC));
+            }
+            else {
+                counts.put(scope, 1 + value(scope));
+            }
+        }
+
+        /**
+         * @param scope the scope counter to get the value of
+         * @return the value of a scope counter
+         */
+        int value(Scope scope) {
+            final Integer value = counts.get(scope);
+            return value == null ? 0 : value;
+        }
+
+        /** @return the total number of methods. */
+        int getTotal() {
+            return total;
+        }
     }
 }

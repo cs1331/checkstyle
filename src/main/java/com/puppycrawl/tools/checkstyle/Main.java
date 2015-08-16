@@ -19,11 +19,6 @@
 
 package com.puppycrawl.tools.checkstyle;
 
-import com.google.common.collect.Lists;
-import com.puppycrawl.tools.checkstyle.api.AuditListener;
-import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
-import com.puppycrawl.tools.checkstyle.api.Configuration;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -42,6 +37,12 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
+import com.google.common.collect.Lists;
+import com.google.common.io.Closeables;
+import com.puppycrawl.tools.checkstyle.api.AuditListener;
+import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
+import com.puppycrawl.tools.checkstyle.api.Configuration;
+
 /**
  * Wrapper command line program for the Checker.
  * @author the original author or authors.
@@ -55,15 +56,17 @@ public final class Main {
     /**
      * Loops over the files specified checking them for errors. The exit code
      * is the number of errors found in all the files.
-     * @param args the command line arguments
+     * @param args the command line arguments.
      * @throws UnsupportedEncodingException if there is a problem to use UTF-8
-     * @throws CheckstyleException if there is a problem with parsing a property file
      * @throws FileNotFoundException if there is a problem with files access
      **/
     public static void main(String... args) throws UnsupportedEncodingException,
-            CheckstyleException, FileNotFoundException {
+            FileNotFoundException {
         int errorCounter = 0;
         boolean cliViolations = false;
+        // provide proper exit code based on results.
+        final int exitWithCliViolation = -1;
+        int exitStatus = 0;
 
         try {
             //parse CLI arguments
@@ -73,46 +76,50 @@ public final class Main {
             if (commandLine.hasOption("v")) {
                 System.out.println("Checkstyle version: "
                         + Main.class.getPackage().getImplementationVersion());
+                exitStatus = 0;
             }
             else {
                 // return error is smth is wrong in arguments
                 final List<String> messages = validateCli(commandLine);
                 cliViolations = !messages.isEmpty();
-                if (messages.isEmpty()) {
-
-                    // create config helper object
-                    final CliOptions config = convertCliToPojo(commandLine);
-                    // run Checker
-                    errorCounter = runCheckstyle(config);
-
-                }
-                else {
+                if (cliViolations) {
+                    exitStatus = exitWithCliViolation;
                     errorCounter = 1;
                     for (String message : messages) {
                         System.out.println(message);
                     }
+                }
+                else {
+                    // create config helper object
+                    final CliOptions config = convertCliToPojo(commandLine);
+                    // run Checker
+                    errorCounter = runCheckstyle(config);
+                    exitStatus = errorCounter;
                 }
             }
         }
         catch (ParseException pex) {
             // smth wrong with arguments - print error and manual
             cliViolations = true;
+            exitStatus = exitWithCliViolation;
             errorCounter = 1;
             System.out.println(pex.getMessage());
             printUsage();
         }
-        catch (Exception ex) {
-            // smth wrong during processing
+        catch (CheckstyleException e) {
+            final int exitWithCheckstyleException = -2;
+            exitStatus = exitWithCheckstyleException;
             errorCounter = 1;
-            throw ex;
+            System.out.println(e.getMessage());
         }
         finally {
             // return exit code base on validation of Checker
             if (errorCounter != 0 && !cliViolations) {
                 System.out.println(String.format("Checkstyle ends with %d errors.", errorCounter));
             }
-            // provide proper exit code based on results.
-            System.exit(errorCounter);
+            if (exitStatus != 0) {
+                System.exit(exitStatus);
+            }
         }
     }
 
@@ -152,6 +159,13 @@ public final class Main {
             final File file = new File(propertiesLocation);
             if (!file.exists()) {
                 result.add(String.format("Could not find file '%s'.", propertiesLocation));
+            }
+        }
+        if (cmdLine.hasOption("o")) {
+            final String outputLocation = cmdLine.getOptionValue("o");
+            final File file = new File(outputLocation);
+            if (file.exists() && !file.canWrite()) {
+                result.add(String.format("Permission denied : '%s'.", outputLocation));
             }
         }
         if (cmdLine.hasOption("o")) {
@@ -257,12 +271,17 @@ public final class Main {
             throws CheckstyleException {
         final Properties properties = new Properties();
 
-        try (FileInputStream fis = new FileInputStream(file)) {
+        FileInputStream fis = null;
+        try {
+            fis = new FileInputStream(file);
             properties.load(fis);
         }
         catch (final IOException e) {
             throw new CheckstyleException(String.format(
                     "Unable to load properties from file '%s'.", file.getAbsolutePath()), e);
+        }
+        finally {
+            Closeables.closeQuietly(fis);
         }
 
         return properties;
@@ -271,9 +290,9 @@ public final class Main {
     /**
      * Creates the audit listener.
      *
-     * @param format format of the auditt listener
+     * @param format format of the audit listener
      * @param outputLocation the location of output
-     * @return a fresh new <code>AuditListener</code>
+     * @return a fresh new {@code AuditListener}
      * @exception UnsupportedEncodingException if there is problem to use UTf-8
      * @exception FileNotFoundException when provided output location is not found
      */
@@ -282,31 +301,33 @@ public final class Main {
             throws UnsupportedEncodingException, FileNotFoundException {
 
         // setup the output stream
-        OutputStream out = null;
-        boolean closeOut = false;
+        OutputStream out;
+        boolean closeOutputStream;
         if (outputLocation != null) {
             out = new FileOutputStream(outputLocation);
-            closeOut = true;
+            closeOutputStream = true;
         }
         else {
             out = System.out;
-            closeOut = false;
+            closeOutputStream = false;
         }
 
         // setup a listener
-        AuditListener listener = null;
-        switch (format) {
-            case "xml":
-                listener = new XMLLogger(out, closeOut);
-                break;
+        AuditListener listener;
+        if ("xml".equals(format)) {
+            listener = new XMLLogger(out, closeOutputStream);
 
-            case "plain":
-                listener = new DefaultLogger(out, closeOut);
-                break;
+        }
+        else if ("plain".equals(format)) {
+            listener = new DefaultLogger(out, closeOutputStream);
 
-            default:
-                throw new IllegalStateException("Invalid output format. Found '" + format
-                        + "' but expected 'plain' or 'xml'.");
+        }
+        else {
+            if (closeOutputStream) {
+                Utils.close(out);
+            }
+            throw new IllegalStateException("Invalid output format. Found '" + format
+                    + "' but expected 'plain' or 'xml'.");
         }
 
         return listener;

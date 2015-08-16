@@ -19,16 +19,17 @@
 
 package com.puppycrawl.tools.checkstyle.checks;
 
-import com.google.common.collect.Sets;
-import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import com.puppycrawl.tools.checkstyle.api.TextBlock;
-import com.puppycrawl.tools.checkstyle.Utils;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import org.apache.commons.beanutils.ConversionException;
+import org.apache.commons.lang3.ArrayUtils;
+
+import com.google.common.collect.Sets;
+import com.puppycrawl.tools.checkstyle.Utils;
+import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import com.puppycrawl.tools.checkstyle.api.TextBlock;
 
 /**
  * <p>
@@ -37,7 +38,7 @@ import org.apache.commons.beanutils.ConversionException;
  * precede it is whitespace.
  * It doesn't check comments if they do not end line, i.e. it accept
  * the following:
- * <code>Thread.sleep( 10 &lt;some comment here&gt; );</code>
+ * {@code Thread.sleep( 10 &lt;some comment here&gt; );}
  * Format property is intended to deal with the "} // while" example.
  * </p>
  * <p>
@@ -114,25 +115,22 @@ public class TrailingCommentCheck extends AbstractFormatCheck {
 
     /**
      * Creates new instance of the check.
-     * @throws ConversionException unable to parse DEFAULT_FORMAT.
      */
-    public TrailingCommentCheck() throws ConversionException {
+    public TrailingCommentCheck() {
         super(DEFAULT_FORMAT);
     }
 
     /**
      * Sets patter for legal trailing comments.
      * @param format format to set.
-     * @throws ConversionException if unable to create Pattern object
      */
-    public void setLegalComment(final String format)
-        throws ConversionException {
+    public void setLegalComment(final String format) {
         legalComment = Utils.createPattern(format);
     }
 
     @Override
     public int[] getDefaultTokens() {
-        return new int[0];
+        return ArrayUtils.EMPTY_INT_ARRAY;
     }
 
     @Override
@@ -152,28 +150,27 @@ public class TrailingCommentCheck extends AbstractFormatCheck {
         lines.addAll(cComments.keySet());
 
         for (Integer lineNo : lines) {
-            final String line = getLines()[lineNo.intValue() - 1];
-            String lineBefore = "";
-            TextBlock comment = null;
+            final String line = getLines()[lineNo - 1];
+            String lineBefore;
+            TextBlock comment;
             if (cppComments.containsKey(lineNo)) {
                 comment = cppComments.get(lineNo);
                 lineBefore = line.substring(0, comment.getStartColNo());
             }
-            else if (cComments.containsKey(lineNo)) {
+            else {
                 final List<TextBlock> commentList = cComments.get(lineNo);
                 comment = commentList.get(commentList.size() - 1);
                 lineBefore = line.substring(0, comment.getStartColNo());
                 if (comment.getText().length == 1) {
                     final String lineAfter =
                         line.substring(comment.getEndColNo() + 1).trim();
-                    if (!"".equals(lineAfter)) {
+                    if (!lineAfter.isEmpty()) {
                         // do not check comment which doesn't end line
                         continue;
                     }
                 }
             }
-            if (comment != null
-                && !blankLinePattern.matcher(lineBefore).find()
+            if (!blankLinePattern.matcher(lineBefore).find()
                 && !isLegalComment(comment)) {
                 log(lineNo.intValue(), MSG_KEY);
             }

@@ -21,14 +21,25 @@ package com.puppycrawl.tools.checkstyle.filters;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.powermock.api.mockito.PowerMockito.mock;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.powermock.api.mockito.PowerMockito.when;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.regex.PatternSyntaxException;
 
 import org.junit.Assume;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
+import org.powermock.reflect.Whitebox;
+import org.xml.sax.InputSource;
 
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 import com.puppycrawl.tools.checkstyle.api.FilterSet;
@@ -37,6 +48,8 @@ import com.puppycrawl.tools.checkstyle.api.FilterSet;
  * Tests SuppressionsLoader.
  * @author Rick Giles
  */
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({ SuppressionsLoader.class, SuppressionsLoaderTest.class })
 public class SuppressionsLoaderTest {
     @Test
     public void testNoSuppressions()
@@ -162,7 +175,7 @@ public class SuppressionsLoaderTest {
 
     private static boolean isInternetReachable() {
         try {
-            URL url = new URL("http://www.yahoo.com");
+            URL url = new URL("http://checkstyle.sourceforge.net/");
             HttpURLConnection urlConnect = (HttpURLConnection) url.openConnection();
             @SuppressWarnings("unused")
             Object objData = urlConnect.getContent();
@@ -171,5 +184,112 @@ public class SuppressionsLoaderTest {
             return false;
         }
         return true;
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testUnableToFindSuppressions() throws Exception {
+        mockStatic(SuppressionsLoader.class);
+
+        String fileName = "suppressions_none.xml";
+        InputSource source = mock(InputSource.class);
+
+        when(source.getByteStream()).thenThrow(FileNotFoundException.class);
+        when(SuppressionsLoader.class, "loadSuppressions", source, fileName).thenCallRealMethod();
+
+        try {
+            Whitebox.invokeMethod(SuppressionsLoader.class, "loadSuppressions", source, fileName);
+            fail("Exception is expected");
+        }
+        catch (CheckstyleException ex) {
+            assertTrue(ex.getCause() instanceof  FileNotFoundException);
+            assertEquals("unable to find " + fileName, ex.getMessage());
+        }
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testUnableToReadSuppressions() throws Exception {
+        mockStatic(SuppressionsLoader.class);
+
+        String fileName = "suppressions_none.xml";
+        InputSource source = mock(InputSource.class);
+
+        when(source.getByteStream()).thenThrow(IOException.class);
+        when(SuppressionsLoader.class, "loadSuppressions", source, fileName).thenCallRealMethod();
+
+        try {
+            Whitebox.invokeMethod(SuppressionsLoader.class, "loadSuppressions", source, fileName);
+            fail("Exception is expected");
+        }
+        catch (CheckstyleException ex) {
+            assertTrue(ex.getCause() instanceof  IOException);
+            assertEquals("unable to read " + fileName, ex.getMessage());
+        }
+    }
+
+    @Test
+    public void testNoCheckNoId() {
+        final String fn = "src/test/resources/com/puppycrawl/tools/checkstyle/suppressions_no_check_and_id.xml";
+        try {
+            SuppressionsLoader.loadSuppressions(fn);
+        }
+        catch (CheckstyleException ex) {
+            assertEquals(
+                "unable to parse " + fn + " - missing checks and id attribute",
+                ex.getMessage());
+        }
+    }
+
+    @Test
+    public void testNoCheckYesId() throws Exception {
+        final String fn = "src/test/resources/com/puppycrawl/tools/checkstyle/suppressions_id.xml";
+        SuppressionsLoader.loadSuppressions(fn);
+    }
+
+    @Test
+    public void testInvalidFileFormat() {
+        final String fn = "src/test/resources/com/puppycrawl/tools/checkstyle/suppressions_invalid_file.xml";
+        try {
+            SuppressionsLoader.loadSuppressions(fn);
+        }
+        catch (CheckstyleException ex) {
+            assertEquals(
+                "unable to parse " + fn + " - invalid files or checks format",
+                ex.getMessage());
+        }
+    }
+
+    @Test
+    public void testLoadFromClasspath()
+        throws CheckstyleException {
+        final FilterSet fc =
+            SuppressionsLoader.loadSuppressions(
+                    "/com/puppycrawl/tools/checkstyle/suppressions_none.xml");
+        final FilterSet fc2 = new FilterSet();
+        assertEquals(fc, fc2);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testloadSuppressionsURISyntaxException() throws Exception {
+        mockStatic(SuppressionsLoader.class);
+
+        URL configUrl = mock(URL.class);
+        String fileName = "suppressions_none.xml";
+
+        when(SuppressionsLoader.class.getResource(fileName)).thenReturn(configUrl);
+        when(configUrl.toURI()).thenThrow(URISyntaxException.class);
+        when(SuppressionsLoader.loadSuppressions(fileName))
+                .thenCallRealMethod();
+
+        try {
+            SuppressionsLoader.loadSuppressions(fileName);
+            fail("Exception is expected");
+        }
+        catch (CheckstyleException ex) {
+            assertTrue(ex.getCause() instanceof  URISyntaxException);
+            assertEquals("unable to find " + fileName, ex.getMessage());
+        }
     }
 }

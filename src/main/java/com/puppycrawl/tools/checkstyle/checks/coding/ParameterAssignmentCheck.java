@@ -19,14 +19,15 @@
 
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
-import com.google.common.collect.Sets;
-import com.puppycrawl.tools.checkstyle.api.Check;
-import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import java.util.ArrayDeque;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.Set;
+
+import com.google.common.collect.Sets;
+import com.puppycrawl.tools.checkstyle.api.Check;
+import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
 /**
  * <p>
@@ -198,7 +199,7 @@ public final class ParameterAssignmentCheck extends Check {
      * @param ast ident to check.
      */
     private void checkIdent(DetailAST ast) {
-        if (parameterNames != null && !parameterNames.isEmpty()) {
+        if (!parameterNames.isEmpty()) {
             final DetailAST identAST = ast.getFirstChild();
 
             if (identAST != null

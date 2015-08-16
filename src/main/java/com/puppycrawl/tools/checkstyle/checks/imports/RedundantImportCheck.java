@@ -19,12 +19,13 @@
 
 package com.puppycrawl.tools.checkstyle.checks.imports;
 
+import java.util.Set;
+
 import com.google.common.collect.Sets;
 import com.puppycrawl.tools.checkstyle.api.Check;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.FullIdent;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import java.util.Set;
 
 /**
  * <p>
@@ -34,8 +35,8 @@ import java.util.Set;
  *<ul>
  *  <li>It is a duplicate of another import. This is, when a class is imported
  *  more than once.</li>
- *  <li>The class non-statically imported is from the <code>java.lang</code>
- *  package. For example importing <code>java.lang.String</code>.</li>
+ *  <li>The class non-statically imported is from the {@code java.lang}
+ *  package. For example importing {@code java.lang.String}.</li>
  *  <li>The class non-statically imported is from the same package as the
  *  current package.</li>
  *</ul>
@@ -113,7 +114,9 @@ public class RedundantImportCheck
                 log(ast.getLineNo(), ast.getColumnNo(), MSG_LANG,
                     imp.getText());
             }
-            else if (fromPackage(imp.getText(), pkgName)) {
+            // imports from unnamed package are not allowed,
+            // so we are checking SAME rule only for named packages
+            else if (pkgName != null && fromPackage(imp.getText(), pkgName)) {
                 log(ast.getLineNo(), ast.getColumnNo(), MSG_SAME,
                     imp.getText());
             }
@@ -151,18 +154,11 @@ public class RedundantImportCheck
      * @return whether from the package
      */
     private static boolean fromPackage(String importName, String pkg) {
-        boolean retVal = false;
-        if (pkg == null) {
-            // If not package, then check for no package in the import.
-            retVal = importName.indexOf('.') == -1;
-        }
-        else {
-            final int index = importName.lastIndexOf('.');
-            if (index != -1) {
-                final String front = importName.substring(0, index);
-                retVal = front.equals(pkg);
-            }
-        }
-        return retVal;
+        // imports from unnamed package are not allowed:
+        // http://docs.oracle.com/javase/specs/jls/se7/html/jls-7.html#jls-7.5
+        // So '.' must be present in member name and we are not checking for it
+        final int index = importName.lastIndexOf('.');
+        final String front = importName.substring(0, index);
+        return front.equals(pkg);
     }
 }

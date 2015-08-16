@@ -19,10 +19,11 @@
 
 package com.puppycrawl.tools.checkstyle.api;
 
-import com.google.common.collect.Sets;
-
+import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
+
+import com.google.common.collect.Sets;
 
 /**
  * A filter set applies filters to AuditEvents.
@@ -56,7 +57,7 @@ public class FilterSet
      * @return the Filters of the filter set.
      */
     public Set<Filter> getFilters() {
-        return filters;
+        return Collections.unmodifiableSet(filters);
     }
 
     @Override
@@ -81,7 +82,6 @@ public class FilterSet
         return Objects.hash(filters);
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean accept(AuditEvent event) {
         for (Filter filter : filters) {

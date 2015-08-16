@@ -19,7 +19,6 @@
 
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
-import antlr.collections.AST;
 import com.puppycrawl.tools.checkstyle.api.Check;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
@@ -45,7 +44,7 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  *     int x = (a + b) + c;</pre>
  * <p>
  * In the above case, given that <em>a</em>, <em>b</em>, and <em>c</em> are
- * all <code>int</code> variables, the parentheses around <code>a + b</code>
+ * all {@code int} variables, the parentheses around {@code a + b}
  * are not needed.
  * </p>
  *
@@ -89,8 +88,6 @@ public class UnnecessaryParenthesesCheck extends Check {
      */
     public static final String MSG_RETURN = "unnecessary.paren.return";
 
-    /** The minimum number of child nodes to consider for a match. */
-    private static final int MIN_CHILDREN_FOR_MATCH = 3;
     /** The maximum string length before we chop the string. */
     private static final int MAX_QUOTED_LENGTH = 25;
 
@@ -187,6 +184,12 @@ public class UnnecessaryParenthesesCheck extends Check {
     }
 
     @Override
+    public int[] getRequiredTokens() {
+        // Check can work with any of acceptable tokens
+        return new int[] {};
+    }
+
+    @Override
     public void visitToken(DetailAST ast) {
         final int type = ast.getType();
         final DetailAST parent = ast.getParent();
@@ -246,12 +249,11 @@ public class UnnecessaryParenthesesCheck extends Check {
             // warning about an immediate child node in visitToken, so we don't
             // need to log another one here.
 
-            if (parentToSkip != ast && exprSurrounded(ast)) {
+            if (parentToSkip != ast && isExprSurrounded(ast)) {
                 if (assignDepth >= 1) {
                     log(ast, MSG_ASSIGN);
                 }
-                else if (ast.getParent().getType()
-                    == TokenTypes.LITERAL_RETURN) {
+                else if (ast.getParent().getType() == TokenTypes.LITERAL_RETURN) {
                     log(ast, MSG_RETURN);
                 }
                 else {
@@ -269,55 +271,41 @@ public class UnnecessaryParenthesesCheck extends Check {
     }
 
     /**
-     * Tests if the given <code>DetailAST</code> is surrounded by parentheses.
-     * In short, does <code>ast</code> have a previous sibling whose type is
-     * <code>TokenTypes.LPAREN</code> and a next sibling whose type is <code>
-     * TokenTypes.RPAREN</code>.
-     * @param ast the <code>DetailAST</code> to check if it is surrounded by
+     * Tests if the given {@code DetailAST} is surrounded by parentheses.
+     * In short, does {@code ast} have a previous sibling whose type is
+     * {@code TokenTypes.LPAREN} and a next sibling whose type is {@code
+     * TokenTypes.RPAREN}.
+     * @param ast the {@code DetailAST} to check if it is surrounded by
      *        parentheses.
-     * @return <code>true</code> if <code>ast</code> is surrounded by
+     * @return {@code true} if {@code ast} is surrounded by
      *         parentheses.
      */
-    private boolean isSurrounded(DetailAST ast) {
+    private static boolean isSurrounded(DetailAST ast) {
+        // if previous sibling is left parenthesis,
+        // next sibling can't be other than right parenthesis
         final DetailAST prev = ast.getPreviousSibling();
-        final DetailAST next = ast.getNextSibling();
-
-        return prev != null && prev.getType() == TokenTypes.LPAREN
-            && next != null && next.getType() == TokenTypes.RPAREN;
+        return prev != null && prev.getType() == TokenTypes.LPAREN;
     }
 
     /**
      * Tests if the given expression node is surrounded by parentheses.
-     * @param ast a <code>DetailAST</code> whose type is
-     *        <code>TokenTypes.EXPR</code>.
-     * @return <code>true</code> if the expression is surrounded by
+     * @param ast a {@code DetailAST} whose type is
+     *        {@code TokenTypes.EXPR}.
+     * @return {@code true} if the expression is surrounded by
      *         parentheses.
-     * @throws IllegalArgumentException if <code>ast.getType()</code> is not
-     *         equal to <code>TokenTypes.EXPR</code>.
      */
-    private boolean exprSurrounded(DetailAST ast) {
-        if (ast.getType() != TokenTypes.EXPR) {
-            throw new IllegalArgumentException("Not an expression node.");
-        }
-        boolean surrounded = false;
-        if (ast.getChildCount() >= MIN_CHILDREN_FOR_MATCH) {
-            final AST n1 = ast.getFirstChild();
-            final AST nn = ast.getLastChild();
-
-            surrounded = n1.getType() == TokenTypes.LPAREN
-                && nn.getType() == TokenTypes.RPAREN;
-        }
-        return surrounded;
+    private static boolean isExprSurrounded(DetailAST ast) {
+        return ast.getFirstChild().getType() == TokenTypes.LPAREN;
     }
 
     /**
      * Check if the given token type can be found in an array of token types.
      * @param type the token type.
      * @param tokens an array of token types to search.
-     * @return <code>true</code> if <code>type</code> was found in <code>
-     *         tokens</code>.
+     * @return {@code true} if {@code type} was found in {@code
+     *         tokens}.
      */
-    private boolean inTokenList(int type, int... tokens) {
+    private static boolean inTokenList(int type, int... tokens) {
         // NOTE: Given the small size of the two arrays searched, I'm not sure
         //       it's worth bothering with doing a binary search or using a
         //       HashMap to do the searches.
@@ -330,17 +318,17 @@ public class UnnecessaryParenthesesCheck extends Check {
     }
 
     /**
-     * Returns the specified string chopped to <code>MAX_QUOTED_LENGTH</code>
-     * plus an ellipsis (...) if the length of the string exceeds <code>
-     * MAX_QUOTED_LENGTH</code>.
-     * @param string the string to potentially chop.
-     * @return the chopped string if <code>string</code> is longer than
-     *         <code>MAX_QUOTED_LENGTH</code>; otherwise <code>string</code>.
+     * Returns the specified string chopped to {@code MAX_QUOTED_LENGTH}
+     * plus an ellipsis (...) if the length of the string exceeds {@code
+     * MAX_QUOTED_LENGTH}.
+     * @param value the string to potentially chop.
+     * @return the chopped string if {@code string} is longer than
+     *         {@code MAX_QUOTED_LENGTH}; otherwise {@code string}.
      */
-    private String chopString(String string) {
-        if (string.length() > MAX_QUOTED_LENGTH) {
-            return string.substring(0, MAX_QUOTED_LENGTH) + "...\"";
+    private static String chopString(String value) {
+        if (value.length() > MAX_QUOTED_LENGTH) {
+            return value.substring(0, MAX_QUOTED_LENGTH) + "...\"";
         }
-        return string;
+        return value;
     }
 }

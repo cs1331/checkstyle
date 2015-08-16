@@ -33,31 +33,31 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  * <p>
  * The Check validate abbreviations(consecutive capital letters) length in
  * identifier name, it also allows to enforce camel case naming. Please read more at
- * <a href="http://google-styleguide.googlecode.com/svn/trunk/javaguide.html#s5.3-camel-case">
+ * <a href="http://checkstyle.sourceforge.net/reports/google-java-style.html#s5.3-camel-case">
  * Google Style Guide</a> to get to know how to avoid long abbreviations in names.
  * </p>
  * <p>
- * Option <code>allowedAbbreviationLength</code> indicates on the allowed amount of capital
+ * Option {@code allowedAbbreviationLength} indicates on the allowed amount of capital
  * letters in abbreviations in the classes, interfaces,
  * variables and methods names. Default value is '3'.
  * </p>
  * <p>
- * Option <code>allowedAbbreviations</code> - list of abbreviations that
+ * Option {@code allowedAbbreviations} - list of abbreviations that
  * must be skipped for checking. Abbreviations should be separated by comma,
  * no spaces are allowed.
  * </p>
  * <p>
- * Option <code>ignoreFinal</code> allow to skip variables with <code>final</code> modifier.
- * Default value is <code>true</code>.
+ * Option {@code ignoreFinal} allow to skip variables with {@code final} modifier.
+ * Default value is {@code true}.
  * </p>
  * <p>
- * Option <code>ignoreStatic</code> allow to skip variables with <code>static</code> modifier.
- * Default value is <code>true</code>.
+ * Option {@code ignoreStatic} allow to skip variables with {@code static} modifier.
+ * Default value is {@code true}.
  * </p>
  * <p>
- * Option <code>ignoreOverriddenMethod</code> - Allows to
- * ignore methods tagged with <code>@Override</code> annotation
- * (that usually mean inherited name). Default value is <code>true</code>.
+ * Option {@code ignoreOverriddenMethod} - Allows to
+ * ignore methods tagged with {@code @Override} annotation
+ * (that usually mean inherited name). Default value is {@code true}.
  * </p>
  * Default configuration
  * <pre>
@@ -245,12 +245,10 @@ public class AbbreviationAsWordInNameCheck extends Check {
     private static boolean isInterfaceDeclaration(DetailAST variableDefAst) {
         boolean result = false;
         final DetailAST astBlock = variableDefAst.getParent();
-        if (astBlock != null) {
-            final DetailAST astParent2 = astBlock.getParent();
-            if (astParent2 != null
-                    && astParent2.getType() == TokenTypes.INTERFACE_DEF) {
-                result = true;
-            }
+        final DetailAST astParent2 = astBlock.getParent();
+
+        if (astParent2.getType() == TokenTypes.INTERFACE_DEF) {
+            result = true;
         }
         return result;
     }
@@ -267,6 +265,7 @@ public class AbbreviationAsWordInNameCheck extends Check {
         for (DetailAST child : getChildren(methodModifiersAST)) {
             if (child.getType() == TokenTypes.ANNOTATION) {
                 final DetailAST annotationIdent = child.findFirstToken(TokenTypes.IDENT);
+
                 if (annotationIdent != null && "Override".equals(annotationIdent.getText())) {
                     result = true;
                     break;
@@ -301,30 +300,38 @@ public class AbbreviationAsWordInNameCheck extends Check {
                 if (abbrStarted) {
                     abbrStarted = false;
 
-                    // -1 as a first capital is usually beginning of next word
                     final int endIndex = index - 1;
-                    final int abbrLength = endIndex - beginIndex;
-                    if (abbrLength > allowedAbbreviationLength) {
-                        result = str.substring(beginIndex, endIndex);
-                        if (!allowedAbbreviations.contains(result)) {
-                            break;
-                        }
-                        else {
-                            result = null;
-                        }
+                    // -1 as a first capital is usually beginning of next word
+                    result = getAbbreviationIfIllegal(str, beginIndex, endIndex);
+                    if (result != null) {
+                        break;
                     }
                     beginIndex = -1;
                 }
             }
         }
-        if (abbrStarted) {
+        // if abbreviation at the end of name and it is not single character (example: scaleX)
+        if (abbrStarted && beginIndex != str.length() - 1) {
             final int endIndex = str.length();
-            final int abbrLength = endIndex - beginIndex;
-            if (abbrLength > 1 && abbrLength > allowedAbbreviationLength) {
-                result = str.substring(beginIndex, endIndex);
-                if (allowedAbbreviations.contains(result)) {
-                    result = null;
-                }
+            result = getAbbreviationIfIllegal(str, beginIndex, endIndex);
+        }
+        return result;
+    }
+
+    /**
+     * get Abbreviation if it is illegal
+     * @param str name
+     * @param beginIndex begin index
+     * @param endIndex end index
+     * @return true is abbreviation is bigger that requierd and not in ignore list
+     */
+    private String getAbbreviationIfIllegal(String str, int beginIndex, int endIndex) {
+        String result = null;
+        final int abbrLength = endIndex - beginIndex;
+        if (abbrLength > allowedAbbreviationLength) {
+            final String abbr = str.substring(beginIndex, endIndex);
+            if (!allowedAbbreviations.contains(abbr)) {
+                result = abbr;
             }
         }
         return result;

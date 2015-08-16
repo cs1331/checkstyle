@@ -19,7 +19,6 @@
 
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
-import antlr.collections.AST;
 import com.puppycrawl.tools.checkstyle.api.Check;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
@@ -39,18 +38,18 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  * For example:
  *
  * <pre>
- *  <code>
+ *  {@code
  *    String nullString = null;
  *    nullString.equals(&quot;My_Sweet_String&quot;);
- *  </code>
+ *  }
  * </pre>
  * should be refactored to
  *
  * <pre>
- *  <code>
+ *  {@code
  *    String nullString = null;
  *    &quot;My_Sweet_String&quot;.equals(nullString);
- *  </code>
+ *  }
  * </pre>
  *
  *
@@ -110,7 +109,12 @@ public class EqualsAvoidNullCheck extends Check {
 
     @Override
     public int[] getAcceptableTokens() {
-        return new int[] {TokenTypes.METHOD_CALL};
+        return getDefaultTokens();
+    }
+
+    @Override
+    public int[] getRequiredTokens() {
+        return getDefaultTokens();
     }
 
     @Override
@@ -121,15 +125,7 @@ public class EqualsAvoidNullCheck extends Check {
         }
 
         final DetailAST objCalledOn = dot.getFirstChild();
-
-        //checks for calling equals on String literal and
-        //anon object which cannot be null
-        //Also, checks if calling using strange inner class
-        //syntax outter.inner.equals(otherObj) by looking
-        //for the dot operator which cannot be improved
-        if (objCalledOn.getType() == TokenTypes.STRING_LITERAL
-                || objCalledOn.getType() == TokenTypes.LITERAL_NEW
-                || objCalledOn.getType() == TokenTypes.DOT) {
+        if (isStringLiteral(objCalledOn)) {
             return;
         }
 
@@ -137,51 +133,43 @@ public class EqualsAvoidNullCheck extends Check {
         final DetailAST expr = dot.getNextSibling().getFirstChild();
 
         if ("equals".equals(method.getText())
-            && containsOneArg(expr) && containsAllSafeTokens(expr)) {
+            && containsOneArgument(methodCall) && containsAllSafeTokens(expr)) {
             log(methodCall.getLineNo(), methodCall.getColumnNo(),
                 MSG_EQUALS_AVOID_NULL);
         }
 
         if (!ignoreEqualsIgnoreCase
             && "equalsIgnoreCase".equals(method.getText())
-            && containsOneArg(expr) && containsAllSafeTokens(expr)) {
+            && containsOneArgument(methodCall) && containsAllSafeTokens(expr)) {
             log(methodCall.getLineNo(), methodCall.getColumnNo(),
                 MSG_EQUALS_IGNORE_CASE_AVOID_NULL);
         }
     }
 
     /**
-     * Checks if a method contains no arguments
-     * starting at with the argument expression.
+     * Verify that method call has one argument.
      *
-     * @param expr the argument expression
-     * @return true if the method contains no args, false if not
+     * @param methodCall METHOD_CALL DetailAST
+     * @return true if method call has one argument.
      */
-    private boolean containsNoArgs(final AST expr) {
-        return expr == null;
+    private static boolean containsOneArgument(DetailAST methodCall) {
+        final DetailAST elist = methodCall.findFirstToken(TokenTypes.ELIST);
+        return elist.getChildCount() == 1;
     }
 
     /**
-     * Checks if a method contains multiple arguments
-     * starting at with the argument expression.
-     *
-     * @param expr the argument expression
-     * @return true if the method contains multiple args, false if not
+     * checks for calling equals on String literal and
+     * anon object which cannot be null
+     * Also, checks if calling using strange inner class
+     * syntax outter.inner.equals(otherObj) by looking
+     * for the dot operator which cannot be improved
+     * @param objCalledOn object AST
+     * @return if it is string literal
      */
-    private boolean containsMultiArgs(final AST expr) {
-        final AST comma = expr.getNextSibling();
-        return comma != null && comma.getType() == TokenTypes.COMMA;
-    }
-
-    /**
-     * Checks if a method contains a single argument
-     * starting at with the argument expression.
-     *
-     * @param expr the argument expression
-     * @return true if the method contains a single arg, false if not
-     */
-    private boolean containsOneArg(final AST expr) {
-        return !containsNoArgs(expr) && !containsMultiArgs(expr);
+    private static boolean isStringLiteral(DetailAST objCalledOn) {
+        return objCalledOn.getType() == TokenTypes.STRING_LITERAL
+                || objCalledOn.getType() == TokenTypes.LITERAL_NEW
+                || objCalledOn.getType() == TokenTypes.DOT;
     }
 
     /**
@@ -198,7 +186,7 @@ public class EqualsAvoidNullCheck extends Check {
      * @param expr the argument expression
      * @return - true if any child matches the set of tokens, false if not
      */
-    private boolean containsAllSafeTokens(final DetailAST expr) {
+    private static boolean containsAllSafeTokens(final DetailAST expr) {
         DetailAST arg = expr.getFirstChild();
 
         if (arg.branchContains(TokenTypes.METHOD_CALL)) {
@@ -215,13 +203,9 @@ public class EqualsAvoidNullCheck extends Check {
         //(s += "SweetString").equals(s); //true
         //arg = skipVariablePlusAssign(arg);
 
-        if (arg.branchContains(TokenTypes.PLUS_ASSIGN)
-                || arg.branchContains(TokenTypes.IDENT)) {
-            return false;
-        }
-
-        //must be just String literals if got here
-        return true;
+        //must be just String literals to return true
+        return !arg.branchContains(TokenTypes.PLUS_ASSIGN)
+                && !arg.branchContains(TokenTypes.IDENT);
     }
 
     /**
@@ -229,7 +213,7 @@ public class EqualsAvoidNullCheck extends Check {
      * @param currentAST current token in the argument expression
      * @return the next relevant token
      */
-    private DetailAST skipVariableAssign(final DetailAST currentAST) {
+    private static DetailAST skipVariableAssign(final DetailAST currentAST) {
         if (currentAST.getType() == TokenTypes.ASSIGN
                 && currentAST.getFirstChild().getType() == TokenTypes.IDENT) {
             return currentAST.getFirstChild().getNextSibling();

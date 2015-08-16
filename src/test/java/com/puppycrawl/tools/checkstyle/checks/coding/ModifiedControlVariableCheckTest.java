@@ -19,11 +19,15 @@
 
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
-import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
-import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
+import static com.puppycrawl.tools.checkstyle.checks.coding.ModifiedControlVariableCheck.MSG_KEY;
+
+import org.junit.Assert;
 import org.junit.Test;
 
-import static com.puppycrawl.tools.checkstyle.checks.coding.ModifiedControlVariableCheck.MSG_KEY;
+import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
+import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
+import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
 public class ModifiedControlVariableCheckTest
     extends BaseCheckTestSupport {
@@ -44,4 +48,57 @@ public class ModifiedControlVariableCheckTest
         verify(checkConfig, getPath("coding/InputModifiedControl.java"), expected);
     }
 
+    @Test
+    public void testEnhancedForLoopVariableTrue() throws Exception {
+        final DefaultConfiguration checkConfig =
+            createCheckConfig(ModifiedControlVariableCheck.class);
+        checkConfig.addAttribute("skipEnhancedForLoopVariable", "true");
+
+        final String[] expected = {
+        };
+        verify(checkConfig, getPath("coding/InputModifiedControlVariableEnhancedForLoopVariable.java"), expected);
+    }
+
+    @Test
+    public void testEnhancedForLoopVariableFalse() throws Exception {
+        final DefaultConfiguration checkConfig =
+            createCheckConfig(ModifiedControlVariableCheck.class);
+
+        final String[] expected = {
+            "9:18: " + getCheckMessage(MSG_KEY, "line"),
+        };
+        verify(checkConfig, getPath("coding/InputModifiedControlVariableEnhancedForLoopVariable.java"), expected);
+    }
+
+    @Test
+    public void testTokensNotNull() {
+        ModifiedControlVariableCheck check = new ModifiedControlVariableCheck();
+        Assert.assertNotNull(check.getAcceptableTokens());
+        Assert.assertNotNull(check.getDefaultTokens());
+        Assert.assertNotNull(check.getRequiredTokens());
+    }
+
+    @Test
+    public void testImproperToken() throws Exception {
+        ModifiedControlVariableCheck check = new ModifiedControlVariableCheck();
+
+        DetailAST classDefAst = new DetailAST();
+        classDefAst.setType(TokenTypes.CLASS_DEF);
+
+        try {
+            check.visitToken(classDefAst);
+            Assert.fail();
+        }
+        catch (IllegalStateException e) {
+            // it is OK
+        }
+
+        try {
+            check.leaveToken(classDefAst);
+            Assert.fail();
+        }
+        catch (IllegalStateException e) {
+            // it is OK
+        }
+    }
 }

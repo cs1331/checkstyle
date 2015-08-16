@@ -19,14 +19,16 @@
 
 package com.puppycrawl.tools.checkstyle.checks.modifier;
 
+import static com.puppycrawl.tools.checkstyle.checks.modifier.RedundantModifierCheck.MSG_KEY;
+
 import java.io.File;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
-
-import static com.puppycrawl.tools.checkstyle.checks.modifier.RedundantModifierCheck.MSG_KEY;
+import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
 public class RedundantModifierTest
     extends BaseCheckTestSupport {
@@ -78,5 +80,52 @@ public class RedundantModifierTest
                 new File("src/test/resources-noncompilable/com/puppycrawl/tools/"
                         + "checkstyle/InputFinalInDefaultMethods.java").getCanonicalPath(),
                 expected);
+    }
+
+    @Test
+    public void testEnumConstructorIsImplicitlyPrivate() throws Exception {
+        final DefaultConfiguration checkConfig =
+                createCheckConfig(RedundantModifierCheck.class);
+        final String[] expected = {
+            "10:5: " + getCheckMessage(MSG_KEY, "private"),
+        };
+        verify(checkConfig, getPath("InputRedundantConstructorModifier.java"), expected);
+    }
+
+    @Test
+    public void testInnerTypeInInterfaceIsImplicitlyStatic() throws Exception {
+        final DefaultConfiguration checkConfig =
+                createCheckConfig(RedundantModifierCheck.class);
+        final String[] expected = {
+            "8:5: " + getCheckMessage(MSG_KEY, "static"),
+            "12:5: " + getCheckMessage(MSG_KEY, "static"),
+        };
+        verify(checkConfig, getPath("InputRedundantStaticModifierInInnerTypeOfInterface.java"), expected);
+    }
+
+    @Test
+    public void testGetAcceptableTokens() {
+        RedundantModifierCheck redundantModifierCheckObj = new RedundantModifierCheck();
+        int[] actual = redundantModifierCheckObj.getAcceptableTokens();
+        int[] expected = new int[] {
+            TokenTypes.METHOD_DEF,
+            TokenTypes.VARIABLE_DEF,
+            TokenTypes.ANNOTATION_FIELD_DEF,
+            TokenTypes.INTERFACE_DEF,
+            TokenTypes.CTOR_DEF,
+            TokenTypes.CLASS_DEF,
+            TokenTypes.ENUM_DEF,
+        };
+        Assert.assertNotNull(actual);
+        Assert.assertArrayEquals(expected, actual);
+    }
+
+    @Test
+    public void testGetRequiredTokens() {
+        RedundantModifierCheck redundantModifierCheckObj = new RedundantModifierCheck();
+        int[] actual = redundantModifierCheckObj.getRequiredTokens();
+        int[] expected = new int[] {};
+        Assert.assertNotNull(actual);
+        Assert.assertArrayEquals(expected, actual);
     }
 }

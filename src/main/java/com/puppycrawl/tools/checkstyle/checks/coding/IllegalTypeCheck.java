@@ -19,6 +19,11 @@
 
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
 import com.google.common.collect.Sets;
 import com.puppycrawl.tools.checkstyle.Utils;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
@@ -26,11 +31,6 @@ import com.puppycrawl.tools.checkstyle.api.FullIdent;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import com.puppycrawl.tools.checkstyle.checks.AbstractFormatCheck;
 import com.puppycrawl.tools.checkstyle.checks.CheckUtils;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
 
 /**
  * <p>
@@ -61,14 +61,15 @@ import java.util.Set;
  *   corresponding declarations
  *  (of variables, methods or parameters). This helps to avoid ambiguous cases, e.g.:
  * <p>
- * <code>java.awt.List</code> was set as illegal class name, then, code like:
+ * {@code java.awt.List} was set as illegal class name, then, code like:
  * <p>
- * <code>
+ * {@code
  * import java.util.List;<br>
  * ...<br>
  * List list; //No violation here
- * </code>
+ * }
  * </p>
+ * <p>
  * will be ok.
  * </p>
  * <p>
@@ -79,6 +80,7 @@ import java.util.Set;
  * </p>
  * <p>
  * In most cases it's justified to put following classes to <b>illegalClassNames</b>:
+ * </p>
  * <ul>
  * <li>GregorianCalendar</li>
  * <li>Hashtable</li>
@@ -86,6 +88,7 @@ import java.util.Set;
  * <li>LinkedList</li>
  * <li>Vector</li>
  * </ul>
+ * <p>
  * as methods that are differ from interface methods are rear used, so in most cases user will
  *  benefit from checking for them.
  * </p>
@@ -251,7 +254,7 @@ public final class IllegalTypeCheck extends AbstractFormatCheck {
      */
     private void visitImport(DetailAST importAst) {
         if (!isStarImport(importAst)) {
-            final String canonicalName = getCanonicalName(importAst);
+            final String canonicalName = getImportedTypeCanonicalName(importAst);
             extendIllegalClassNamesWithShortName(canonicalName);
         }
     }
@@ -327,14 +330,12 @@ public final class IllegalTypeCheck extends AbstractFormatCheck {
      * @param importAst {@link TokenTypes#IMPORT Import}
      * @return Imported canonical type's name.
      */
-    private static String getCanonicalName(DetailAST importAst) {
+    private static String getImportedTypeCanonicalName(DetailAST importAst) {
         final StringBuilder canonicalNameBuilder = new StringBuilder();
         DetailAST toVisit = importAst;
         while (toVisit != null) {
             toVisit = getNextSubTreeNode(toVisit, importAst);
-            if (toVisit != null
-                   && (toVisit.getType() == TokenTypes.IDENT
-                      || toVisit.getType() == TokenTypes.STAR)) {
+            if (toVisit != null && toVisit.getType() == TokenTypes.IDENT) {
                 canonicalNameBuilder.append(toVisit.getText());
                 final DetailAST nextSubTreeNode = getNextSubTreeNode(toVisit, importAst);
                 if (nextSubTreeNode.getType() != TokenTypes.SEMI) {
@@ -390,30 +391,12 @@ public final class IllegalTypeCheck extends AbstractFormatCheck {
     }
 
     /**
-     * Get the list of illegal variable types.
-     * @return array of illegal variable types
-     */
-    public String[] getIllegalClassNames() {
-        return illegalClassNames.toArray(
-            new String[illegalClassNames.size()]);
-    }
-
-    /**
      * Set the list of ignore method names.
      * @param methodNames array of ignored method names
      */
     public void setIgnoredMethodNames(String... methodNames) {
         ignoredMethodNames.clear();
         Collections.addAll(ignoredMethodNames, methodNames);
-    }
-
-    /**
-     * Get the list of ignored method names.
-     * @return array of ignored method names
-     */
-    public String[] getIgnoredMethodNames() {
-        return ignoredMethodNames.toArray(
-            new String[ignoredMethodNames.size()]);
     }
 
     /**
@@ -426,15 +409,6 @@ public final class IllegalTypeCheck extends AbstractFormatCheck {
     }
 
     /**
-     * Get the list of legal abstract class names.
-     * @return array of legal abstract class names
-     */
-    public String[] getLegalAbstractClassNames() {
-        return legalAbstractClassNames.toArray(
-            new String[legalAbstractClassNames.size()]);
-    }
-
-    /**
      * Set the list of member modifiers (of methods and fields) which should be checked.
      * @param modifiers String contains modifiers.
      */
@@ -443,6 +417,6 @@ public final class IllegalTypeCheck extends AbstractFormatCheck {
         for (String modifier : modifiers.split(",")) {
             modifiersList.add(Utils.getTokenId(modifier.trim()));
         }
-        this.memberModifiers = modifiersList;
+        memberModifiers = modifiersList;
     }
 }

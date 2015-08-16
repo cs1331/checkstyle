@@ -461,7 +461,7 @@ public class InputVariableDeclarationUsageDistanceCheck {
     
     public void testIssue32_7() {
         String line = "abc";
-        writer.write(line);
+        otherWriter.write(line);
         line.charAt(1);
         builder.append(line);
         test(line, line, line);
@@ -814,7 +814,7 @@ public class InputVariableDeclarationUsageDistanceCheck {
     	
     }
     
-    static class writer {
+    static class otherWriter {
 
 		public static void write(String line)
 		{
@@ -834,6 +834,144 @@ public class InputVariableDeclarationUsageDistanceCheck {
 			
 		}
     	
+    }
+    
+}
+
+class New {
+    void a() {
+        int a = 1;
+        System.out.println();
+        System.out.println();
+        System.out.println();
+        System.out.println();
+        while (true) {
+            System.out.println();
+            System.out.println(a);
+        }
+    }
+    
+    void b() {
+        int a = 1;
+        System.out.println();
+        System.out.println();
+        System.out.println();
+        System.out.println();
+        do {
+            System.out.println();
+            System.out.println(a);
+        } while (true);
+    }
+    
+    void c() {
+        int a = 1;
+        System.out.println();
+        System.out.println();
+        System.out.println();
+        System.out.println();
+        for (;;) {
+            System.out.println();
+            System.out.println(a);
+        }
+    }
+    
+    void d() {
+        int a = 1;
+        System.out.println();
+        System.out.println();
+        System.out.println();
+        System.out.println();
+        for (int i: new int[]{1,2,3}) {
+            System.out.println();
+            System.out.println(a);
+        }
+    }
+
+    void f() {
+        int a = 1;
+        System.out.println();
+        System.out.println();
+        System.out.println();
+        System.out.println();
+        while (true)
+            System.out.println(a);
+    }
+    
+    void h() {
+        int a = 1;
+        System.out.println();
+        System.out.println();
+        System.out.println();
+        System.out.println();
+        while (true)
+            while (true)
+                a++;
+    }
+    
+    void i() {
+        int a = 1;
+        switch (Math.max(1, 2)) {
+        case 1:
+            System.out.println();
+            break;
+        case 2:
+            System.out.println();
+            break;
+        }
+
+        switch (Math.max(1, 2)) {
+        case 1:
+            System.out.println(a);
+            break;
+        case 2:
+            System.out.println(a);
+            break;
+        }
+    }
+    
+    void k() {
+        int a = 1;
+        System.out.println();
+        System.out.println();
+        System.out.println();
+        System.out.println();
+        while (true) {
+            System.out.println();
+            if (true) {
+                System.out.println();
+            } else if (true) {
+                System.out.println(a);
+            } else {
+                System.out.println();
+            }
+        }
+    }
+    
+    void l() {
+        int a = 1;
+        
+        while (true) {
+            switch (hashCode()){}
+            switch (Math.max(1, 2)) {
+            case 1:
+                System.out.println(a);
+                break;
+            case 2:
+                System.out.println(a);
+                break;
+            }
+        }
+    }
+    
+    void tryWithoutFinally() {
+        int a = 1;
+        System.out.println();
+        System.out.println();
+        System.out.println();
+        try {
+            a = 2;
+        }
+        catch(Exception e){}
     }
     
 }

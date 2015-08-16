@@ -19,13 +19,12 @@
 
 package com.puppycrawl.tools.checkstyle.checks.javadoc;
 
+import static com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocTagContinuationIndentationCheck.MSG_KEY;
+
 import org.junit.Test;
 
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
-
-import static com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocTagContinuationIndentationCheck
-.MSG_KEY;
 
 public class JavadocTagContinuationIndentationCheckTest
         extends BaseCheckTestSupport {
@@ -56,7 +55,20 @@ public class JavadocTagContinuationIndentationCheckTest
             "310: " + getCheckMessage(MSG_KEY, 4),
             "322: " + getCheckMessage(MSG_KEY, 4),
         };
-        verify(checkConfig, getPath("javadoc/InputJavaDocTagContinuationIndentation.java"), expected);
+        verify(checkConfig, getPath("javadoc/InputJavaDocTagContinuationIndentation.java"),
+                expected);
     }
 
+    @Test
+    public void testCheckWithOffset3() throws Exception {
+        final DefaultConfiguration checkConfig =
+                createCheckConfig(JavadocTagContinuationIndentationCheck.class);
+        checkConfig.addAttribute("offset", "3");
+        final String[] expected = {
+            "7: " + getCheckMessage(MSG_KEY, 3),
+            "19: " + getCheckMessage(MSG_KEY, 3),
+        };
+        verify(checkConfig, getPath("javadoc/InputJavaDocTagContinuationIndentationOffset3.java"),
+                expected);
+    }
 }

@@ -20,13 +20,16 @@
 package com.puppycrawl.tools.checkstyle.checks.sizes;
 
 import static com.puppycrawl.tools.checkstyle.checks.sizes.ExecutableStatementCountCheck.MSG_KEY;
+import static org.junit.Assert.fail;
+
+import org.junit.Test;
 
 import antlr.CommonHiddenStreamToken;
+
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import org.junit.Test;
 
 public class ExecutableStatementCountCheckTest
     extends BaseCheckTestSupport {
@@ -137,5 +140,22 @@ public class ExecutableStatementCountCheckTest
         ast.initialize(
             new CommonHiddenStreamToken(TokenTypes.ENUM, "ENUM"));
         checkObj.leaveToken(ast);
+    }
+
+    @Test
+    public void testDefaultConfiguration() throws Exception {
+        DefaultConfiguration checkConfig =
+            createCheckConfig(ExecutableStatementCountCheck.class);
+        String[] expected = {
+        };
+
+        try {
+            createChecker(checkConfig);
+            verify(checkConfig, getPath("ExecutableStatementCountInput.java"), expected);
+        }
+        catch (Exception ex) {
+            //Exception is not expected
+            fail();
+        }
     }
 }

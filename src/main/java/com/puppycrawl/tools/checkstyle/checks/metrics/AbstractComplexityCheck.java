@@ -19,12 +19,13 @@
 
 package com.puppycrawl.tools.checkstyle.checks.metrics;
 
-import com.puppycrawl.tools.checkstyle.api.Check;
-import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import java.math.BigInteger;
 import java.util.ArrayDeque;
 import java.util.Deque;
+
+import com.puppycrawl.tools.checkstyle.api.Check;
+import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
 /**
  * Base class for checks the calculate complexity based around methods.
@@ -50,7 +51,7 @@ public abstract class AbstractComplexityCheck
      * Creates an instance.
      * @param max the threshold of when to report an error
      */
-    public AbstractComplexityCheck(int max) {
+    protected AbstractComplexityCheck(int max) {
         this.max = max;
     }
 
@@ -58,24 +59,6 @@ public abstract class AbstractComplexityCheck
      * @return the message ID to log violations with
      */
     protected abstract String getMessageID();
-
-    /**
-     * Hook called when visiting a token. Will not be called the method
-     * definition tokens.
-     *
-     * @param ast the token being visited
-     */
-    protected void visitTokenHook(DetailAST ast) {
-    }
-
-    /**
-     * Hook called when leaving a token. Will not be called the method
-     * definition tokens.
-     *
-     * @param ast the token being left
-     */
-    protected void leaveTokenHook(DetailAST ast) {
-    }
 
     @Override
     public final int[] getRequiredTokens() {
@@ -130,6 +113,26 @@ public abstract class AbstractComplexityCheck
     }
 
     /**
+     * Hook called when visiting a token. Will not be called the method
+     * definition tokens.
+     *
+     * @param ast the token being visited
+     */
+    protected void visitTokenHook(DetailAST ast) {
+        // no code
+    }
+
+    /**
+     * Hook called when leaving a token. Will not be called the method
+     * definition tokens.
+     *
+     * @param ast the token being left
+     */
+    protected void leaveTokenHook(DetailAST ast) {
+        // no code
+    }
+
+    /**
      * @return the current value
      */
     protected final BigInteger getCurrentValue() {
@@ -150,7 +153,7 @@ public abstract class AbstractComplexityCheck
      * @param by the amount to increment by
      */
     protected final void incrementCurrentValue(BigInteger by) {
-        setCurrentValue(getCurrentValue().add(by));
+        currentValue = getCurrentValue().add(by);
     }
 
     /** Push the current value on the stack */
@@ -178,7 +181,7 @@ public abstract class AbstractComplexityCheck
      * @param ast the token representing the method definition
      */
     private void leaveMethodDef(DetailAST ast) {
-        final BigInteger bigIntegerMax = BigInteger.valueOf(max);
+        final BigInteger bigIntegerMax = BigInteger.valueOf(getMax());
         if (currentValue.compareTo(bigIntegerMax) > 0) {
             log(ast, getMessageID(), currentValue, bigIntegerMax);
         }

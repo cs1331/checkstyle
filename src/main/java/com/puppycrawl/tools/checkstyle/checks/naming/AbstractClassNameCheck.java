@@ -26,7 +26,7 @@ import com.puppycrawl.tools.checkstyle.checks.AbstractFormatCheck;
 /**
  * <p>
  * Ensures that the names of abstract classes conforming to some
- * regular expression and check that <code>abstract</code> modifier exists.
+ * regular expression and check that {@code abstract} modifier exists.
  * </p>
  * <p>
  * Rationale: Abstract classes are convenience base class
@@ -54,7 +54,7 @@ public final class AbstractClassNameCheck extends AbstractFormatCheck {
     public static final String NO_ABSTRACT_CLASS_MODIFIER = "no.abstract.class.modifier";
 
     /** Default format for abstract class names */
-    private static final String DEFAULT_FORMAT = "^Abstract.+$|^.*Factory$";
+    private static final String DEFAULT_FORMAT = "^Abstract.+$";
 
     /** whether to ignore checking the modifier */
     private boolean ignoreModifier;
@@ -68,7 +68,7 @@ public final class AbstractClassNameCheck extends AbstractFormatCheck {
     }
 
     /**
-     * Whether to ignore checking for the <code>abstract</code> modifier.
+     * Whether to ignore checking for the {@code abstract} modifier.
      * @param value new value
      */
     public void setIgnoreModifier(boolean value) {
@@ -90,7 +90,7 @@ public final class AbstractClassNameCheck extends AbstractFormatCheck {
 
     @Override
     public int[] getRequiredTokens() {
-        return getDefaultTokens();
+        return new int[]{TokenTypes.CLASS_DEF};
     }
 
     @Override
@@ -127,7 +127,7 @@ public final class AbstractClassNameCheck extends AbstractFormatCheck {
      * @param ast class definition for check.
      * @return true if a given class declared as abstract.
      */
-    private boolean isAbstract(DetailAST ast) {
+    private static boolean isAbstract(DetailAST ast) {
         final DetailAST abstractAST = ast.findFirstToken(TokenTypes.MODIFIERS)
             .findFirstToken(TokenTypes.ABSTRACT);
 

@@ -19,8 +19,6 @@
 
 package com.puppycrawl.tools.checkstyle.checks.imports;
 
-import com.puppycrawl.tools.checkstyle.api.AbstractLoader;
-import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -29,10 +27,15 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.xml.parsers.ParserConfigurationException;
+
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+
+import com.puppycrawl.tools.checkstyle.api.AbstractLoader;
+import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 
 /**
  * Responsible for loading the contents of an import control configuration file.
@@ -61,7 +64,6 @@ final class ImportControlLoader extends AbstractLoader {
     /** Used to hold the {@link PkgControl} objects. */
     private final Deque<PkgControl> stack = new ArrayDeque<>();
 
-    /** Initialise the map */
     static {
         DTD_RESOURCE_BY_ID.put(DTD_PUBLIC_ID_1_0, DTD_RESOURCE_NAME_1_0);
         DTD_RESOURCE_BY_ID.put(DTD_PUBLIC_ID_1_1, DTD_RESOURCE_NAME_1_1);
@@ -87,12 +89,10 @@ final class ImportControlLoader extends AbstractLoader {
             stack.push(new PkgControl(pkg));
         }
         else if ("subpackage".equals(qName)) {
-            assert !stack.isEmpty();
             final String name = safeGet(atts, "name");
             stack.push(new PkgControl(stack.peek(), name));
         }
         else if ("allow".equals(qName) || "disallow".equals(qName)) {
-            assert !stack.isEmpty();
             // Need to handle either "pkg" or "class" attribute.
             // May have "exact-match" for "pkg"
             // May have "local-only"
@@ -122,7 +122,6 @@ final class ImportControlLoader extends AbstractLoader {
     public void endElement(final String namespaceURI, final String localName,
         final String qName) {
         if ("subpackage".equals(qName)) {
-            assert stack.size() > 1;
             stack.pop();
         }
     }
@@ -134,7 +133,7 @@ final class ImportControlLoader extends AbstractLoader {
      * @throws CheckstyleException if an error occurs.
      */
     static PkgControl load(final URI uri) throws CheckstyleException {
-        InputStream is = null;
+        InputStream is;
         try {
             is = uri.toURL().openStream();
         }
@@ -175,7 +174,6 @@ final class ImportControlLoader extends AbstractLoader {
      * @return the root {@link PkgControl} object loaded.
      */
     private PkgControl getRoot() {
-        assert stack.size() == 1;
         return stack.peek();
     }
 
@@ -187,7 +185,7 @@ final class ImportControlLoader extends AbstractLoader {
      * @return the value of the attribute.
      * @throws SAXException if the attribute does not exist.
      */
-    private String safeGet(final Attributes atts, final String name)
+    private static String safeGet(final Attributes atts, final String name)
         throws SAXException {
         final String retVal = atts.getValue(name);
         if (retVal == null) {

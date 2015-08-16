@@ -22,6 +22,7 @@ package com.puppycrawl.tools.checkstyle.filters;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
 
 /** Tests IntMatchFilter */
@@ -43,5 +44,11 @@ public class IntMatchFilterTest {
         assertFalse("0 != 1", filter.equals(filter3));
         assertFalse("0 != this", filter.equals(this));
         assertFalse("0 != null", filter.equals(null));
+    }
+
+    @Test
+    public void testToString() {
+        final IntFilter filter = new IntMatchFilter(6);
+        assertEquals("IntMatchFilter[6]", filter.toString());
     }
 }

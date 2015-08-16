@@ -23,10 +23,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
+import java.util.HashSet;
+
+import org.junit.Test;
+
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 import com.puppycrawl.tools.checkstyle.checks.naming.ConstantNameCheck;
-import java.util.HashSet;
-import org.junit.Test;
 
 /**
  * Enter a description of class PackageObjectFactoryTest.java.
@@ -36,6 +38,11 @@ public class PackageObjectFactoryTest {
 
     private final PackageObjectFactory factory = new PackageObjectFactory(
             new HashSet<String>(), Thread.currentThread().getContextClassLoader());
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testCtorException()  throws CheckstyleException {
+        new PackageObjectFactory(new HashSet<String>(), null);
+    }
 
     @Test
     public void testMakeObjectFromName()

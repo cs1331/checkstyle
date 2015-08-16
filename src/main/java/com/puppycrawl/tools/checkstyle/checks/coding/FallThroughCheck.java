@@ -28,7 +28,7 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
 /**
  * Checks for fall through in switch statements
- * Finds locations where a case contains Java code -
+ * Finds locations where a case <b>contains</b> Java code -
  * but lacks a break, return, throw or continue statement.
  *
  * <p>
@@ -38,17 +38,21 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  * </p>
  * <p>
  * The following fragment of code will NOT trigger the check,
- * because of the comment "fallthru".
+ * because of the comment "fallthru" and absence of any Java code
+ * in case 5.
  * </p>
  * <pre>
  * case 3:
  *     x = 2;
  *     // fallthru
  * case 4:
+ * case 5:
+ * case 6:
+ *     break;
  * </pre>
  * <p>
  * The recognized relief comment can be configured with the property
- * <code>reliefPattern</code>. Default value of this regular expression
+ * {@code reliefPattern}. Default value of this regular expression
  * is "fallthru|fall through|fallthrough|falls through".
  * </p>
  * <p>
@@ -128,9 +132,7 @@ public class FallThroughCheck extends Check {
     @Override
     public void visitToken(DetailAST ast) {
         final DetailAST nextGroup = ast.getNextSibling();
-        final boolean isLastGroup =
-                nextGroup == null
-                 || nextGroup.getType() != TokenTypes.CASE_GROUP;
+        final boolean isLastGroup = nextGroup.getType() != TokenTypes.CASE_GROUP;
         if (isLastGroup && !checkLastGroup) {
             // we do not need to check last group
             return;
@@ -140,11 +142,11 @@ public class FallThroughCheck extends Check {
 
         if (slist != null && !isTerminated(slist, true, true)
             && !hasFallTruComment(ast, nextGroup)) {
-            if (!isLastGroup) {
-                log(nextGroup, MSG_FALL_THROUGH);
+            if (isLastGroup) {
+                log(ast, MSG_FALL_THROUGH_LAST);
             }
             else {
-                log(ast, MSG_FALL_THROUGH_LAST);
+                log(nextGroup, MSG_FALL_THROUGH);
             }
         }
     }
@@ -187,19 +189,14 @@ public class FallThroughCheck extends Check {
     /**
      * Checks if a given SLIST terminated by return, throw or,
      * if allowed break, continue.
-     * @param ast SLIST to check
+     * @param slistAst SLIST to check
      * @param useBreak should we consider break as terminator.
      * @param useContinue should we consider continue as terminator.
      * @return true if SLIST is terminated.
      */
-    private boolean checkSlist(final DetailAST ast, boolean useBreak,
+    private boolean checkSlist(final DetailAST slistAst, boolean useBreak,
                                boolean useContinue) {
-        DetailAST lastStmt = ast.getLastChild();
-        if (lastStmt == null) {
-            // if last case in switch is empty then slist is empty
-            // since this is a last case it is not a fall-through
-            return true;
-        }
+        DetailAST lastStmt = slistAst.getLastChild();
 
         if (lastStmt.getType() == TokenTypes.RCURLY) {
             lastStmt = lastStmt.getPreviousSibling();
@@ -226,7 +223,10 @@ public class FallThroughCheck extends Check {
 
         if (isTerminated && elseStmt != null) {
             isTerminated = isTerminated(elseStmt.getFirstChild(),
-                                        useBreak, useContinue);
+                useBreak, useContinue);
+        }
+        else if (elseStmt == null) {
+            isTerminated = false;
         }
         return isTerminated;
     }
@@ -238,7 +238,7 @@ public class FallThroughCheck extends Check {
      * @return true if loop is terminated.
      */
     private boolean checkLoop(final DetailAST ast) {
-        DetailAST loopBody = null;
+        DetailAST loopBody;
         if (ast.getType() == TokenTypes.LITERAL_DO) {
             final DetailAST lparen = ast.findFirstToken(TokenTypes.DO_WHILE);
             loopBody = lparen.getPreviousSibling();
@@ -282,15 +282,14 @@ public class FallThroughCheck extends Check {
     /**
      * Checks if a given switch terminated by return, throw or,
      * if allowed break, continue.
-     * @param ast loop to check
+     * @param literalSwitchAst loop to check
      * @param useContinue should we consider continue as terminator.
      * @return true if switch is terminated.
      */
-    private boolean checkSwitch(final DetailAST ast, boolean useContinue) {
-        DetailAST caseGroup = ast.findFirstToken(TokenTypes.CASE_GROUP);
+    private boolean checkSwitch(final DetailAST literalSwitchAst, boolean useContinue) {
+        DetailAST caseGroup = literalSwitchAst.findFirstToken(TokenTypes.CASE_GROUP);
         boolean isTerminated = caseGroup != null;
-        while (isTerminated && caseGroup != null
-               && caseGroup.getType() != TokenTypes.RCURLY) {
+        while (isTerminated && caseGroup.getType() != TokenTypes.RCURLY) {
             final DetailAST caseBody =
                 caseGroup.findFirstToken(TokenTypes.SLIST);
             isTerminated = caseBody != null && isTerminated(caseBody, false, useContinue);
@@ -300,8 +299,8 @@ public class FallThroughCheck extends Check {
     }
 
     /**
-     * Determines if the fall through case between <code>currentCase</code> and
-     * <code>nextCase</code> is reliefed by a appropriate comment.
+     * Determines if the fall through case between {@code currentCase} and
+     * {@code nextCase} is reliefed by a appropriate comment.
      *
      * @param currentCase AST of the case that falls through to the next case.
      * @param nextCase AST of the next case.
@@ -350,7 +349,7 @@ public class FallThroughCheck extends Check {
          */
         final int startLineNo = currentCase.getLineNo();
         for (int i = endLineNo - 2; i > startLineNo - 1; i--) {
-            if (lines[i].trim().length() != 0) {
+            if (!lines[i].trim().isEmpty()) {
                 return commentMatch(regExp, lines[i], i + 1);
             }
         }

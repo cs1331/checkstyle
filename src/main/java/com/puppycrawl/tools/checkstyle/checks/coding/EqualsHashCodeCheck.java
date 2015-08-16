@@ -19,14 +19,16 @@
 
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
+import java.util.Map;
+import java.util.Set;
+
 import antlr.collections.AST;
+
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.puppycrawl.tools.checkstyle.api.Check;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * <p>
@@ -107,7 +109,7 @@ public class EqualsHashCodeCheck
      * @param firstChild the AST to check
      * @return true iff firstChild is a parameter of an Object type.
      */
-    private boolean isObjectParam(AST firstChild) {
+    private static boolean isObjectParam(AST firstChild) {
         final AST modifiers = firstChild.getFirstChild();
         final AST type = modifiers.getNextSibling();
         switch (type.getFirstChild().getType()) {

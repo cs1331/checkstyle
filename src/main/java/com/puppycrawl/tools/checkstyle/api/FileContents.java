@@ -19,17 +19,17 @@
 
 package com.puppycrawl.tools.checkstyle.api;
 
-import com.google.common.collect.ImmutableMap;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.puppycrawl.tools.checkstyle.grammars.CommentListener;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.puppycrawl.tools.checkstyle.grammars.CommentListener;
 
 /**
  * Represents the contents of a file.
@@ -67,36 +67,35 @@ public final class FileContents implements CommentListener {
     private final Map<Integer, List<TextBlock>> clangComments = Maps.newHashMap();
 
     /**
-     * Creates a new <code>FileContents</code> instance.
+     * Creates a new {@code FileContents} instance.
      *
      * @param filename name of the file
      * @param lines the contents of the file
      * @deprecated Use {@link #FileContents(FileText)} instead
      *   in order to preserve the original line breaks where possible.
      */
-    @Deprecated public FileContents(String filename, String... lines) {
-        this.fileName = filename;
+    @Deprecated
+    public FileContents(String filename, String... lines) {
+        fileName = filename;
         text = FileText.fromLines(new File(filename), Arrays.asList(lines));
     }
 
     /**
-     * Creates a new <code>FileContents</code> instance.
+     * Creates a new {@code FileContents} instance.
      *
      * @param text the contents of the file
      */
     public FileContents(FileText text) {
         fileName = text.getFile().toString();
-        this.text = text;
+        this.text = new FileText(text);
     }
 
-    /** {@inheritDoc} */
     @Override
     public void reportSingleLineComment(String type, int startLineNo,
             int startColNo) {
         reportCppComment(startLineNo, startColNo);
     }
 
-    /** {@inheritDoc} */
     @Override
     public void reportBlockComment(String type, int startLineNo,
             int startColNo, int endLineNo, int endColNo) {
@@ -110,7 +109,7 @@ public final class FileContents implements CommentListener {
      **/
     public void reportCppComment(int startLineNo, int startColNo) {
         final String line = line(startLineNo - 1);
-        final String[] txt = new String[] {line.substring(startColNo)};
+        final String[] txt = {line.substring(startColNo)};
         final Comment comment = new Comment(txt, startColNo, startLineNo,
                 line.length() - 1);
         cppComments.put(startLineNo, comment);
@@ -134,9 +133,9 @@ public final class FileContents implements CommentListener {
      **/
     public void reportCComment(int startLineNo, int startColNo,
             int endLineNo, int endColNo) {
-        final String[] cc = extractCComment(startLineNo, startColNo,
+        final String[] cComment = extractCComment(startLineNo, startColNo,
                 endLineNo, endColNo);
-        final Comment comment = new Comment(cc, startColNo, endLineNo,
+        final Comment comment = new Comment(cComment, startColNo, endLineNo,
                 endColNo);
 
         // save the comment
@@ -196,9 +195,9 @@ public final class FileContents implements CommentListener {
 
     /**
      * Returns the Javadoc comment before the specified line.
-     * A return value of <code>null</code> means there is no such comment.
+     * A return value of {@code null} means there is no such comment.
      * @param lineNoBefore the line number to check before
-     * @return the Javadoc comment, or <code>null</code> if none
+     * @return the Javadoc comment, or {@code null} if none
      **/
     public TextBlock getJavadocBefore(int lineNoBefore) {
         // Lines start at 1 to the callers perspective, so need to take off 2
@@ -229,7 +228,7 @@ public final class FileContents implements CommentListener {
      * @return an object containing the full text of the file
      */
     public FileText getText() {
-        return text;
+        return new FileText(text);
     }
 
     /** @return the lines in the file */
@@ -252,13 +251,23 @@ public final class FileContents implements CommentListener {
     }
 
     /**
+     * Getter.
+     * @return the name of the file
+     * @deprecated use {@link #getFileName} instead
+     */
+    @Deprecated
+    public String getFilename() {
+        return getFileName();
+    }
+
+    /**
      * Checks if the specified line is blank.
      * @param lineNo the line number to check
      * @return if the specified line consists only of tabs and spaces.
      **/
     public boolean lineIsBlank(int lineNo) {
         // possible improvement: avoid garbage creation in trim()
-        return "".equals(line(lineNo).trim());
+        return line(lineNo).trim().isEmpty();
     }
 
     /**
@@ -310,6 +319,6 @@ public final class FileContents implements CommentListener {
      * @return true if the package file.
      */
     public boolean inPackageInfo() {
-        return this.getFileName().endsWith("package-info.java");
+        return getFileName().endsWith("package-info.java");
     }
 }

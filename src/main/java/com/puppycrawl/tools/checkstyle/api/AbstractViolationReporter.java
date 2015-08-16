@@ -48,7 +48,7 @@ public abstract class AbstractViolationReporter
 
     /**
      * Sets the severity level.  The string should be one of the names
-     * defined in the <code>SeverityLevel</code> class.
+     * defined in the {@code SeverityLevel} class.
      *
      * @param severity  The new severity level
      * @see SeverityLevel
@@ -111,7 +111,7 @@ public abstract class AbstractViolationReporter
      * used by this module.
      */
     protected String getMessageBundle() {
-        final String className = this.getClass().getName();
+        final String className = getClass().getName();
         return getMessageBundle(className);
     }
 
@@ -130,7 +130,7 @@ public abstract class AbstractViolationReporter
      * @return name of a resource bundle that contains the messages
      * used by the module.
      */
-    String getMessageBundle(final String className) {
+    static String getMessageBundle(final String className) {
         final int endIndex = className.lastIndexOf('.');
         final String messages = "messages";
         if (endIndex < 0) {

@@ -19,12 +19,15 @@
 
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
-import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
-import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
+import static com.puppycrawl.tools.checkstyle.checks.coding.MultipleStringLiteralsCheck.MSG_KEY;
+
 import java.io.File;
+
+import org.junit.Assert;
 import org.junit.Test;
 
-import static com.puppycrawl.tools.checkstyle.checks.coding.MultipleStringLiteralsCheck.MSG_KEY;
+import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
+import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 
 public class MultipleStringLiteralsCheckTest extends BaseCheckTestSupport {
     @Test
@@ -93,4 +96,43 @@ public class MultipleStringLiteralsCheckTest extends BaseCheckTestSupport {
                expected);
     }
 
+    @Test
+    public void testTokensNotNull() {
+        MultipleStringLiteralsCheck check = new MultipleStringLiteralsCheck();
+        Assert.assertNotNull(check.getAcceptableTokens());
+        Assert.assertNotNull(check.getDefaultTokens());
+        Assert.assertNotNull(check.getRequiredTokens());
+    }
+
+    @Test
+    public void testDefaultConfiguration() throws Exception {
+        DefaultConfiguration checkConfig =
+            createCheckConfig(MultipleStringLiteralsCheck.class);
+        final String[] expected = {
+            "5:16: " + getCheckMessage(MSG_KEY, "\"StringContents\"", 3),
+            "7:17: " + getCheckMessage(MSG_KEY, "\"DoubleString\"", 2),
+            "10:23: " + getCheckMessage(MSG_KEY, "\", \"", 3),
+        };
+
+        createChecker(checkConfig);
+        verify(checkConfig,
+            getPath("coding" + File.separator + "InputMultipleStringLiterals.java"),
+            expected);
+    }
+
+    @Test
+    public void testIgnores() throws Exception {
+        DefaultConfiguration checkConfig =
+            createCheckConfig(MultipleStringLiteralsCheck.class);
+        checkConfig.addAttribute("ignoreStringsRegexp", null);
+        checkConfig.addAttribute("ignoreOccurrenceContext", "VARIABLE_DEF");
+        final String[] expected = {
+            "19:23: " + getCheckMessage(MSG_KEY, "\"unchecked\"", 4),
+        };
+
+        createChecker(checkConfig);
+        verify(checkConfig,
+            getPath("coding" + File.separator + "InputMultipleStringLiterals.java"),
+            expected);
+    }
 }

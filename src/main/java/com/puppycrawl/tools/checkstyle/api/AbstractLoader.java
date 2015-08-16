@@ -19,18 +19,21 @@
 
 package com.puppycrawl.tools.checkstyle.api;
 
-import com.google.common.collect.Maps;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
+
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
+
+import com.google.common.collect.Maps;
 
 /**
  * Contains the common implementation of a loader, for loading a configuration
@@ -103,21 +106,13 @@ public abstract class AbstractLoader
             final String dtdResourceName =
                     publicIdToResourceNameMap.get(publicId);
             final ClassLoader loader =
-                this.getClass().getClassLoader();
+                getClass().getClassLoader();
             final InputStream dtdIS =
                 loader.getResourceAsStream(dtdResourceName);
-            if (dtdIS == null) {
-                throw new SAXException(
-                    "Unable to load internal dtd " + dtdResourceName);
-            }
+
             return new InputSource(dtdIS);
         }
         return super.resolveEntity(publicId, systemId);
-    }
-
-    @Override
-    public void warning(SAXParseException ex) throws SAXException {
-        throw ex;
     }
 
     @Override

@@ -37,7 +37,7 @@ public abstract class AbstractNestedDepthCheck extends Check {
      * Creates new instance of checks.
      * @param max default allowed nesting depth.
      */
-    public AbstractNestedDepthCheck(int max) {
+    protected AbstractNestedDepthCheck(int max) {
         setMax(max);
     }
 
@@ -49,14 +49,6 @@ public abstract class AbstractNestedDepthCheck extends Check {
     @Override
     public void beginTree(DetailAST rootAST) {
         depth = 0;
-    }
-
-    /**
-     * Getter for maximum allowed nesting depth.
-     * @return maximum allowed nesting depth.
-     */
-    public final int getMax() {
-        return max;
     }
 
     /**

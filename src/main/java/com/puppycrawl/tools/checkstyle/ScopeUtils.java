@@ -20,6 +20,7 @@
 package com.puppycrawl.tools.checkstyle;
 
 import antlr.collections.AST;
+
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.Scope;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
@@ -38,24 +39,21 @@ public final class ScopeUtils {
      * Returns the Scope specified by the modifier set.
      *
      * @param aMods root node of a modifier set
-     * @return a <code>Scope</code> value
+     * @return a {@code Scope} value
      */
     public static Scope getScopeFromMods(DetailAST aMods) {
         Scope retVal = Scope.PACKAGE; // default scope
-        for (AST token = aMods.getFirstChild();
-            token != null;
-            token = token.getNextSibling()) {
+        for (AST token = aMods.getFirstChild(); token != null
+                && retVal == Scope.PACKAGE;
+                token = token.getNextSibling()) {
             if ("public".equals(token.getText())) {
                 retVal = Scope.PUBLIC;
-                break;
             }
             else if ("protected".equals(token.getText())) {
                 retVal = Scope.PROTECTED;
-                break;
             }
             else if ("private".equals(token.getText())) {
                 retVal = Scope.PRIVATE;
-                break;
             }
         }
         return retVal;
@@ -78,7 +76,7 @@ public final class ScopeUtils {
                 || type == TokenTypes.ENUM_DEF) {
                 final DetailAST mods =
                     token.findFirstToken(TokenTypes.MODIFIERS);
-                final Scope modScope = ScopeUtils.getScopeFromMods(mods);
+                final Scope modScope = getScopeFromMods(mods);
                 if (retVal == null || retVal.isIn(modScope)) {
                     retVal = modScope;
                 }
@@ -97,27 +95,26 @@ public final class ScopeUtils {
      *
      * @param aAST the node to check if directly contained within an interface
      * block
-     * @return a <code>boolean</code> value
+     * @return a {@code boolean} value
      */
     public static boolean inInterfaceBlock(DetailAST aAST) {
         boolean retVal = false;
 
         // Loop up looking for a containing interface block
         for (DetailAST token = aAST.getParent();
-             token != null;
+             token != null && !retVal;
              token = token.getParent()) {
+
             final int type = token.getType();
-            if (type == TokenTypes.CLASS_DEF
-                || type == TokenTypes.ENUM_DEF
-                || type == TokenTypes.ANNOTATION_DEF) {
-                break; // in a class, enum or annotation
-            }
-            else if (type == TokenTypes.LITERAL_NEW) {
-                break; // inner implementation
-            }
-            else if (type == TokenTypes.INTERFACE_DEF) {
+
+            if (type == TokenTypes.INTERFACE_DEF) {
                 retVal = true;
-                break;
+            }
+            else if (type == TokenTypes.CLASS_DEF
+                || type == TokenTypes.ENUM_DEF
+                || type == TokenTypes.ANNOTATION_DEF
+                || type == TokenTypes.LITERAL_NEW) {
+                break; // in a class, enum or annotation
             }
         }
 
@@ -129,28 +126,26 @@ public final class ScopeUtils {
      *
      * @param aAST the node to check if directly contained within an annotation
      * block
-     * @return a <code>boolean</code> value
+     * @return a {@code boolean} value
      */
     public static boolean inAnnotationBlock(DetailAST aAST) {
         boolean retVal = false;
 
         // Loop up looking for a containing interface block
         for (DetailAST token = aAST.getParent();
-             token != null;
+             token != null && !retVal;
              token = token.getParent()) {
             final int type = token.getType();
-            if (type == TokenTypes.CLASS_DEF
+            if (type == TokenTypes.ANNOTATION_DEF) {
+                retVal = true;
+            }
+            else if (type == TokenTypes.CLASS_DEF
                 || type == TokenTypes.ENUM_DEF
-                || type == TokenTypes.INTERFACE_DEF) {
+                || type == TokenTypes.INTERFACE_DEF
+                || type == TokenTypes.LITERAL_NEW) {
                 break; // in a class, enum or interface
             }
-            else if (type == TokenTypes.LITERAL_NEW) {
-                break; // inner implementation
-            }
-            else if (type == TokenTypes.ANNOTATION_DEF) {
-                retVal = true;
-                break;
-            }
+
         }
 
         return retVal;
@@ -162,7 +157,7 @@ public final class ScopeUtils {
      *
      * @param aAST the node to check if directly contained within an interface
      * or annotation block
-     * @return a <code>boolean</code> value
+     * @return a {@code boolean} value
      */
     public static boolean inInterfaceOrAnnotationBlock(DetailAST aAST) {
         return inInterfaceBlock(aAST) || inAnnotationBlock(aAST);
@@ -173,27 +168,24 @@ public final class ScopeUtils {
      *
      * @param aAST the node to check if directly contained within an enum
      * block
-     * @return a <code>boolean</code> value
+     * @return a {@code boolean} value
      */
     public static boolean inEnumBlock(DetailAST aAST) {
         boolean retVal = false;
 
         // Loop up looking for a containing interface block
         for (DetailAST token = aAST.getParent();
-             token != null;
+             token != null && !retVal;
              token = token.getParent()) {
             final int type = token.getType();
-            if (type == TokenTypes.INTERFACE_DEF
-                || type == TokenTypes.ANNOTATION_DEF
-                || type == TokenTypes.CLASS_DEF) {
-                break; // in an interface, annotation or class
-            }
-            else if (type == TokenTypes.LITERAL_NEW) {
-                break; // inner implementation, enums can't be inner classes
-            }
-            else if (type == TokenTypes.ENUM_DEF) {
+            if (type == TokenTypes.ENUM_DEF) {
                 retVal = true;
-                break;
+            }
+            else if (type == TokenTypes.INTERFACE_DEF
+                || type == TokenTypes.ANNOTATION_DEF
+                || type == TokenTypes.CLASS_DEF
+                || type == TokenTypes.LITERAL_NEW) {
+                break; // in an interface, annotation or class
             }
         }
 
@@ -205,7 +197,7 @@ public final class ScopeUtils {
      * A code block is a method or constructor body, or a initialiser block.
      *
      * @param aAST the node to check
-     * @return a <code>boolean</code> value
+     * @return a {@code boolean} value
      */
     public static boolean inCodeBlock(DetailAST aAST) {
         boolean retVal = false;
@@ -231,7 +223,7 @@ public final class ScopeUtils {
      * Returns whether a node is contained in the outer most type block.
      *
      * @param aAST the node to check
-     * @return a <code>boolean</code> value
+     * @return a {@code boolean} value
      */
     public static boolean isOuterMostType(DetailAST aAST) {
         boolean retVal = true;
@@ -261,19 +253,15 @@ public final class ScopeUtils {
         // variable declaration?
         if (aAST.getType() == TokenTypes.VARIABLE_DEF) {
             final DetailAST parent = aAST.getParent();
-            if (parent != null) {
-                final int type = parent.getType();
-                return type == TokenTypes.SLIST
+            final int type = parent.getType();
+            return type == TokenTypes.SLIST
                     || type == TokenTypes.FOR_INIT
                     || type == TokenTypes.FOR_EACH_CLAUSE;
-            }
         }
         // catch parameter?
-        else if (aAST.getType() == TokenTypes.PARAMETER_DEF) {
+        if (aAST.getType() == TokenTypes.PARAMETER_DEF) {
             final DetailAST parent = aAST.getParent();
-            if (parent != null) {
-                return parent.getType() == TokenTypes.LITERAL_CATCH;
-            }
+            return parent.getType() == TokenTypes.LITERAL_CATCH;
         }
         return false;
     }

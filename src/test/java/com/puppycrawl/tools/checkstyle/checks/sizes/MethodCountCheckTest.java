@@ -25,10 +25,12 @@ import static com.puppycrawl.tools.checkstyle.checks.sizes.MethodCountCheck.MSG_
 import static com.puppycrawl.tools.checkstyle.checks.sizes.MethodCountCheck.MSG_PROTECTED_METHODS;
 import static com.puppycrawl.tools.checkstyle.checks.sizes.MethodCountCheck.MSG_PUBLIC_METHODS;
 import static org.junit.Assert.assertArrayEquals;
+
+import org.junit.Test;
+
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import org.junit.Test;
 
 public class MethodCountCheckTest extends BaseCheckTestSupport {
     @Test
@@ -55,8 +57,7 @@ public class MethodCountCheckTest extends BaseCheckTestSupport {
         final String[] expected = {
         };
 
-        verify(checkConfig,
-            getSrcPath("checks/sizes/MethodCountCheckInput.java"), expected);
+        verify(checkConfig, getPath("sizes/MethodCountCheckInput.java"), expected);
     }
 
     @Test
@@ -81,8 +82,7 @@ public class MethodCountCheckTest extends BaseCheckTestSupport {
             "45: " + getCheckMessage(MSG_MANY_METHODS, 5, 3),
         };
 
-        verify(checkConfig,
-            getSrcPath("checks/sizes/MethodCountCheckInput.java"), expected);
+        verify(checkConfig, getPath("sizes/MethodCountCheckInput.java"), expected);
     }
 
     @Test
@@ -97,7 +97,19 @@ public class MethodCountCheckTest extends BaseCheckTestSupport {
             "9: " + getCheckMessage(MSG_MANY_METHODS, 3, 2),
         };
 
-        verify(checkConfig,
-            getSrcPath("checks/sizes/MethodCountCheckInput2.java"), expected);
+        verify(checkConfig, getPath("sizes/MethodCountCheckInput2.java"), expected);
+    }
+
+    @Test
+    public void testWithPackageModifier() throws Exception {
+        final DefaultConfiguration checkConfig = createCheckConfig(MethodCountCheck.class);
+        checkConfig.addAttribute("maxPrivate", "0");
+        checkConfig.addAttribute("maxTotal", "2");
+
+        final String[] expected = {
+            "3: " + getCheckMessage(MSG_MANY_METHODS, 5, 2),
+        };
+
+        verify(checkConfig, getPath("sizes/MethodCountCheckInput3.java"), expected);
     }
 }

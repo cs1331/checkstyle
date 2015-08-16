@@ -19,23 +19,24 @@
 
 package com.puppycrawl.tools.checkstyle.checks.header;
 
-import java.util.Arrays;
-
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import com.puppycrawl.tools.checkstyle.Utils;
 import org.apache.commons.beanutils.ConversionException;
+import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.Lists;
-import org.apache.commons.lang3.StringUtils;
+import com.puppycrawl.tools.checkstyle.Utils;
 
 /**
  * Checks the header of the source against a header file that contains a
- * {@link java.util.regex.Pattern regular expression}
- * for each line of the source header.
+ * {@link Pattern regular expression}
+ * for each line of the source header. In default configuration,
+ * if header is not specified, the default value of header is set to null
+ * and the check does not rise any violations.
  *
  * @author Lars Kühne
  * @author o_sukhodolsky
@@ -55,7 +56,7 @@ public class RegexpHeaderCheck extends AbstractHeaderCheck {
      * @param list comma separated list of line numbers to repeat in header.
      */
     public void setMultiLines(int... list) {
-        if (list == null || list.length == 0) {
+        if (list.length == 0) {
             multiLines = EMPTY_INT_ARRAY;
             return;
         }
@@ -118,7 +119,7 @@ public class RegexpHeaderCheck extends AbstractHeaderCheck {
 
     /**
      * @param lineNo a line number
-     * @return if <code>lineNo</code> is one of the repeat header lines.
+     * @return if {@code lineNo} is one of the repeat header lines.
      */
     private boolean isMultiLine(int lineNo) {
         return Arrays.binarySearch(multiLines, lineNo + 1) >= 0;
@@ -132,7 +133,7 @@ public class RegexpHeaderCheck extends AbstractHeaderCheck {
             try {
                 headerRegexps.add(Pattern.compile(line));
             }
-            catch (final PatternSyntaxException ex) {
+            catch (final PatternSyntaxException ignored) {
                 throw new ConversionException("line "
                         + (headerRegexps.size() + 1)
                         + " in header specification"
@@ -143,7 +144,7 @@ public class RegexpHeaderCheck extends AbstractHeaderCheck {
 
     /**
      * Validates the {@code header} by compiling it with
-     * {@link Pattern#compile(java.lang.String) } and throws
+     * {@link Pattern#compile(String) } and throws
      * {@link PatternSyntaxException} if {@code header} isn't a valid pattern.
      * @param header the header value to validate and set (in that order)
      */

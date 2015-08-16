@@ -19,13 +19,13 @@
 
 package com.puppycrawl.tools.checkstyle.checks.metrics;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
+
 import com.puppycrawl.tools.checkstyle.api.Check;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import com.puppycrawl.tools.checkstyle.checks.CheckUtils;
-
-import java.util.ArrayDeque;
-import java.util.Deque;
 
 /**
  * Restricts nested boolean operators (&amp;&amp;, ||, &amp;, | and ^) to
@@ -57,7 +57,7 @@ public final class BooleanExpressionComplexityCheck extends Check {
 
     /** Creates new instance of the check. */
     public BooleanExpressionComplexityCheck() {
-        setMax(DEFAULT_MAX);
+        max = DEFAULT_MAX;
     }
 
     @Override
@@ -139,7 +139,7 @@ public final class BooleanExpressionComplexityCheck extends Check {
                 context.visitBooleanOperator();
                 break;
             default:
-                throw new IllegalStateException(ast.toString());
+                throw new IllegalArgumentException("Unknown type: " + ast);
         }
     }
 
@@ -148,7 +148,7 @@ public final class BooleanExpressionComplexityCheck extends Check {
      * @param logicalOperator logical operator
      * @return true if logical operator is part of constructor or method call
      */
-    private boolean isPassedInParameter(DetailAST logicalOperator) {
+    private static boolean isPassedInParameter(DetailAST logicalOperator) {
         return logicalOperator.getParent().getType() == TokenTypes.EXPR
             && logicalOperator.getParent().getParent().getType() == TokenTypes.ELIST;
     }
@@ -186,7 +186,8 @@ public final class BooleanExpressionComplexityCheck extends Check {
      */
     private void visitMethodDef(DetailAST ast) {
         contextStack.push(context);
-        context = new Context(!CheckUtils.isEqualsMethod(ast));
+        final boolean check = !CheckUtils.isEqualsMethod(ast);
+        context = new Context(check);
     }
 
     /** Removes old context. */
@@ -197,7 +198,7 @@ public final class BooleanExpressionComplexityCheck extends Check {
     /** Creates and pushes new context. */
     private void visitExpr() {
         contextStack.push(context);
-        context = new Context(context == null || context.isChecking());
+        context = new Context(context.isChecking());
     }
 
     /**

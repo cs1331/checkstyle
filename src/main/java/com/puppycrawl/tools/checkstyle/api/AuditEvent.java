@@ -21,7 +21,6 @@ package com.puppycrawl.tools.checkstyle.api;
 
 import java.util.EventObject;
 
-
 /**
  * Raw event for audit.
  * <p>
@@ -57,7 +56,7 @@ public final class AuditEvent
     }
 
     /**
-     * Creates a new <code>AuditEvent</code> instance.
+     * Creates a new {@code AuditEvent} instance.
      * @param src source of the event
      * @param fileName file associated with the event
      */
@@ -66,7 +65,7 @@ public final class AuditEvent
     }
 
     /**
-     * Creates a new <code>AuditEvent</code> instance.
+     * Creates a new {@code AuditEvent} instance.
      *
      * @param src source of the event
      * @param fileName file associated with the event

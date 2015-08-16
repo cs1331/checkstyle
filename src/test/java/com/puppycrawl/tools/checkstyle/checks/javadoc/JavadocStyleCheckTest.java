@@ -19,22 +19,45 @@
 
 package com.puppycrawl.tools.checkstyle.checks.javadoc;
 
+import static com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocStyleCheck.EMPTY;
+import static com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocStyleCheck.EXTRA_HTML;
+import static com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocStyleCheck.INCOMPLETE_TAG;
+import static com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocStyleCheck.JAVADOC_MISSING;
+import static com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocStyleCheck.NO_PERIOD;
+import static com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocStyleCheck.UNCLOSED_HTML;
+import static org.junit.Assert.assertArrayEquals;
+
 import java.io.File;
 
 import org.junit.Test;
 
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
-
-import static com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocStyleCheck.EXTRA_HTML;
-import static com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocStyleCheck.UNCLOSED_HTML;
-import static com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocStyleCheck.INCOMPLETE_TAG;
-import static com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocStyleCheck.NO_PERIOD;
-import static com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocStyleCheck.EMPTY;
-import static com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocStyleCheck.JAVADOC_MISSING;
+import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
 public class JavadocStyleCheckTest
     extends BaseCheckTestSupport {
+    @Test
+    public void testGetAcceptableTokens() {
+        JavadocStyleCheck javadocStyleCheck = new JavadocStyleCheck();
+
+        int[] actual = javadocStyleCheck.getAcceptableTokens();
+        int[] expected = new int[]{
+            TokenTypes.INTERFACE_DEF,
+            TokenTypes.CLASS_DEF,
+            TokenTypes.ANNOTATION_DEF,
+            TokenTypes.ENUM_DEF,
+            TokenTypes.METHOD_DEF,
+            TokenTypes.CTOR_DEF,
+            TokenTypes.VARIABLE_DEF,
+            TokenTypes.ENUM_CONSTANT_DEF,
+            TokenTypes.ANNOTATION_FIELD_DEF,
+            TokenTypes.PACKAGE_DEF,
+        };
+
+        assertArrayEquals(expected, actual);
+    }
+
     @Test
     public void testDefaultSettings()
         throws Exception {
@@ -58,6 +81,12 @@ public class JavadocStyleCheckTest
             "193: " + getCheckMessage(NO_PERIOD),
             "238: " + getCheckMessage(NO_PERIOD),
             "335:33: " + getCheckMessage(EXTRA_HTML, "</string>"),
+            "361:37: " + getCheckMessage(UNCLOSED_HTML, "<code>"),
+            "372: " + getCheckMessage(NO_PERIOD),
+            "378:15: " + getCheckMessage(UNCLOSED_HTML, "<b>Note:<b> it's unterminated tag.</p>"),
+            "382: " + getCheckMessage(NO_PERIOD),
+            "386: " + getCheckMessage(NO_PERIOD),
+            "393: " + getCheckMessage(NO_PERIOD),
         };
 
         verify(checkConfig, getPath("InputJavadocStyleCheck.java"), expected);
@@ -77,6 +106,10 @@ public class JavadocStyleCheckTest
             "88: " + getCheckMessage(NO_PERIOD),
             "193: " + getCheckMessage(NO_PERIOD),
             "238: " + getCheckMessage(NO_PERIOD),
+            "372: " + getCheckMessage(NO_PERIOD),
+            "382: " + getCheckMessage(NO_PERIOD),
+            "386: " + getCheckMessage(NO_PERIOD),
+            "393: " + getCheckMessage(NO_PERIOD),
         };
 
         verify(checkConfig, getPath("InputJavadocStyleCheck.java"), expected);
@@ -100,6 +133,10 @@ public class JavadocStyleCheckTest
             "88: " + getCheckMessage(NO_PERIOD),
             "193: " + getCheckMessage(NO_PERIOD),
             "238: " + getCheckMessage(NO_PERIOD),
+            "372: " + getCheckMessage(NO_PERIOD),
+            "382: " + getCheckMessage(NO_PERIOD),
+            "386: " + getCheckMessage(NO_PERIOD),
+            "393: " + getCheckMessage(NO_PERIOD),
         };
 
         verify(checkConfig, getPath("InputJavadocStyleCheck.java"), expected);
@@ -121,6 +158,8 @@ public class JavadocStyleCheckTest
             "109:39: " + getCheckMessage(EXTRA_HTML, "</img>"),
             "186:8: " + getCheckMessage(UNCLOSED_HTML, "<blockquote>"),
             "335:33: " + getCheckMessage(EXTRA_HTML, "</string>"),
+            "361:37: " + getCheckMessage(UNCLOSED_HTML, "<code>"),
+            "378:15: " + getCheckMessage(UNCLOSED_HTML, "<b>Note:<b> it's unterminated tag.</p>"),
         };
 
         verify(checkConfig, getPath("InputJavadocStyleCheck.java"), expected);
@@ -154,6 +193,8 @@ public class JavadocStyleCheckTest
             "230: " + getCheckMessage(EMPTY),
             "238: " + getCheckMessage(NO_PERIOD),
             "335:33: " + getCheckMessage(EXTRA_HTML, "</string>"),
+            "382: " + getCheckMessage(NO_PERIOD),
+            "386: " + getCheckMessage(NO_PERIOD),
         };
 
         verify(checkConfig, getPath("InputJavadocStyleCheck.java"), expected);
@@ -179,6 +220,8 @@ public class JavadocStyleCheckTest
             "230: " + getCheckMessage(EMPTY),
             "238: " + getCheckMessage(NO_PERIOD),
             "335:33: " + getCheckMessage(EXTRA_HTML, "</string>"),
+            "382: " + getCheckMessage(NO_PERIOD),
+            "386: " + getCheckMessage(NO_PERIOD),
         };
 
         verify(checkConfig, getPath("InputJavadocStyleCheck.java"), expected);
@@ -207,6 +250,9 @@ public class JavadocStyleCheckTest
             "230: " + getCheckMessage(EMPTY),
             "238: " + getCheckMessage(NO_PERIOD),
             "335:33: " + getCheckMessage(EXTRA_HTML, "</string>"),
+            "382: " + getCheckMessage(NO_PERIOD),
+            "386: " + getCheckMessage(NO_PERIOD),
+            "393: " + getCheckMessage(NO_PERIOD),
         };
 
         verify(checkConfig, getPath("InputJavadocStyleCheck.java"), expected);
@@ -247,6 +293,10 @@ public class JavadocStyleCheckTest
             "109:39: " + getCheckMessage(EXTRA_HTML, "</img>"),
             "186:8: " + getCheckMessage(UNCLOSED_HTML, "<blockquote>"),
             "193: " + getCheckMessage(NO_PERIOD),
+            "361:37: " + getCheckMessage(UNCLOSED_HTML, "<code>"),
+            "372: " + getCheckMessage(NO_PERIOD),
+            "378:15: " + getCheckMessage(UNCLOSED_HTML, "<b>Note:<b> it's unterminated tag.</p>"),
+            "393: " + getCheckMessage(NO_PERIOD),
         };
 
         verify(checkConfig, getPath("InputJavadocStyleCheck.java"), expected);

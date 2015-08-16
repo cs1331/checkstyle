@@ -32,7 +32,7 @@ public class SynchronizedHandler extends BlockParentHandler {
     /**
      * Determine that "synchronized" token used as modifier of method
      */
-    private boolean methodModifier;
+    private final boolean methodModifier;
 
     /**
      * Construct an instance of this handler with the given indentation check,
@@ -43,7 +43,7 @@ public class SynchronizedHandler extends BlockParentHandler {
      * @param parent      the parent handler
      */
     public SynchronizedHandler(IndentationCheck indentCheck, DetailAST ast,
-                               ExpressionHandler parent) {
+                               AbstractExpressionHandler parent) {
         super(indentCheck, "synchronized", ast, parent);
         methodModifier = isMethodModifier(ast);
     }

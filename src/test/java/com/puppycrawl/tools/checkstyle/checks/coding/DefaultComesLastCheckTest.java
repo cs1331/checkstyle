@@ -19,14 +19,15 @@
 
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
+import static com.puppycrawl.tools.checkstyle.checks.coding.DefaultComesLastCheck.MSG_KEY;
+
 import java.io.File;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
-
-import static com.puppycrawl.tools.checkstyle.checks.coding.DefaultComesLastCheck.MSG_KEY;
 
 public class DefaultComesLastCheckTest extends BaseCheckTestSupport {
     @Test
@@ -35,6 +36,7 @@ public class DefaultComesLastCheckTest extends BaseCheckTestSupport {
             createCheckConfig(DefaultComesLastCheck.class);
         final String[] expected = {
             "24:9: " + getCheckMessage(MSG_KEY),
+            "31:24: " + getCheckMessage(MSG_KEY),
         };
         verify(checkConfig,
                getPath("coding" + File.separator + "InputDefaultComesLast.java"),
@@ -53,5 +55,13 @@ public class DefaultComesLastCheckTest extends BaseCheckTestSupport {
                         "src/test/resources-noncompilable/com/puppycrawl/tools/"
                         + "checkstyle/coding/InputDefaultComesLast2.java").getCanonicalPath(),
                   expected);
+    }
+
+    @Test
+    public void testTokensNotNull() {
+        DefaultComesLastCheck check = new DefaultComesLastCheck();
+        Assert.assertNotNull(check.getAcceptableTokens());
+        Assert.assertNotNull(check.getDefaultTokens());
+        Assert.assertNotNull(check.getRequiredTokens());
     }
 }

@@ -19,12 +19,12 @@
 
 package com.puppycrawl.tools.checkstyle.checks.regexp;
 
+import java.io.File;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractFileSetCheck;
 import com.puppycrawl.tools.checkstyle.api.FileText;
-import java.io.File;
-import java.util.List;
 
 /**
  * Implementation of a check that looks that matches across multiple lines in
@@ -33,7 +33,7 @@ import java.util.List;
  */
 public class RegexpMultilineCheck extends AbstractFileSetCheck {
     /** The detection options to use. */
-    private DetectorOptions options = new DetectorOptions(Pattern.MULTILINE,
+    private final DetectorOptions options = new DetectorOptions(Pattern.MULTILINE,
             this);
     /** The detector to use. */
     private MultilineDetector detector;

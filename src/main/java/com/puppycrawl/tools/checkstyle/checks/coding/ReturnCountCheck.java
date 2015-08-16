@@ -19,16 +19,17 @@
 
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
+
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import com.puppycrawl.tools.checkstyle.checks.AbstractFormatCheck;
-import java.util.ArrayDeque;
-import java.util.Deque;
 
 /**
  * <p>
  * Restricts the number of return statements in methods, constructors and lambda expressions
- * (2 by default). Ignores specified methods (<code>equals()</code> by default).
+ * (2 by default). Ignores specified methods ({@code equals()} by default).
  * </p>
  * <p>
  * Rationale: Too many return points can be indication that code is
@@ -151,8 +152,8 @@ public final class ReturnCountCheck extends AbstractFormatCheck {
     private void visitMethodDef(DetailAST ast) {
         contextStack.push(context);
         final DetailAST methodNameAST = ast.findFirstToken(TokenTypes.IDENT);
-        context =
-            new Context(!getRegexp().matcher(methodNameAST.getText()).find());
+        final boolean check = !getRegexp().matcher(methodNameAST.getText()).find();
+        context = new Context(check);
     }
 
     /**

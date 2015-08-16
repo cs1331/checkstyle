@@ -53,11 +53,19 @@
   </module>
 
   <module name="RegexpMultiline"/>
+  <module name="RegexpMultiline">
+    <property name="format" value="\r?\n[\t ]*\r?\n[\t ]*\r?\n"/>
+    <property name="fileExtensions" value="java,xml,properties"/>
+    <property name="message" value="Unnecessary consecutive lines"/>
+  </module>
 
-  <!-- 
-  <module name="RegexpHeader"/>
+  <module name="RegexpHeader">
+    <property name="headerFile" value="${checkstyle.regexp.header.file}"/>
+    <property name="fileExtensions" value="java"/>
+  </module>
+
   <module name="UniqueProperties"/>
-  -->
+
   <module name="TreeWalker">
     <property name="tabWidth" value="4"/>
 
@@ -74,6 +82,20 @@
     <module name="ImportControl">
       <property name="file" value="${checkstyle.importcontrol.file}"/>
     </module>
+    <module name="ImportOrder">
+      <property name="groups" value="/^javax?\./,org"/>
+      <property name="ordered" value="true"/>
+      <property name="separated" value="true"/>
+      <property name="option" value="top"/>
+      <property name="sortStaticImportsAlphabetically" value="true"/>
+    </module>
+    <module name="CustomImportOrder">
+      <property name="customImportOrderRules" value="STATIC###STANDARD_JAVA_PACKAGE###SPECIAL_IMPORTS"/>
+      <property name="specialImportsRegExp" value="org"/>
+      <property name="sortImportsInGroupAlphabetically" value="true"/>
+      <property name="separateLineBetweenGroups" value="true"/>
+    </module>
+
     <module name="IllegalImport"/>
     <module name="IllegalInstantiation"/>
     <module name="IllegalThrows"/>
@@ -167,7 +189,9 @@
       <property name="format" value="^s[A-Z][a-zA-Z0-9]*$"/>
     </module>
     <module name="TypeName"/>
-    <module name="UnusedImports"/>
+    <module name="UnusedImports">
+        <property name="processJavadoc" value="true"/>
+    </module>
     <module name="UpperEll"/>
     <module name="VisibilityModifier"/>
     <module name="WhitespaceAfter"/>
@@ -226,6 +250,7 @@
     <module name="EmptyLineSeparator">
       <property name="allowNoEmptyLineBetweenFields" value="true"/>
     </module>
+    <module name="EmptyStatement"/>
     <module name="FallThrough"/>
     <module name="IllegalTokenText"/>
     <module name="InterfaceIsType"/>
@@ -236,7 +261,13 @@
     <module name="NoClone"/>
     <module name="NoFinalizer"/>
     <module name="NoLineWrap"/>
+    <module name="NonEmptyAtclauseDescription"/>
     <module name="Regexp"/>
+    <module name="RegexpSinglelineJava"/>
+    <module name="RegexpSinglelineJava">
+      <property name="format" value="[^\p{ASCII}]"/>
+      <property name="ignoreComments" value="true"/>
+    </module>
     <module name="SeparatorWrap">
       <property name="tokens" value="DOT"/>
       <property name="option" value="nl"/>
@@ -252,45 +283,52 @@
     <module name="ThrowsCount">
       <property name="max" value="2"/>
     </module>
-    <module name="TodoComment"/>
+    <module name="TodoComment">
+      <property name="format" value="(TODO)|(FIXME)" />
+    </module>
+    <module name="UncommentedMain"/>
     <module name="UnnecessaryParentheses"/>
+    <module name="AbbreviationAsWordInName"/>
+    <module name="AvoidEscapedUnicodeCharacters"/>
+    <module name="AbstractClassName"/>
+
+    <module name="BooleanExpressionComplexity">
+      <property name="max" value="7"/>
+    </module>
+
+    <module name="CommentsIndentation"/>
+    <module name="HiddenField">
+        <property name="ignoreConstructorParameter" value="true"/>
+        <property name="ignoreSetter" value="true"/>
+        <property name="setterCanReturnItsClass" value="true"/>
+    </module>
+    <module name="InnerTypeLast"/>
+
+    <module name="ModifiedControlVariable"/>
 
 <!--
-    <module name="AbbreviationAsWordInName"/>
-    <module name="AbstractClassName"/>
-    <module name="AvoidEscapedUnicodeCharacters"/>
     <module name="AvoidInlineConditionals"/>
-    <module name="BooleanExpressionComplexity"/>
     <module name="ClassDataAbstractionCoupling"/>
     <module name="ClassFanOutComplexity"/>
-    <module name="CustomImportOrder"/>
     <module name="DesignForExtension"/>
-    <module name="EmptyStatement"/>
     <module name="ExecutableStatementCount"/>
     <module name="FinalParameters"/>
-    <module name="HiddenField"/>
     <module name="IllegalToken"/>
     <module name="IllegalType"/>
-    <module name="ImportOrder"/>
-    <module name="InnerTypeLast"/>
     <module name="JavadocParagraph"/>
     <module name="JavadocTagContinuationIndentation"/>
     <module name="JavaNCSS"/>
     <module name="MissingCtor"/>
-    <module name="ModifiedControlVariable"/>
     <module name="MultipleStringLiterals"/>
-    <module name="NonEmptyAtclauseDescription"/>
     <module name="NPathComplexity"/>
     <module name="OneTopLevelClass"/>
     <module name="OverloadMethodsDeclarationOrder"/>
     <module name="PackageDeclaration"/>
-    <module name="RegexpSinglelineJava"/>
     <module name="TrailingComment"/>
     <module name="RequireThis"/>
     <module name="ReturnCount"/>
     <module name="SingleLineJavadoc"/>
     <module name="SummaryJavadoc"/>
-    <module name="UncommentedMain"/>
     <module name="VariableDeclarationUsageDistance"/>
     <module name="WriteTag"/>
 -->

@@ -19,22 +19,70 @@
 
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
-import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
-import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
+import static com.puppycrawl.tools.checkstyle.checks.coding.OneStatementPerLineCheck.MSG_KEY;
+
+import java.io.File;
+
+import org.junit.Assert;
 import org.junit.Test;
 
-import static com.puppycrawl.tools.checkstyle.checks.coding.OneStatementPerLineCheck.MSG_KEY;
+import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
+import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
+
 public class OneStatementPerLineCheckTest extends BaseCheckTestSupport {
     @Test
     public void testMultiCaseClass() throws Exception {
         DefaultConfiguration checkConfig = createCheckConfig(OneStatementPerLineCheck.class);
         final String[] expected = {
-            "99:18: " + getCheckMessage(MSG_KEY),
-            "127:11: " + getCheckMessage(MSG_KEY),
+            "24:59: " + getCheckMessage(MSG_KEY),
+            "104:21: " + getCheckMessage(MSG_KEY),
+            "131:14: " + getCheckMessage(MSG_KEY),
+            "157:15: " + getCheckMessage(MSG_KEY),
+            "169:23: " + getCheckMessage(MSG_KEY),
+            "189:19: " + getCheckMessage(MSG_KEY),
+            "192:59: " + getCheckMessage(MSG_KEY),
         };
 
         verify(checkConfig,
             getPath("checks/coding/OneStatementPerLineCheckInput.java"),
+            expected);
+    }
+
+    @Test
+    public void testTokensNotNull() {
+        OneStatementPerLineCheck check = new OneStatementPerLineCheck();
+        Assert.assertNotNull(check.getAcceptableTokens());
+        Assert.assertNotNull(check.getDefaultTokens());
+        Assert.assertNotNull(check.getRequiredTokens());
+    }
+
+    @Test
+    public void testWithMultilineStatements() throws Exception {
+        DefaultConfiguration checkConfig = createCheckConfig(OneStatementPerLineCheck.class);
+        final String[] expected = {
+            "44:21: " + getCheckMessage(MSG_KEY),
+            "61:17: " + getCheckMessage(MSG_KEY),
+            "69:17: " + getCheckMessage(MSG_KEY),
+            "81:10: " + getCheckMessage(MSG_KEY),
+            "90:28: " + getCheckMessage(MSG_KEY),
+            "135:39: " + getCheckMessage(MSG_KEY),
+        };
+
+        verify(checkConfig,
+            getPath("checks/coding/OneStatementPerLineCheckInput2.java"),
+            expected);
+    }
+
+    @Test
+    public void oneStatementNonCompilableInputTest() throws Exception {
+        DefaultConfiguration checkConfig = createCheckConfig(OneStatementPerLineCheck.class);
+        final String[] expected = {
+            "24:6: " + getCheckMessage(MSG_KEY),
+        };
+
+        verify(checkConfig, new File("src/test/resources-noncompilable/"
+                + "com/puppycrawl/tools/checkstyle/coding/"
+                + "InputOneStatementPerLineCheck.java").getCanonicalPath(),
             expected);
     }
 }

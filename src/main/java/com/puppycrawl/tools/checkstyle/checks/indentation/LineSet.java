@@ -19,8 +19,9 @@
 
 package com.puppycrawl.tools.checkstyle.checks.indentation;
 
-import com.google.common.collect.Maps;
 import java.util.SortedMap;
+
+import com.google.common.collect.Maps;
 
 /**
  * Represents a set of lines.
@@ -50,8 +51,8 @@ public class LineSet {
      * @return the starting column for the first line.
      */
     public int firstLineCol() {
-        final Object firstLineKey = lines.firstKey();
-        return lines.get(firstLineKey).intValue();
+        final Integer firstLineKey = lines.firstKey();
+        return lines.get(firstLineKey);
     }
 
     /**
@@ -60,7 +61,7 @@ public class LineSet {
      * @return the line number of the first line
      */
     public int firstLine() {
-        return lines.firstKey().intValue();
+        return lines.firstKey();
     }
 
     /**
@@ -69,7 +70,7 @@ public class LineSet {
      * @return the line number of the last line
      */
     public int lastLine() {
-        return lines.lastKey().intValue();
+        return lines.lastKey();
     }
 
     /**
@@ -93,6 +94,6 @@ public class LineSet {
 
     @Override
     public String toString() {
-        return "LineSet[ start=" + firstLine() + ", last=" + lastLine() + "]";
+        return "LineSet[firstLine=" + firstLine() + ", lastLine=" + lastLine() + "]";
     }
 }

@@ -11,12 +11,21 @@
 
   <head>
     <title>Importing and debugging in Netbeans IDE</title>
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-    <script type="text/javascript" src="js/anchors.js"></script>
-    <script type="text/javascript" src="js/google-analytics.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"/>
+    <script type="text/javascript" src="js/anchors.js"/>
+    <script type="text/javascript" src="js/google-analytics.js"/>
+    <link rel="icon" href="images/favicon.png" type="image/x-icon" />
+    <link rel="shortcut icon" href="images/favicon.ico" type="image/ico" />
   </head>
 
   <body>
+    <section name="Content">
+      <macro name="toc">
+        <param name="fromDepth" value="1"/>
+        <param name="toDepth" value="1"/>
+      </macro>
+    </section>
+
     <section name="Import Checkstyle Project">
       <p>
         Select File > New Project > Maven > Project with existing POM<br/><br/>
@@ -43,5 +52,18 @@
         Shift+F8 (Step Over Expression), Step Over (F8)
       </p>
     </section>
+
+    <section name="Organize Imports">
+      <p>
+        One of the Checkstyle checks we run on our own code require sertain order of import
+        statements. Few changes in IDE settings are required to help your IDE do it automatically.<br/>
+        To change formatter settings please go to Tools->Options in menu.<br/>
+        On Options page go to Editor->Formatting->Java->Imports (follow numbers on a
+        picture) and apply settings highlighted:<br/><br/>
+        <img alt="Organize Imports settings in NetBeans" src="images/gui_screenshot_organize_imports_netbeans.jpg"/>
+        <br/>
+      </p>
+    </section>
+
   </body>
 </document>

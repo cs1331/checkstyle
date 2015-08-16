@@ -20,13 +20,13 @@
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
 import com.puppycrawl.tools.checkstyle.api.Check;
-import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
 /**
  * <p>
  * Checks for overly complicated boolean expressions. Currently finds code like
- * <code>if (b == true)</code>, <code>b || true</code>, <code>!false</code>,
+ * {@code if (b == true)}, {@code b || true}, {@code !false},
  * etc.
  * </p>
  * <p>

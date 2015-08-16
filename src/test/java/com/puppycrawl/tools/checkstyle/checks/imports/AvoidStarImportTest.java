@@ -19,12 +19,16 @@
 
 package com.puppycrawl.tools.checkstyle.checks.imports;
 
-import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
-import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
+import static com.puppycrawl.tools.checkstyle.checks.imports.AvoidStarImportCheck.MSG_KEY;
+import static org.junit.Assert.assertArrayEquals;
+
 import java.io.File;
+
 import org.junit.Test;
 
-import static com.puppycrawl.tools.checkstyle.checks.imports.AvoidStarImportCheck.MSG_KEY;
+import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
+import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
+import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
 public class AvoidStarImportTest
     extends BaseCheckTestSupport {
@@ -73,5 +77,38 @@ public class AvoidStarImportTest
             "28: " + getCheckMessage(MSG_KEY, "java.io.File.*"), };
         verify(checkConfig, getPath("imports" + File.separator
             + "InputAvoidStarImportCheck.java"), expected2);
+    }
+
+    @Test
+    public void testAllowStaticMemberImports() throws Exception {
+        final DefaultConfiguration checkConfig = createCheckConfig(AvoidStarImportCheck.class);
+        checkConfig.addAttribute("allowStaticMemberImports", "true");
+        // allow all static star imports
+        final String[] expected2 = new String[] {
+            "7: " + getCheckMessage(MSG_KEY, "com.puppycrawl.tools.checkstyle.imports.*"),
+            "9: " + getCheckMessage(MSG_KEY, "java.io.*"),
+            "10: " + getCheckMessage(MSG_KEY, "java.lang.*"),
+        };
+        verify(checkConfig, getPath("imports" + File.separator
+            + "InputAvoidStarImportCheck.java"), expected2);
+    }
+
+    @Test
+    public void testGetAcceptableTokens() {
+        AvoidStarImportCheck testCheckObject =
+                new AvoidStarImportCheck();
+        int[] actual = testCheckObject.getAcceptableTokens();
+        int[] expected = new int[]{TokenTypes.IMPORT, TokenTypes.STATIC_IMPORT};
+        assertArrayEquals(expected, actual);
+    }
+
+    @Test
+    public void testGetRequiredTokens() {
+        AvoidStarImportCheck testCheckObject =
+                new AvoidStarImportCheck();
+        int[] actual = testCheckObject.getRequiredTokens();
+        int[] expected = new int[]{TokenTypes.IMPORT, TokenTypes.STATIC_IMPORT};
+
+        assertArrayEquals(expected, actual);
     }
 }

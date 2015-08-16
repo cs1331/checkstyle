@@ -19,9 +19,11 @@
 
 package com.puppycrawl.tools.checkstyle.checks.blocks;
 
-import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import com.puppycrawl.tools.checkstyle.api.TokenTypes;
+import com.puppycrawl.tools.checkstyle.ScopeUtils;
 import com.puppycrawl.tools.checkstyle.Utils;
+import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import com.puppycrawl.tools.checkstyle.api.Scope;
+import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import com.puppycrawl.tools.checkstyle.checks.AbstractOptionCheck;
 import com.puppycrawl.tools.checkstyle.checks.CheckUtils;
 
@@ -48,6 +50,10 @@ import com.puppycrawl.tools.checkstyle.checks.CheckUtils;
  *  {@link TokenTypes#INSTANCE_INIT INSTANCE_INIT}.
  * </p>
  * <p>
+ * <b>shouldStartLine</b> - does the check need to check
+ * if right curly starts line. Default value is <b>true</b>
+ * </p>
+ * <p>
  * An example of how to configure the check is:
  * </p>
  * <pre>
@@ -55,8 +61,8 @@ import com.puppycrawl.tools.checkstyle.checks.CheckUtils;
  * </pre>
  * <p>
  * An example of how to configure the check with policy
- * {@link RightCurlyOption#ALONE} for <code>else</code> and
- * <code>{@link TokenTypes#METHOD_DEF METHOD_DEF}</code>tokens is:
+ * {@link RightCurlyOption#ALONE} for {@code else} and
+ * {@code {@link TokenTypes#METHOD_DEF METHOD_DEF}}tokens is:
  * </p>
  * <pre>
  * &lt;module name="RightCurly"&gt;
@@ -69,6 +75,7 @@ import com.puppycrawl.tools.checkstyle.checks.CheckUtils;
  * @author lkuehne
  * @author o_sukhodolsky
  * @author maxvetrenko
+ * @author Andrei Selkin
  */
 public class RightCurlyCheck extends AbstractOptionCheck<RightCurlyOption> {
     /**
@@ -95,7 +102,7 @@ public class RightCurlyCheck extends AbstractOptionCheck<RightCurlyOption> {
      */
     public static final String MSG_KEY_LINE_NEW = "line.new";
 
-    /** Do we need to check if rculry starts line. */
+    /** Do we need to check if right curly starts line. */
     private boolean shouldStartLine = true;
 
     /**
@@ -106,7 +113,7 @@ public class RightCurlyCheck extends AbstractOptionCheck<RightCurlyOption> {
     }
 
     /**
-     * Does the check need to check if rcurly starts line.
+     * Does the check need to check if right curly starts line.
      * @param flag new value of this property.
      */
     public void setShouldStartLine(boolean flag) {
@@ -153,52 +160,120 @@ public class RightCurlyCheck extends AbstractOptionCheck<RightCurlyOption> {
             return;
         }
 
-        final DetailAST lcurly = details.lcurly;
-        final DetailAST nextToken = details.nextToken;
-        final boolean shouldCheckLastRcurly = details.shouldCheckLastRcurly;
-
-        if (getAbstractOption() == RightCurlyOption.SAME && !hasLineBreakBefore(rcurly)) {
-            log(rcurly, MSG_KEY_LINE_BREAK_BEFORE);
+        final String violation;
+        if (shouldStartLine) {
+            final String targetSourceLine = getLines()[rcurly.getLineNo() - 1];
+            violation = validate(details, getAbstractOption(), true, targetSourceLine);
+        }
+        else {
+            violation = validate(details, getAbstractOption(), false, "");
         }
 
-        if (shouldCheckLastRcurly) {
-            if (rcurly.getLineNo() == nextToken.getLineNo()) {
-                log(rcurly, MSG_KEY_LINE_ALONE, "}");
-            }
-        }
-        else if (getAbstractOption() == RightCurlyOption.SAME
-                && rcurly.getLineNo() != nextToken.getLineNo()) {
-            log(rcurly, MSG_KEY_LINE_SAME, "}");
-        }
-        else if (getAbstractOption() == RightCurlyOption.ALONE
-                && rcurly.getLineNo() == nextToken.getLineNo()
-                && !isEmptyBody(lcurly)) {
-            log(rcurly, MSG_KEY_LINE_ALONE, "}");
-        }
-
-        if (!shouldStartLine) {
-            return;
-        }
-        final boolean startsLine =
-                Utils.whitespaceBefore(rcurly.getColumnNo(),
-                        getLines()[rcurly.getLineNo() - 1]);
-
-        if (!startsLine && lcurly.getLineNo() != rcurly.getLineNo()) {
-            log(rcurly, MSG_KEY_LINE_NEW, "}");
+        if (!violation.isEmpty()) {
+            log(rcurly, violation, "}", rcurly.getColumnNo() + 1);
         }
     }
 
     /**
-     * Collect validation details
+     * Does general validation.
+     * @param details for validation.
+     * @param bracePolicy for placing the right curly brace.
+     * @param shouldStartLine do we need to check if right curly starts line.
+     * @param targetSourceLine line that we need to check if shouldStartLine is true.
+     * @return violation message or empty string
+     * if there was not violation durning validation.
+     */
+    private static String validate(Details details, RightCurlyOption bracePolicy,
+                                   boolean shouldStartLine, String targetSourceLine) {
+        final DetailAST rcurly = details.rcurly;
+        final DetailAST lcurly = details.lcurly;
+        final DetailAST nextToken = details.nextToken;
+        final boolean shouldCheckLastRcurly = details.shouldCheckLastRcurly;
+        String violation = "";
+
+        if (bracePolicy == RightCurlyOption.SAME
+                && !hasLineBreakBefore(rcurly)) {
+            violation = MSG_KEY_LINE_BREAK_BEFORE;
+        }
+        else if (shouldCheckLastRcurly) {
+            if (rcurly.getLineNo() == nextToken.getLineNo()) {
+                violation = MSG_KEY_LINE_ALONE;
+            }
+        }
+        else if (bracePolicy == RightCurlyOption.SAME
+                && rcurly.getLineNo() != nextToken.getLineNo()) {
+            violation = MSG_KEY_LINE_SAME;
+        }
+        else if (bracePolicy == RightCurlyOption.ALONE
+                && !isAloneOnLine(details)
+                && !isEmptyBody(lcurly)) {
+            violation = MSG_KEY_LINE_ALONE;
+        }
+        else if (bracePolicy == RightCurlyOption.ALONE_OR_SINGLELINE
+                && !isAloneOnLine(details)
+                && !isSingleLineBlock(details)
+                && !isAnonInnerClassInit(lcurly)
+                && !isEmptyBody(lcurly)) {
+            violation = MSG_KEY_LINE_ALONE;
+        }
+        else if (shouldStartLine) {
+            final boolean startsLine =
+                Utils.whitespaceBefore(rcurly.getColumnNo(), targetSourceLine);
+
+            if (!startsLine && lcurly.getLineNo() != rcurly.getLineNo()) {
+                violation = MSG_KEY_LINE_NEW;
+            }
+        }
+        return violation;
+    }
+
+    /**
+     * Checks whether right curly is alone on a line.
+     * @param details for validation.
+     * @return true if right curly is alone on a line.
+     */
+    private static boolean isAloneOnLine(Details details) {
+        final DetailAST rcurly = details.rcurly;
+        final DetailAST lcurly = details.lcurly;
+        final DetailAST nextToken = details.nextToken;
+        return rcurly.getLineNo() != lcurly.getLineNo()
+            && rcurly.getLineNo() != nextToken.getLineNo();
+    }
+
+    /**
+     * Checks whether block has a single-line format.
+     * @param details for validation.
+     * @return true if block has single-line format.
+     */
+    private static boolean isSingleLineBlock(Details details) {
+        final DetailAST rcurly = details.rcurly;
+        final DetailAST lcurly = details.lcurly;
+        final DetailAST nextToken = details.nextToken;
+        return rcurly.getLineNo() == lcurly.getLineNo()
+            && rcurly.getLineNo() != nextToken.getLineNo();
+    }
+
+    /**
+     * Checks wthether lcurly is in anonymous inner class initialization.
+     * @param lcurly left curly token.
+     * @return true if lcurly begins anonymous inner class initialization.
+     */
+    private static boolean isAnonInnerClassInit(DetailAST lcurly) {
+        final Scope surroundingScope = ScopeUtils.getSurroundingScope(lcurly);
+        return surroundingScope.ordinal() == Scope.ANONINNER.ordinal();
+    }
+
+    /**
+     * Collects validation details.
      * @param ast detail ast.
      * @return object that contain all details to make a validation.
      */
-    private Details getDetails(DetailAST ast) {
+    private static Details getDetails(DetailAST ast) {
         // Attempt to locate the tokens to do the check
         boolean shouldCheckLastRcurly = false;
         DetailAST rcurly = null;
-        DetailAST lcurly = null;
-        DetailAST nextToken = null;
+        DetailAST lcurly;
+        DetailAST nextToken;
 
         switch (ast.getType()) {
             case TokenTypes.LITERAL_TRY:
@@ -246,22 +321,22 @@ public class RightCurlyCheck extends AbstractOptionCheck<RightCurlyOption> {
             case TokenTypes.INSTANCE_INIT:
                 lcurly = ast.findFirstToken(TokenTypes.SLIST);
                 rcurly = lcurly.getLastChild();
-                nextToken = ast;
-                break;
-            case TokenTypes.METHOD_DEF:
-            case TokenTypes.LITERAL_FOR:
-            case TokenTypes.LITERAL_WHILE:
-            case TokenTypes.LITERAL_DO:
-                lcurly = ast.findFirstToken(TokenTypes.SLIST);
-                if (lcurly != null) {
-                    //SLIST could be absent if method is abstract, and code like "while(true);"
-                    rcurly = lcurly.getLastChild();
-                }
-                nextToken = ast;
+                nextToken = getNextToken(ast);
                 break;
             default:
-                throw new RuntimeException("Unexpected token type ("
-                        + Utils.getTokenName(ast.getType()) + ")");
+                // ATTENTION! We have default here, but we expect case TokenTypes.METHOD_DEF,
+                // TokenTypes.LITERAL_FOR, TokenTypes.LITERAL_WHILE, TokenTypes.LITERAL_DO only.
+                // It has been done to improve coverage to 100%. I couldn't replace it with
+                // if-else-if block because code was ugly and didn't pass pmd check.
+
+                lcurly = ast.findFirstToken(TokenTypes.SLIST);
+                if (lcurly != null) {
+                    // SLIST could be absent if method is abstract,
+                    // and code like "while(true);"
+                    rcurly = lcurly.getLastChild();
+                }
+                nextToken = getNextToken(ast);
+                break;
         }
 
         final Details details = new Details();
@@ -278,7 +353,7 @@ public class RightCurlyCheck extends AbstractOptionCheck<RightCurlyOption> {
      * @param lcurly left curly.
      * @return true if definition body is empty.
      */
-    private boolean isEmptyBody(DetailAST lcurly) {
+    private static boolean isEmptyBody(DetailAST lcurly) {
         boolean result = false;
         if (lcurly.getParent().getType() == TokenTypes.OBJBLOCK) {
             if (lcurly.getNextSibling().getType() == TokenTypes.RCURLY) {
@@ -296,10 +371,10 @@ public class RightCurlyCheck extends AbstractOptionCheck<RightCurlyOption> {
      * @param ast the given node.
      * @return the token which represents next lexical item.
      */
-    private DetailAST getNextToken(DetailAST ast) {
+    private static DetailAST getNextToken(DetailAST ast) {
         DetailAST next = null;
         DetailAST parent = ast;
-        while (parent != null && next == null) {
+        while (next == null) {
             next = parent.getNextSibling();
             parent = parent.getParent();
         }
@@ -308,32 +383,26 @@ public class RightCurlyCheck extends AbstractOptionCheck<RightCurlyOption> {
 
     /**
      * Checks if right curly has line break before.
-     * @param rightCurly
-     *        Right curly token.
-     * @return
-     *        True, if right curly has line break before.
+     * @param rightCurly right curly token.
+     * @return true, if right curly has line break before.
      */
-    private boolean hasLineBreakBefore(DetailAST rightCurly) {
-        if (rightCurly != null) {
-            final DetailAST previousToken = rightCurly.getPreviousSibling();
-            if (previousToken != null && rightCurly.getLineNo() == previousToken.getLineNo()) {
-                return false;
-            }
-        }
-        return true;
+    private static boolean hasLineBreakBefore(DetailAST rightCurly) {
+        final DetailAST previousToken = rightCurly.getPreviousSibling();
+        return previousToken == null
+                || rightCurly.getLineNo() != previousToken.getLineNo();
     }
 
     /**
-     * Structure that contains all details for validation
+     * Structure that contains all details for validation.
      */
-    static class Details {
-        /** right curly */
+    private static class Details {
+        /** Right curly. */
         private DetailAST rcurly;
-        /** left curly */
+        /** Left curly. */
         private DetailAST lcurly;
-        /** next Token */
+        /** Next token. */
         private DetailAST nextToken;
-        /** should Check Last Rcurly */
+        /** Should check last right curly. */
         private boolean shouldCheckLastRcurly;
     }
 }

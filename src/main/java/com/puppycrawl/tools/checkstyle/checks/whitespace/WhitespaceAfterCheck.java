@@ -20,8 +20,8 @@
 package com.puppycrawl.tools.checkstyle.checks.whitespace;
 
 import com.puppycrawl.tools.checkstyle.api.Check;
-import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
 /**
  * <p>
@@ -61,13 +61,15 @@ public class WhitespaceAfterCheck
      */
     public static final String WS_NOT_FOLLOWED = "ws.notFollowed";
 
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String WS_TYPECAST = "ws.typeCast";
+
     @Override
     public int[] getDefaultTokens() {
-        return new int[] {
-            TokenTypes.COMMA,
-            TokenTypes.SEMI,
-            TokenTypes.TYPECAST,
-        };
+        return getAcceptableTokens();
     }
 
     @Override
@@ -81,43 +83,43 @@ public class WhitespaceAfterCheck
 
     @Override
     public void visitToken(DetailAST ast) {
-        final Object[] message;
-        final DetailAST targetAST;
+        final String line = getLine(ast.getLineNo() - 1);
         if (ast.getType() == TokenTypes.TYPECAST) {
-            targetAST = ast.findFirstToken(TokenTypes.RPAREN);
-            message = new Object[]{"cast"};
-        }
-        else {
-            targetAST = ast;
-            message = new Object[]{ast.getText()};
-        }
-        final String line = getLine(targetAST.getLineNo() - 1);
-        final int after =
-            targetAST.getColumnNo() + targetAST.getText().length();
-
-        if (after < line.length()) {
-
-            final char charAfter = line.charAt(after);
-            if (targetAST.getType() == TokenTypes.SEMI
-                && (charAfter == ';' || charAfter == ')')) {
-                return;
-            }
-            if (!Character.isWhitespace(charAfter)) {
-                //empty FOR_ITERATOR?
-                if (targetAST.getType() == TokenTypes.SEMI) {
-                    final DetailAST sibling =
-                        targetAST.getNextSibling();
-                    if (sibling != null
-                        && sibling.getType() == TokenTypes.FOR_ITERATOR
-                        && sibling.getChildCount() == 0) {
-                        return;
-                    }
-                }
+            final DetailAST targetAST = ast.findFirstToken(TokenTypes.RPAREN);
+            if (!isFollowedByWhitespace(targetAST, line)) {
                 log(targetAST.getLineNo(),
                     targetAST.getColumnNo() + targetAST.getText().length(),
+                    WS_TYPECAST);
+            }
+        }
+        else {
+            if (!isFollowedByWhitespace(ast, line)) {
+                final Object[] message = {ast.getText()};
+                log(ast.getLineNo(),
+                    ast.getColumnNo() + ast.getText().length(),
                     WS_NOT_FOLLOWED,
                     message);
             }
         }
+    }
+
+    /**
+     * checks whether token is followed by a whitespace.
+     * @param targetAST Ast token.
+     * @param line The line associated with the ast token.
+     * @return true if ast token is followed by a whitespace.
+     */
+    private static boolean isFollowedByWhitespace(DetailAST targetAST, String line) {
+        final int after =
+            targetAST.getColumnNo() + targetAST.getText().length();
+        boolean followedByWhitespace = true;
+
+        if (after < line.length()) {
+            final char charAfter = line.charAt(after);
+            followedByWhitespace = Character.isWhitespace(charAfter)
+                || targetAST.getType() == TokenTypes.SEMI
+                    && (charAfter == ';' || charAfter == ')');
+        }
+        return followedByWhitespace;
     }
 }

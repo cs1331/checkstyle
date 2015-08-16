@@ -27,7 +27,7 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  *
  * @author o_sukhodolsky
  */
-public class MemberDefHandler extends ExpressionHandler {
+public class MemberDefHandler extends AbstractExpressionHandler {
     /**
      * Construct an instance of this handler with the given indentation check,
      * abstract syntax tree, and parent handler.
@@ -37,18 +37,18 @@ public class MemberDefHandler extends ExpressionHandler {
      * @param parent        the parent handler
      */
     public MemberDefHandler(IndentationCheck indentCheck,
-        DetailAST ast, ExpressionHandler parent) {
+        DetailAST ast, AbstractExpressionHandler parent) {
         super(indentCheck, "member def", ast, parent);
     }
 
     @Override
     public void checkIndentation() {
         final DetailAST modifiersNode = getMainAst().findFirstToken(TokenTypes.MODIFIERS);
-        if (modifiersNode.getChildCount() != 0) {
-            checkModifiers();
+        if (modifiersNode.getChildCount() == 0) {
+            checkType();
         }
         else {
-            checkType();
+            checkModifiers();
         }
         final LineWrappingHandler lineWrap =
             new LineWrappingHandler(getIndentCheck(), getMainAst(),
@@ -59,7 +59,7 @@ public class MemberDefHandler extends ExpressionHandler {
     }
 
     @Override
-    public IndentLevel suggestedChildLevel(ExpressionHandler child) {
+    public IndentLevel suggestedChildLevel(AbstractExpressionHandler child) {
         return getLevel();
     }
 
@@ -77,7 +77,7 @@ public class MemberDefHandler extends ExpressionHandler {
      */
     private void checkType() {
         final DetailAST type = getMainAst().findFirstToken(TokenTypes.TYPE);
-        final DetailAST ident = ExpressionHandler.getFirstToken(type);
+        final DetailAST ident = AbstractExpressionHandler.getFirstToken(type);
         final int columnNo = expandedTabsColumnNo(ident);
         if (startsLine(ident) && !getLevel().accept(columnNo)) {
             logError(ident, "type", columnNo);
@@ -89,7 +89,7 @@ public class MemberDefHandler extends ExpressionHandler {
      * @param variableDef current variable_def.
      * @return true if variable_def node is array declaration.
      */
-    private boolean isArrayDeclaration(DetailAST variableDef) {
+    private static boolean isArrayDeclaration(DetailAST variableDef) {
         return variableDef.findFirstToken(TokenTypes.TYPE)
             .findFirstToken(TokenTypes.ARRAY_DECLARATOR) != null;
     }

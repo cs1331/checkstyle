@@ -36,22 +36,11 @@ public abstract class AbstractNameCheck
     public static final String MSG_INVALID_PATTERN = "name.invalidPattern";
 
     /**
-     * Creates a new <code>AbstractNameCheck</code> instance.
+     * Creates a new {@code AbstractNameCheck} instance.
      * @param format format to check with
      */
-    public AbstractNameCheck(String format) {
+    protected AbstractNameCheck(String format) {
         super(format);
-    }
-
-    /**
-     * Decides whether the name of an AST should be checked against
-     * the format regexp.
-     * @param ast the AST to check.
-     * @return true if the IDENT subnode of ast should be checked against
-     * the format regexp.
-     */
-    protected boolean mustCheckName(DetailAST ast) {
-        return true;
     }
 
     @Override
@@ -67,4 +56,13 @@ public abstract class AbstractNameCheck
             }
         }
     }
+
+    /**
+     * Decides whether the name of an AST should be checked against
+     * the format regexp.
+     * @param ast the AST to check.
+     * @return true if the IDENT subnode of ast should be checked against
+     * the format regexp.
+     */
+    protected abstract boolean mustCheckName(DetailAST ast);
 }

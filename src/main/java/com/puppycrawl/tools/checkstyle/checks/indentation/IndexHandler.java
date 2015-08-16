@@ -26,7 +26,7 @@ import com.puppycrawl.tools.checkstyle.api.DetailAST;
  *
  * @author yudindi
  */
-public class IndexHandler extends ExpressionHandler {
+public class IndexHandler extends AbstractExpressionHandler {
 
     /**
      * Construct an instance of this handler with the given indentation check,
@@ -38,7 +38,7 @@ public class IndexHandler extends ExpressionHandler {
      */
     public IndexHandler(IndentationCheck indentCheck,
                       DetailAST ast,
-                      ExpressionHandler parent) {
+                      AbstractExpressionHandler parent) {
         super(indentCheck, "index op", ast, parent);
     }
 
@@ -46,10 +46,4 @@ public class IndexHandler extends ExpressionHandler {
     public void checkIndentation() {
         // do nothing. Used to provide a correct suggested child level for now.
     }
-
-    @Override
-    public IndentLevel suggestedChildLevel(ExpressionHandler child) {
-        return getLevel();
-    }
-
 }

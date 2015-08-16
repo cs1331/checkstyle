@@ -19,14 +19,18 @@
 
 package com.puppycrawl.tools.checkstyle.checks.imports;
 
-import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
-import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
-import java.io.File;
-import org.junit.Test;
-
 import static com.puppycrawl.tools.checkstyle.checks.imports.RedundantImportCheck.MSG_DUPLICATE;
 import static com.puppycrawl.tools.checkstyle.checks.imports.RedundantImportCheck.MSG_LANG;
 import static com.puppycrawl.tools.checkstyle.checks.imports.RedundantImportCheck.MSG_SAME;
+import static org.junit.Assert.assertArrayEquals;
+
+import java.io.File;
+
+import org.junit.Test;
+
+import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
+import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
+import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
 public class RedundantImportCheckTest
     extends BaseCheckTestSupport {
@@ -44,5 +48,33 @@ public class RedundantImportCheckTest
             "26:1: " + getCheckMessage(MSG_DUPLICATE, 25, "javax.swing.WindowConstants.*"),
         };
         verify(checkConfig, getPath("imports" + File.separator + "InputRedundantImportCheck.java"), expected);
+    }
+
+    @Test
+    public void testUnnamedPackage()
+        throws Exception {
+        final DefaultConfiguration checkConfig =
+            createCheckConfig(RedundantImportCheck.class);
+        final String[] expected = {
+            "2:1: " + getCheckMessage(MSG_DUPLICATE, 1, "java.util.List"),
+            "4:1: " + getCheckMessage(MSG_LANG, "java.lang.String"),
+        };
+        verify(checkConfig, new File("src/test/resources-noncompilable/com/puppycrawl/tools/"
+                + "checkstyle/imports/"
+                + "InputRedundantImportCheck_UnnamedPackage.java").getCanonicalPath(), expected);
+    }
+
+    @Test
+    public void testGetAcceptableTokens() {
+        RedundantImportCheck testCheckObject =
+                new RedundantImportCheck();
+        int[] actual = testCheckObject.getAcceptableTokens();
+        int[] expected = new int[]{
+            TokenTypes.IMPORT,
+            TokenTypes.STATIC_IMPORT,
+            TokenTypes.PACKAGE_DEF,
+        };
+
+        assertArrayEquals(expected, actual);
     }
 }

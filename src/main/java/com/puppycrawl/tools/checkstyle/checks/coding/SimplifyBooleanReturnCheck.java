@@ -20,10 +20,10 @@
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
 import antlr.collections.AST;
-import com.puppycrawl.tools.checkstyle.api.Check;
-import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.api.DetailAST;
 
+import com.puppycrawl.tools.checkstyle.api.Check;
+import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
 /**
  * <p>
@@ -48,13 +48,18 @@ public class SimplifyBooleanReturnCheck
     public static final String MSG_KEY = "simplify.boolreturn";
 
     @Override
-    public int[] getDefaultTokens() {
+    public int[] getAcceptableTokens() {
         return new int[] {TokenTypes.LITERAL_IF};
     }
 
     @Override
-    public int[] getAcceptableTokens() {
-        return new int[] {TokenTypes.LITERAL_IF};
+    public int[] getDefaultTokens() {
+        return getAcceptableTokens();
+    }
+
+    @Override
+    public int[] getRequiredTokens() {
+        return getAcceptableTokens();
     }
 
     @Override
@@ -88,7 +93,7 @@ public class SimplifyBooleanReturnCheck
      * Returns if an AST is a return statment with a boolean literal
      * or a compound statement that contains only such a return statement.
      *
-     * Returns <code>true</code> iff ast represents
+     * Returns {@code true} iff ast represents
      * <br/>
      * <pre>
      * return true/false;
@@ -116,7 +121,7 @@ public class SimplifyBooleanReturnCheck
     /**
      * Returns if an AST is a return statment with a boolean literal.
      *
-     * Returns <code>true</code> iff ast represents
+     * Returns {@code true} iff ast represents
      * <br/>
      * <pre>
      * return true/false;
@@ -132,7 +137,7 @@ public class SimplifyBooleanReturnCheck
 
         final AST expr = ast.getFirstChild();
 
-        if (expr == null || expr.getType() == TokenTypes.SEMI) {
+        if (expr.getType() == TokenTypes.SEMI) {
             return false;
         }
 

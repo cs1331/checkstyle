@@ -11,12 +11,21 @@
 
   <head>
     <title>Property Types</title>
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-    <script type="text/javascript" src="js/anchors.js"></script>
-    <script type="text/javascript" src="js/google-analytics.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"/>
+    <script type="text/javascript" src="js/anchors.js"/>
+    <script type="text/javascript" src="js/google-analytics.js"/>
+    <link rel="icon" href="images/favicon.png" type="image/x-icon" />
+    <link rel="shortcut icon" href="images/favicon.ico" type="image/ico" />
   </head>
 
   <body>
+    <section name="Content">
+      <macro name="toc">
+        <param name="fromDepth" value="1"/>
+        <param name="toDepth" value="1"/>
+      </macro>
+    </section>
+
     <section name="Property Types">
     <p>
       Checkstyle is configured using properties, which are string
@@ -239,8 +248,9 @@
         <tr>
           <td><code>nlow</code></td>
           <td>
-            If the brace will fit on the first line of the statement, taking
-            into account maximum line length, then apply <code>eol</code> rule. Otherwise apply the <code>nl</code> rule. <code>nlow</code> is a
+            If the brace will fit on the first line of the statement,
+            then apply <code>eol</code> rule. Otherwise apply the
+            <code>nl</code> rule. <code>nlow</code> is a
             mnemonic for "new line on wrap". For the example above Checkstyle
             will enforce:
             <pre>
@@ -276,7 +286,9 @@
         <tr>
           <td><code>same</code></td>
           <td>
-            The brace must be on the same line as the next statement. For
+            The brace must be on the same line as the next part of
+            a multi-block statement (one that directly contains
+            multiple blocks: if/else-if/else or try/catch/finally. For
             example:
             <pre>
     try {
@@ -295,9 +307,32 @@
         ...
     }
     finally {
+        ...
+    }
             </pre>
           </td>
         </tr>
+
+          <tr>
+              <td><code>alone_or_singleline</code></td>
+              <td>
+                  The brace must be alone on the line, yet
+                  single-line format of block is allowed.
+                  For example:
+                  <pre>
+    // Brace is alone on the line
+    try {
+        ...
+    }
+    finally {
+        ...
+    }
+
+    // Single-line format of block
+    private int foo() { return 1; }
+                  </pre>
+              </td>
+          </tr>
       </table>
     </subsection>
 
@@ -405,7 +440,6 @@
       </table>
     </subsection>
 
-
     <subsection name="elementStyle">
       <p>
         This property represents the policy for the styles for defining
@@ -462,7 +496,6 @@
       </table>
     </subsection>
 
-
     <subsection name="closingParens">
       <p>
         This property represents the policy for the styles for the ending
@@ -499,7 +532,6 @@
         </tr>
       </table>
     </subsection>
-
 
     <subsection name="trailingArrayComma">
       <p>

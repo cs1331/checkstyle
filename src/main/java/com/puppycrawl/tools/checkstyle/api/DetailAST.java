@@ -29,7 +29,7 @@ import com.puppycrawl.tools.checkstyle.Utils;
 /**
  * An extension of the CommonAST that records the line and column
  * number.  The idea was taken from <a target="_top"
- * href="http://www.jguru.com/jguru/faq/view.jsp?EID=62654">Java Guru
+ * href="http://www.jguru.com/faq/view.jsp?EID=62654">Java Guru
  * FAQ: How can I include line numbers in automatically generated
  * ASTs?</a>.
  * @author Oliver Burn
@@ -108,18 +108,18 @@ public final class DetailAST extends CommonASTWithHiddenTokens {
     public void addPreviousSibling(DetailAST ast) {
         if (ast != null) {
             ast.setParent(parent);
-            final DetailAST previousSibling = this.getPreviousSibling();
+            final DetailAST previousSiblingNode = getPreviousSibling();
 
-            if (previousSibling != null) {
-                ast.setPreviousSibling(previousSibling);
-                previousSibling.setNextSibling(ast);
+            if (previousSiblingNode != null) {
+                ast.setPreviousSibling(previousSiblingNode);
+                previousSiblingNode.setNextSibling(ast);
             }
             else if (parent != null) {
                 parent.setFirstChild(ast);
             }
 
             ast.setNextSibling(this);
-            this.setPreviousSibling(ast);
+            setPreviousSibling(ast);
         }
     }
 
@@ -131,7 +131,7 @@ public final class DetailAST extends CommonASTWithHiddenTokens {
     public void addNextSibling(DetailAST ast) {
         if (ast != null) {
             ast.setParent(parent);
-            final DetailAST nextSibling = this.getNextSibling();
+            final DetailAST nextSibling = getNextSibling();
 
             if (nextSibling != null) {
                 ast.setNextSibling(nextSibling);
@@ -139,7 +139,7 @@ public final class DetailAST extends CommonASTWithHiddenTokens {
             }
 
             ast.setPreviousSibling(this);
-            this.setNextSibling(ast);
+            setNextSibling(ast);
         }
     }
 
@@ -314,7 +314,7 @@ public final class DetailAST extends CommonASTWithHiddenTokens {
      * of the provided type.
      * @param type a TokenType
      * @return true if and only if this branch (including this node)
-     * contains a token of type <code>type</code>.
+     * contains a token of type {@code type}.
      */
     public boolean branchContains(int type) {
         return getBranchTokenTypes().get(type);
@@ -327,8 +327,8 @@ public final class DetailAST extends CommonASTWithHiddenTokens {
      */
     public int getChildCount(int type) {
         int count = 0;
-        for (AST i = getFirstChild(); i != null; i = i.getNextSibling()) {
-            if (i.getType() == type) {
+        for (AST ast = getFirstChild(); ast != null; ast = ast.getNextSibling()) {
+            if (ast.getType() == type) {
                 count++;
             }
         }
@@ -350,9 +350,9 @@ public final class DetailAST extends CommonASTWithHiddenTokens {
      */
     public DetailAST findFirstToken(int type) {
         DetailAST retVal = null;
-        for (DetailAST i = getFirstChild(); i != null; i = i.getNextSibling()) {
-            if (i.getType() == type) {
-                retVal = i;
+        for (DetailAST ast = getFirstChild(); ast != null; ast = ast.getNextSibling()) {
+            if (ast.getType() == type) {
+                retVal = ast;
                 break;
             }
         }

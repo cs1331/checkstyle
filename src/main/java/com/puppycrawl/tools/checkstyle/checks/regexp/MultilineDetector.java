@@ -20,6 +20,8 @@
 package com.puppycrawl.tools.checkstyle.checks.regexp;
 
 import java.util.regex.Matcher;
+
+import com.google.common.base.Strings;
 import com.puppycrawl.tools.checkstyle.api.FileText;
 import com.puppycrawl.tools.checkstyle.api.LineColumn;
 
@@ -41,6 +43,17 @@ class MultilineDetector {
      */
     public static final String REGEXP_MINIMUM = "regexp.minimum";
 
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String EMPTY = "regexp.empty";
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String STACKOVERFLOW = "regexp.StackOverflowError";
+
     /** The detection options to use. */
     private final DetectorOptions options;
     /** Tracks the number of matches. */
@@ -60,46 +73,57 @@ class MultilineDetector {
 
     /**
      * Processes an entire text file looking for matches.
-     * @param text the text to process
+     * @param fileText the text to process
      */
-    public void processLines(FileText text) {
-        this.text = text;
+    public void processLines(FileText fileText) {
+        text = new FileText(fileText);
         resetState();
-        matcher = options.getPattern().matcher(text.getFullText());
-        findMatch();
-        finish();
+
+        if (Strings.isNullOrEmpty(options.getFormat())) {
+            options.getReporter().log(0, EMPTY);
+        }
+        else {
+            matcher = options.getPattern().matcher(fileText.getFullText());
+            findMatch();
+            finish();
+        }
     }
 
-    /** recursive method that finds the matches. */
+    /** Method that finds the matches. */
     private void findMatch() {
-        final boolean foundMatch = matcher.find();
-        if (!foundMatch) {
-            return;
-        }
+        try {
+            boolean foundMatch = matcher.find();
 
-        final LineColumn start = text.lineColumn(matcher.start());
-        final LineColumn end = text.lineColumn(matcher.end());
-
-        if (!options.getSuppressor().shouldSuppress(start.getLine(),
-                start.getColumn(), end.getLine(), end.getColumn())) {
-            currentMatches++;
-            if (currentMatches > options.getMaximum()) {
-                if ("".equals(options.getMessage())) {
-                    options.getReporter().log(start.getLine(),
-                            REGEXP_EXCEEDED, matcher.pattern().toString());
+            while (foundMatch) {
+                final LineColumn start = text.lineColumn(matcher.start());
+                currentMatches++;
+                if (currentMatches > options.getMaximum()) {
+                    if (options.getMessage().isEmpty()) {
+                        options.getReporter().log(start.getLine(),
+                                REGEXP_EXCEEDED, matcher.pattern().toString());
+                    }
+                    else {
+                        options.getReporter()
+                                .log(start.getLine(), options.getMessage());
+                    }
                 }
-                else {
-                    options.getReporter()
-                            .log(start.getLine(), options.getMessage());
-                }
+                foundMatch = matcher.find();
             }
         }
-        findMatch();
+        // see http://bugs.java.com/bugdatabase/view_bug.do?bug_id=6337993 et al.
+        catch (StackOverflowError ignored) {
+            // OK http://blog.igorminar.com/2008/05/catching-stackoverflowerror-and-bug-in.html
+            // http://programmers.stackexchange.com/questions/
+            //        209099/is-it-ever-okay-to-catch-stackoverflowerror-in-java
+            options.getReporter().log(0, STACKOVERFLOW, matcher.pattern().toString());
+        }
+
     }
+
     /** Perform processing at the end of a set of lines. */
     private void finish() {
         if (currentMatches < options.getMinimum()) {
-            if ("".equals(options.getMessage())) {
+            if (options.getMessage().isEmpty()) {
                 options.getReporter().log(0, REGEXP_MINIMUM,
                         options.getMinimum(), options.getFormat());
             }

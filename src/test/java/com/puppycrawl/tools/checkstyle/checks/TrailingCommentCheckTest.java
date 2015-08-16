@@ -19,12 +19,15 @@
 
 package com.puppycrawl.tools.checkstyle.checks;
 
-import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
-import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
+import static com.puppycrawl.tools.checkstyle.checks.TrailingCommentCheck.MSG_KEY;
+
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import static com.puppycrawl.tools.checkstyle.checks.TrailingCommentCheck.MSG_KEY;
+import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
+import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
+import com.puppycrawl.tools.checkstyle.api.DetailAST;
 
 public class TrailingCommentCheckTest extends BaseCheckTestSupport {
     private DefaultConfiguration checkConfig;
@@ -58,5 +61,17 @@ public class TrailingCommentCheckTest extends BaseCheckTestSupport {
             "19: " + getCheckMessage(MSG_KEY),
         };
         verify(checkConfig, getPath("InputTrailingComment.java"), expected);
+    }
+
+    @Test
+    public void testCallVisitToken() throws Exception {
+        TrailingCommentCheck check = new TrailingCommentCheck();
+        try {
+            check.visitToken(new DetailAST());
+            Assert.fail();
+        }
+        catch (IllegalStateException ex) {
+            "visitToken() shouldn't be called.".equals(ex.getMessage());
+        }
     }
 }

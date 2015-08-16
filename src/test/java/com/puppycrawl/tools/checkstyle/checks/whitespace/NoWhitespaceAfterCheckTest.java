@@ -19,12 +19,13 @@
 
 package com.puppycrawl.tools.checkstyle.checks.whitespace;
 
-import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
-import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
+import static com.puppycrawl.tools.checkstyle.checks.whitespace.NoWhitespaceAfterCheck.MSG_KEY;
+
 import org.junit.Before;
 import org.junit.Test;
 
-import static com.puppycrawl.tools.checkstyle.checks.whitespace.NoWhitespaceAfterCheck.MSG_KEY;
+import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
+import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 
 public class NoWhitespaceAfterCheckTest
     extends BaseCheckTestSupport {
@@ -50,6 +51,7 @@ public class NoWhitespaceAfterCheckTest
             "129:24: " + getCheckMessage(MSG_KEY, "."),
             "132:11: " + getCheckMessage(MSG_KEY, "."),
             "136:12: " + getCheckMessage(MSG_KEY, "."),
+            "264:2: " + getCheckMessage(MSG_KEY, "."),
         };
         verify(checkConfig, getPath("InputWhitespace.java"), expected);
     }

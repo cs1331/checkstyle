@@ -19,17 +19,6 @@
 
 package com.puppycrawl.tools.checkstyle.checks;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import com.google.common.io.Closeables;
-import com.puppycrawl.tools.checkstyle.Definitions;
-import com.puppycrawl.tools.checkstyle.api.AbstractFileSetCheck;
-import com.puppycrawl.tools.checkstyle.api.LocalizedMessage;
-import com.puppycrawl.tools.checkstyle.api.MessageDispatcher;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -38,10 +27,22 @@ import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 import java.util.SortedSet;
-import java.util.Map.Entry;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import com.google.common.io.Closeables;
+import com.puppycrawl.tools.checkstyle.Definitions;
+import com.puppycrawl.tools.checkstyle.api.AbstractFileSetCheck;
+import com.puppycrawl.tools.checkstyle.api.LocalizedMessage;
+import com.puppycrawl.tools.checkstyle.api.MessageDispatcher;
 
 /**
  * <p>
@@ -90,11 +91,11 @@ public class TranslationCheck
     private String basenameSeparator;
 
     /**
-     * Creates a new <code>TranslationCheck</code> instance.
+     * Creates a new {@code TranslationCheck} instance.
      */
     public TranslationCheck() {
         setFileExtensions("properties");
-        setBasenameSeparator("_");
+        basenameSeparator = "_";
     }
 
     @Override
@@ -133,17 +134,17 @@ public class TranslationCheck
         final int underscoreIdx = filePath.indexOf(basenameSeparator,
             baseNameStart);
         final int dotIdx = filePath.indexOf('.', baseNameStart);
-        final int cutoffIdx = underscoreIdx != -1 ? underscoreIdx : dotIdx;
+        final int cutoffIdx = underscoreIdx == -1 ? dotIdx : underscoreIdx;
         return filePath.substring(0, cutoffIdx);
     }
 
-   /**
-    * Sets the separator used to determine the basename of a property file.
-    * This defaults to "_"
-    *
-    * @param basenameSeparator the basename separator
-    */
-    public void setBasenameSeparator(String basenameSeparator) {
+    /**
+     * Sets the separator used to determine the basename of a property file.
+     * This defaults to "_"
+     *
+     * @param basenameSeparator the basename separator
+     */
+    public final void setBasenameSeparator(String basenameSeparator) {
         this.basenameSeparator = basenameSeparator;
     }
 
@@ -159,8 +160,8 @@ public class TranslationCheck
         List<File> propFiles, String basenameSeparator) {
         final Map<String, Set<File>> propFileMap = Maps.newHashMap();
 
-        for (final File f : propFiles) {
-            final String identifier = extractPropertyIdentifier(f,
+        for (final File file : propFiles) {
+            final String identifier = extractPropertyIdentifier(file,
                 basenameSeparator);
 
             Set<File> fileSet = propFileMap.get(identifier);
@@ -168,7 +169,7 @@ public class TranslationCheck
                 fileSet = Sets.newHashSet();
                 propFileMap.put(identifier, fileSet);
             }
-            fileSet.add(f);
+            fileSet.add(file);
         }
         return propFileMap;
     }
@@ -222,13 +223,12 @@ public class TranslationCheck
                 key,
                 args,
                 getId(),
-                this.getClass(), null);
+                getClass(), null);
         final SortedSet<LocalizedMessage> messages = Sets.newTreeSet();
         messages.add(message);
         getMessageDispatcher().fireErrors(file.getPath(), messages);
         LOG.debug("IOException occured.", ex);
     }
-
 
     /**
      * Compares the key sets of the given property files (arranged in a map)
@@ -261,7 +261,6 @@ public class TranslationCheck
             dispatcher.fireFileFinished(path);
         }
     }
-
 
     /**
      * Tests whether the given property files (arranged by their prefixes

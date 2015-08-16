@@ -19,6 +19,19 @@
 
 package com.puppycrawl.tools.checkstyle;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import java.util.SortedSet;
+
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.puppycrawl.tools.checkstyle.api.AuditEvent;
@@ -35,18 +48,6 @@ import com.puppycrawl.tools.checkstyle.api.LocalizedMessage;
 import com.puppycrawl.tools.checkstyle.api.MessageDispatcher;
 import com.puppycrawl.tools.checkstyle.api.SeverityLevel;
 import com.puppycrawl.tools.checkstyle.api.SeverityLevelCounter;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-import java.util.SortedSet;
 
 /**
  * This class provides the functionality to check a set of files.
@@ -69,7 +70,7 @@ public class Checker extends AutomaticBean implements MessageDispatcher {
     private final List<FileSetCheck> fileSetChecks = Lists.newArrayList();
 
     /** class loader to resolve classes with. **/
-    private ClassLoader loader = Thread.currentThread()
+    private ClassLoader classLoader = Thread.currentThread()
             .getContextClassLoader();
 
     /** the basedir to strip off in filenames */
@@ -93,7 +94,7 @@ public class Checker extends AutomaticBean implements MessageDispatcher {
     private final FilterSet filters = new FilterSet();
 
     /** the file extensions that are accepted */
-    private String[] fileExtensions = {};
+    private String[] fileExtensions = ArrayUtils.EMPTY_STRING_ARRAY;
 
     /**
      * The severity level of any violations found by submodules.
@@ -111,12 +112,10 @@ public class Checker extends AutomaticBean implements MessageDispatcher {
     private String charset = System.getProperty("file.encoding", "UTF-8");
 
     /**
-     * Creates a new <code>Checker</code> instance.
+     * Creates a new {@code Checker} instance.
      * The instance needs to be contextualized and configured.
-     *
-     * @throws CheckstyleException if an error occurs
      */
-    public Checker() throws CheckstyleException {
+    public Checker() {
         addListener(counter);
     }
 
@@ -141,7 +140,7 @@ public class Checker extends AutomaticBean implements MessageDispatcher {
 
         final DefaultContext context = new DefaultContext();
         context.add("charset", charset);
-        context.add("classLoader", loader);
+        context.add("classLoader", classLoader);
         context.add("moduleFactory", moduleFactory);
         context.add("severity", severityLevel.getName());
         context.add("basedir", basedir);
@@ -161,6 +160,7 @@ public class Checker extends AutomaticBean implements MessageDispatcher {
             }
             if (child instanceof FileSetCheck) {
                 final FileSetCheck fsc = (FileSetCheck) child;
+                fsc.init();
                 addFileSetCheck(fsc);
             }
             else if (child instanceof Filter) {
@@ -246,31 +246,25 @@ public class Checker extends AutomaticBean implements MessageDispatcher {
         }
 
         // Process each file
-        for (final File f : files) {
-            if (!Utils.fileExtensionMatches(f, fileExtensions)) {
+        for (final File file : files) {
+            if (!Utils.fileExtensionMatches(file, fileExtensions)) {
                 continue;
             }
-            final String fileName = f.getAbsolutePath();
+            final String fileName = file.getAbsolutePath();
             fireFileStarted(fileName);
             final SortedSet<LocalizedMessage> fileMessages = Sets.newTreeSet();
             try {
-                final FileText theText = new FileText(f.getAbsoluteFile(),
+                final FileText theText = new FileText(file.getAbsoluteFile(),
                         charset);
                 for (final FileSetCheck fsc : fileSetChecks) {
-                    fileMessages.addAll(fsc.process(f, theText));
+                    fileMessages.addAll(fsc.process(file, theText));
                 }
-            }
-            catch (final FileNotFoundException fnfe) {
-                LOG.debug("FileNotFoundException occured.", fnfe);
-                fileMessages.add(new LocalizedMessage(0,
-                        Definitions.CHECKSTYLE_BUNDLE, "general.fileNotFound", null,
-                        null, this.getClass(), null));
             }
             catch (final IOException ioe) {
                 LOG.debug("IOException occured.", ioe);
                 fileMessages.add(new LocalizedMessage(0,
                         Definitions.CHECKSTYLE_BUNDLE, "general.exception",
-                        new String[] {ioe.getMessage()}, null, this.getClass(),
+                        new String[] {ioe.getMessage()}, null, getClass(),
                         null));
             }
             fireErrors(fileName, fileMessages);
@@ -408,7 +402,7 @@ public class Checker extends AutomaticBean implements MessageDispatcher {
 
     /**
      * Sets the severity level.  The string should be one of the names
-     * defined in the <code>SeverityLevel</code> class.
+     * defined in the {@code SeverityLevel} class.
      *
      * @param severity  The new severity level
      * @see SeverityLevel
@@ -422,10 +416,10 @@ public class Checker extends AutomaticBean implements MessageDispatcher {
      * Some Check implementations will use that classloader to improve the
      * quality of their reports, e.g. to load a class and then analyze it via
      * reflection.
-     * @param loader the new classloader
+     * @param classLoader the new classloader
      */
-    public final void setClassLoader(ClassLoader loader) {
-        this.loader = loader;
+    public final void setClassLoader(ClassLoader classLoader) {
+        this.classLoader = classLoader;
     }
 
     /**
@@ -438,7 +432,7 @@ public class Checker extends AutomaticBean implements MessageDispatcher {
      */
     @Deprecated
     public final void setClassloader(ClassLoader loader) {
-        setClassLoader(loader);
+        classLoader = loader;
     }
 
     /**

@@ -19,6 +19,8 @@
 
 package com.puppycrawl.tools.checkstyle.checks.design;
 
+import static com.puppycrawl.tools.checkstyle.checks.design.OneTopLevelClassCheck.MSG_KEY;
+
 import java.io.File;
 
 import org.junit.Assert;
@@ -26,8 +28,6 @@ import org.junit.Test;
 
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
-
-import static com.puppycrawl.tools.checkstyle.checks.design.OneTopLevelClassCheck.MSG_KEY;
 
 public class OneTopLevelClassCheckTest extends BaseCheckTestSupport {
 
@@ -106,6 +106,7 @@ public class OneTopLevelClassCheckTest extends BaseCheckTestSupport {
             "58: " + getCheckMessage(MSG_KEY, "CloneWithTypeArgumentsAndNoSuper"),
             "67: " + getCheckMessage(MSG_KEY, "MyClassWithGenericSuperMethod"),
             "84: " + getCheckMessage(MSG_KEY, "AnotherClass"),
+            "97: " + getCheckMessage(MSG_KEY, "NativeTest"),
         };
         verify(checkConfig, getPath("coding" + File.separator + "InputClone.java"), expected);
     }
@@ -125,6 +126,6 @@ public class OneTopLevelClassCheckTest extends BaseCheckTestSupport {
         final DefaultConfiguration checkConfig = createCheckConfig(OneTopLevelClassCheck.class);
         final String[] expected = {
         };
-        verify(checkConfig, getPath("design" + File.separator + "package-info.java"), expected);;
+        verify(checkConfig, getPath("design" + File.separator + "package-info.java"), expected);
     }
 }

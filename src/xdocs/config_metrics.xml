@@ -11,12 +11,20 @@
 
   <head>
     <title>Metrics</title>
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-    <script type="text/javascript" src="js/anchors.js"></script>
-    <script type="text/javascript" src="js/google-analytics.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"/>
+    <script type="text/javascript" src="js/anchors.js"/>
+    <script type="text/javascript" src="js/google-analytics.js"/>
+    <link rel="icon" href="images/favicon.png" type="image/x-icon" />
+    <link rel="shortcut icon" href="images/favicon.ico" type="image/ico" />
   </head>
 
   <body>
+    <section name="Content">
+      <macro name="toc">
+        <param name="fromDepth" value="1"/>
+        <param name="toDepth" value="1"/>
+      </macro>
+    </section>
 
     <section name="BooleanExpressionComplexity">
       <subsection name="Description">
@@ -34,7 +42,7 @@
         <p>
           Note that the operators <code>&#x26;</code> and
           <code>|</code> are not only integer bitwise operators, they are also the
-          <a href="http://java.sun.com/docs/books/jls/third_edition/html/expressions.html#15.22.2">
+          <a href="http://docs.oracle.com/javase/specs/jls/se8/html/jls-15.html#jls-15.22.2">
           non-shortcut versions</a> of the boolean operators.
           <code>&#x26;&#x26;</code> and <code>||</code>.
         </p>
@@ -286,14 +294,30 @@
     <section name="CyclomaticComplexity">
       <subsection name="Description">
         <p>
-          Checks cyclomatic complexity against a specified limit. The
-          complexity is measured by the number of <code>if</code>, <code>while</code>, <code>do</code>, <code>for</code>, <code>?:</code>, <code>catch</code>, <code>switch</code>, <code>case</code>
-          statements, and operators <code>&#x26;&#x26;</code> and <code>||</code> (plus one) in the body of a
-          constructor, method, static initializer, or instance
-          initializer.  It is a measure of the minimum number of
-          possible paths through the source and therefore the number of
-          required tests. Generally 1-4 is considered good, 5-7 OK, 8-10
-          consider re-factoring, and 11+ re-factor now!
+          Checks cyclomatic complexity against a specified limit.
+            It is a measure of the minimum number of
+            possible paths through the source and therefore the number of
+            required tests, it is not a about quality of code!
+          It is only applied to methods, c-tors,
+          <a href="https://docs.oracle.com/javase/tutorial/java/javaOO/initial.html">static initializers and instance initializers</a>.
+          <br/>
+          The complexity is equal to the number of decision points <code> + 1</code>
+          Decision points: <code>if</code>, <code>while</code>
+          , <code>do</code>, <code>for</code>, <code>?:</code>, <code>catch</code>
+          , <code>switch</code>, <code>case</code>
+          statements, and operators <code>&#x26;&#x26;</code> and <code>||</code>
+          in the body of target.
+
+          <br/>By pure theory level 1-4 is considered easy to test, 5-7 OK, 8-10
+          consider re-factoring to ease testing, and 11+ re-factor now as testing will be painful.
+
+            <br/>When it comes to code quality measurement by this metric
+            level 10 is very good level as a ultimate target (that is hard to archive).
+            Do not be ashamed to have complexity level 15 or even higher,
+            but keep it below 20 to catch really bad designed code automatically.
+            <br/>Please use Suppression to avoid violations on cases that could not be split in few
+            methods without damanging readability of code or incapsulation.
+            <br/>
         </p>
       </subsection>
 
@@ -323,13 +347,59 @@
         </source>
 
         <p>
-          To configure the check with a threshold of 7:
+          To configure the check with a threshold of 15:
         </p>
         <source>
 &lt;module name=&quot;CyclomaticComplexity&quot;&gt;
-    &lt;property name=&quot;max&quot; value=&quot;7&quot;/&gt;
+    &lt;property name=&quot;max&quot; value=&quot;15&quot;/&gt;
 &lt;/module&gt;
         </source>
+        <p>
+          Explanation on how complexity is calculated:
+        </p>
+        <source>
+class CC {
+   // Cyclomatic Complexity = 13
+   public void doSmth()  {               // 1
+       if (a == b)  {                    // 2
+            if (a1 == b1                 // 3
+                &amp;&amp; c1 == d1) {   // 4
+               fiddle();
+            }
+            else if (a2 == b2            // 5
+                      || c1 &lt; d1) {   // 6
+                fiddle();
+            }
+            else {
+                fiddle();
+            }
+       }
+        else if (c == d) {               // 7
+            while (c == d) {             // 8
+                fiddle();
+            }
+        }
+         else if (e == f) {
+            for (n = 0; n &lt; h         // 9
+                    || n &lt; 6; n++) {  // 10
+                fiddle();
+            }
+        }
+        else {
+            switch (z) {
+              case 1:                    // 11
+                    fiddle();
+                    break;
+              case 2:                    // 12
+                    fiddle();
+                    break;
+              default:                   // 13
+                    fiddle();
+                    break;
+            }
+        }
+    }
+}        </source>
       </subsection>
 
       <subsection name="Package">
@@ -352,13 +422,67 @@
           paths through a function. It takes into account the nesting of
           conditional statements and multi-part boolean expressions
           (e.g., A &amp;&amp; B, C || D, etc.).
+          <br/>
+          The NPATH metric was designed base on Cyclomatic complexity to
+          avoid problem of Cyclomatic complexity metric like nesting level within a function.
+        </p>
+        <p>
+          Metic wsa described at <a href="http://dl.acm.org/citation.cfm?id=42379">"NPATH: a measure of execution pathcomplexity and its applications"</a>. If you need detaled description of algorithm, please read that article,
+          it is well written and have number of examples and details.
         </p>
 
+        <p>Here is some quotes:</p>
+
+        <blockquote>An NPATH threshold value of 200 has been established
+          for a function. The value 200 is based on studies done
+          at AT&amp;T Bell Laboratories [1988 year].
+        </blockquote>
+
+        <blockquote>
+        Some of the most effective methods of reducing the NPATH value include<br/>
+        - distributing functionality,<br/>
+        - implementing multiple if statements as a switch statement<br/>
+        - creating a separate function for logical expressions with a high count of and (&amp;&amp;) and or (||) operators.
+        </blockquote>
+
+        <blockquote>
+        Although strategies to reduce the NPATH complexity
+        of functions are important, care must be taken not to
+        distort the logical clarity of the software by applying a
+        strategy to reduce the complexity of functions. That is,
+        there is a point of diminishing return beyond which a
+        further attempt at reduction of complexity distorts the
+        logical clarity of the system structure.
+        </blockquote>
+
+        <table>
+        <thead><tr><th>Structure</th><th> Complexity expression </th></tr></thead>
+        <tr><td>if</td><td>NP((if-range))+NP((expr))+1</td></tr>
+        <tr><td>if-else</td><td>NP((if-range))+NP((else-range))+NP((expr))</td></tr>
+        <tr><td>while</td><td>NP((while-range))+NP((expr))+1</td></tr>
+        <tr><td>do while</td><td>NP((do-range))+NP((expr))+1</td></tr>
+        <tr><td>for</td><td>NP((for-range))+NP((exprl))+NP((expr2))+NP((expr3))+1</td></tr>
+        <tr><td>switch</td><td>NP((expr))+ S(i=1:i=n)NP((case-range(i)))+ NP((default-range))</td></tr>
+        <tr><td>?</td><td>NP((exprl))+NP((expr2))+NP((expr3))+2</td></tr>
+        <tr><td>goto label</td><td>1</td></tr>
+        <tr><td>break</td><td>1</td></tr>
+        <tr><td>Expressions</td><td>Number of &amp;&amp; and || operators in expression</td></tr>
+        <tr><td>continue</td><td>1</td></tr>
+        <tr><td>return</td><td>1</td></tr>
+        <tr><td>sequential</td><td>1</td></tr>
+        <tr><td>Function call</td><td>1</td></tr>
+        <tr><td>C function</td><td>P(i=1:i=N) NP(Statement(i))</td></tr>
+        </table>
+
         <p>
-          Rationale: Nejmeh says that his group had an informal NPATH
+          <b>Rationale:</b> Nejmeh says that his group had an informal NPATH
           limit of 200 on individual routines; functions that exceeded
           this value were candidates for further decomposition - or at
           least a closer look.
+          <b>Please do not be fanatic with limit 200</b>
+          - choose number that suites your project style. Limit 200 is
+          empirical number base on some sources of at AT&amp;T Bell Laboratories
+          of 1988 year.
         </p>
       </subsection>
 
@@ -388,11 +512,11 @@
         </source>
 
         <p>
-          To configure the check with a threshold of 20:
+          To configure the check with a threshold of 1000:
         </p>
         <source>
 &lt;module name=&quot;NPathComplexity&quot;&gt;
-    &lt;property name=&quot;max&quot; value=&quot;20&quot;/&gt;
+    &lt;property name=&quot;max&quot; value=&quot;1000&quot;/&gt;
 &lt;/module&gt;
         </source>
       </subsection>

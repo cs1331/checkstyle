@@ -19,19 +19,19 @@
 
 package com.puppycrawl.tools.checkstyle.checks;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-import com.puppycrawl.tools.checkstyle.api.Check;
-import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-
-import org.apache.commons.beanutils.ConversionException;
-
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
+import org.apache.commons.beanutils.ConversionException;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+import com.puppycrawl.tools.checkstyle.api.Check;
+import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
 /**
  * Maintains a set of check suppressions from {@link SuppressWarnings}
@@ -40,6 +40,13 @@ import java.util.Map;
  */
 public class SuppressWarningsHolder
     extends Check {
+
+    /**
+     * A key is pointing to the warning message text in "messages.properties"
+     * file.
+     */
+    public static final String MSG_KEY = "suppress.warnings.invalid.target";
+
     /**
      * Optional prefix for warning suppressions that are only intended to be
      * recognized by checkstyle. For instance, to suppress {@code
@@ -63,62 +70,6 @@ public class SuppressWarningsHolder
      * file parsed
      */
     private static final ThreadLocal<List<Entry>> ENTRIES = new ThreadLocal<>();
-
-    /** records a particular suppression for a region of a file */
-    private static class Entry {
-        /** the source name of the suppressed check */
-        private final String checkName;
-        /** the suppression region for the check - first line */
-        private final int firstLine;
-        /** the suppression region for the check - first column */
-        private final int firstColumn;
-        /** the suppression region for the check - last line */
-        private final int lastLine;
-        /** the suppression region for the check - last column */
-        private final int lastColumn;
-
-        /**
-         * Constructs a new suppression region entry.
-         * @param checkName the source name of the suppressed check
-         * @param firstLine the first line of the suppression region
-         * @param firstColumn the first column of the suppression region
-         * @param lastLine the last line of the suppression region
-         * @param lastColumn the last column of the suppression region
-         */
-        public Entry(String checkName, int firstLine, int firstColumn,
-            int lastLine, int lastColumn) {
-            this.checkName = checkName;
-            this.firstLine = firstLine;
-            this.firstColumn = firstColumn;
-            this.lastLine = lastLine;
-            this.lastColumn = lastColumn;
-        }
-
-        /** @return the source name of the suppressed check */
-        public String getCheckName() {
-            return checkName;
-        }
-
-        /** @return the first line of the suppression region */
-        public int getFirstLine() {
-            return firstLine;
-        }
-
-        /** @return the first column of the suppression region */
-        public int getFirstColumn() {
-            return firstColumn;
-        }
-
-        /** @return the last line of the suppression region */
-        public int getLastLine() {
-            return lastLine;
-        }
-
-        /** @return the last column of the suppression region */
-        public int getLastColumn() {
-            return lastColumn;
-        }
-    }
 
     /**
      * Returns the default alias for the source name of a check, which is the
@@ -177,7 +128,7 @@ public class SuppressWarningsHolder
                 registerAlias(sourceAlias.substring(0, index), sourceAlias
                     .substring(index + 1));
             }
-            else if (sourceAlias.length() > 0) {
+            else if (!sourceAlias.isEmpty()) {
                 throw new ConversionException(
                     "'=' expected in alias list item: " + sourceAlias);
             }
@@ -235,44 +186,15 @@ public class SuppressWarningsHolder
         }
         if ("SuppressWarnings".equals(identifier)) {
 
-            // get values of annotation
-            List<String> values = null;
-            final DetailAST lparenAST = ast.findFirstToken(TokenTypes.LPAREN);
-            if (lparenAST != null) {
-                final DetailAST nextAST = lparenAST.getNextSibling();
-                if (nextAST != null) {
-                    final int nextType = nextAST.getType();
-                    switch (nextType) {
-                        case TokenTypes.EXPR:
-                        case TokenTypes.ANNOTATION_ARRAY_INIT:
-                            values = getAnnotationValues(nextAST);
-                            break;
-
-                        case TokenTypes.ANNOTATION_MEMBER_VALUE_PAIR:
-                            // expected children: IDENT ASSIGN ( EXPR |
-                            // ANNOTATION_ARRAY_INIT )
-                            values = getAnnotationValues(getNthChild(nextAST, 2));
-                            break;
-
-                        case TokenTypes.RPAREN:
-                            // no value present (not valid Java)
-                            break;
-
-                        default:
-                            // unknown annotation value type (new syntax?)
-                    }
-                }
-            }
-            if (values == null) {
-                log(ast, "suppress.warnings.missing.value");
+            final List<String> values = getAllAnnotationValues(ast);
+            if (isAnnotationEmpty(values)) {
                 return;
             }
 
             final DetailAST targetAST = getAnnotationTarget(ast);
 
-
             if (targetAST == null) {
-                log(ast, "suppress.warnings.invalid.target");
+                log(ast.getLineNo(), MSG_KEY);
                 return;
             }
 
@@ -295,11 +217,12 @@ public class SuppressWarningsHolder
             final List<Entry> entries = ENTRIES.get();
             if (entries != null) {
                 for (String value : values) {
+                    String checkName = value;
                     // strip off the checkstyle-only prefix if present
                     if (value.startsWith(CHECKSTYLE_PREFIX)) {
-                        value = value.substring(CHECKSTYLE_PREFIX.length());
+                        checkName = checkName.substring(CHECKSTYLE_PREFIX.length());
                     }
-                    entries.add(new Entry(value, firstLine, firstColumn,
+                    entries.add(new Entry(checkName, firstLine, firstColumn,
                         lastLine, lastColumn));
                 }
             }
@@ -307,11 +230,56 @@ public class SuppressWarningsHolder
     }
 
     /**
+     * get all annotation values
+     * @param ast annotation token
+     * @return list values
+     */
+    private static List<String> getAllAnnotationValues(DetailAST ast) {
+        // get values of annotation
+        List<String> values = null;
+        final DetailAST lparenAST = ast.findFirstToken(TokenTypes.LPAREN);
+        if (lparenAST != null) {
+            final DetailAST nextAST = lparenAST.getNextSibling();
+            if (nextAST != null) {
+                final int nextType = nextAST.getType();
+                switch (nextType) {
+                    case TokenTypes.EXPR:
+                    case TokenTypes.ANNOTATION_ARRAY_INIT:
+                        values = getAnnotationValues(nextAST);
+                        break;
+
+                    case TokenTypes.ANNOTATION_MEMBER_VALUE_PAIR:
+                        // expected children: IDENT ASSIGN ( EXPR |
+                        // ANNOTATION_ARRAY_INIT )
+                        values = getAnnotationValues(getNthChild(nextAST, 2));
+                        break;
+
+                    case TokenTypes.RPAREN:
+                        // no value present (not valid Java)
+                        break;
+
+                    default:
+                        // unknown annotation value type (new syntax?)
+                }
+            }
+        }
+        return values;
+    }
+
+    /**
+     * @param values list of values in the annotation
+     * @return whether annotation is empty or contains some values
+     */
+    private static boolean isAnnotationEmpty(List<String> values) {
+        return values == null;
+    }
+
+    /**
      * get target of annotation
      * @param ast the AST node to get the child of
      * @return get target of annotation
      */
-    private DetailAST getAnnotationTarget(DetailAST ast) {
+    private static DetailAST getAnnotationTarget(DetailAST ast) {
         DetailAST targetAST = null;
         DetailAST parentAST = ast.getParent();
         if (parentAST != null) {
@@ -331,6 +299,13 @@ public class SuppressWarningsHolder
                             case TokenTypes.METHOD_DEF:
                             case TokenTypes.PARAMETER_DEF:
                             case TokenTypes.VARIABLE_DEF:
+                            case TokenTypes.ANNOTATION_FIELD_DEF:
+                            case TokenTypes.TYPE:
+                            case TokenTypes.LITERAL_NEW:
+                            case TokenTypes.LITERAL_THROWS:
+                            case TokenTypes.TYPE_ARGUMENT:
+                            case TokenTypes.IMPLEMENTS_CLAUSE:
+                            case TokenTypes.DOT:
                                 targetAST = parentAST;
                                 break;
 
@@ -436,5 +411,61 @@ public class SuppressWarningsHolder
         }
         throw new IllegalArgumentException(
             "Expression or annotation array initializer AST expected: " + ast);
+    }
+
+    /** records a particular suppression for a region of a file */
+    private static class Entry {
+        /** the source name of the suppressed check */
+        private final String checkName;
+        /** the suppression region for the check - first line */
+        private final int firstLine;
+        /** the suppression region for the check - first column */
+        private final int firstColumn;
+        /** the suppression region for the check - last line */
+        private final int lastLine;
+        /** the suppression region for the check - last column */
+        private final int lastColumn;
+
+        /**
+         * Constructs a new suppression region entry.
+         * @param checkName the source name of the suppressed check
+         * @param firstLine the first line of the suppression region
+         * @param firstColumn the first column of the suppression region
+         * @param lastLine the last line of the suppression region
+         * @param lastColumn the last column of the suppression region
+         */
+        public Entry(String checkName, int firstLine, int firstColumn,
+            int lastLine, int lastColumn) {
+            this.checkName = checkName;
+            this.firstLine = firstLine;
+            this.firstColumn = firstColumn;
+            this.lastLine = lastLine;
+            this.lastColumn = lastColumn;
+        }
+
+        /** @return the source name of the suppressed check */
+        public String getCheckName() {
+            return checkName;
+        }
+
+        /** @return the first line of the suppression region */
+        public int getFirstLine() {
+            return firstLine;
+        }
+
+        /** @return the first column of the suppression region */
+        public int getFirstColumn() {
+            return firstColumn;
+        }
+
+        /** @return the last line of the suppression region */
+        public int getLastLine() {
+            return lastLine;
+        }
+
+        /** @return the last column of the suppression region */
+        public int getLastColumn() {
+            return lastColumn;
+        }
     }
 }

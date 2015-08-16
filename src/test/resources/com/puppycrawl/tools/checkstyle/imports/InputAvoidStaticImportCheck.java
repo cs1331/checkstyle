@@ -26,6 +26,8 @@ import static javax.swing.WindowConstants.*;
 import static javax.swing.WindowConstants.*;
 import static java.io.File.createTempFile;
 import static java.io.File.pathSeparator;
+import static com.puppycrawl.tools.checkstyle.imports.InputAvoidStaticImportNestedClass.InnerClass;
+import static com.puppycrawl.tools.checkstyle.imports.InputAvoidStaticImportNestedClass.InnerClass.one;
 
 import java.awt.Component;
 import java.awt.Graphics2D;
@@ -41,7 +43,7 @@ import com.puppycrawl.tools.checkstyle.BaseFileSetCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.Definitions;
 import com.puppycrawl.tools.checkstyle.Input15Extensions;
 import com.puppycrawl.tools.checkstyle.ConfigurationLoaderTest;
-import com.puppycrawl.tools.checkstyle.CheckStyleTask;
+import com.puppycrawl.tools.checkstyle.PackageNamesLoader;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.DefaultLogger;
 

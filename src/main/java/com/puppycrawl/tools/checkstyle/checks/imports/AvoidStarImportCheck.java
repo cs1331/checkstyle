@@ -20,6 +20,7 @@
 package com.puppycrawl.tools.checkstyle.checks.imports;
 
 import java.util.List;
+
 import com.google.common.collect.Lists;
 import com.puppycrawl.tools.checkstyle.api.Check;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
@@ -90,6 +91,20 @@ public class AvoidStarImportCheck
         return new int[] {TokenTypes.IMPORT, TokenTypes.STATIC_IMPORT};
     }
 
+    @Override
+    public int[] getRequiredTokens() {
+        // original implementation checks both IMPORT and STATIC_IMPORT tokens to avoid ".*" imports
+        // however user can allow using "import" or "import static"
+        // by configuring allowClassImports and allowStaticMemberImports
+        // To avoid potential confusion when user specifies conflicting options on configuration
+        // (see example below) we are adding both tokens to Required list
+        //   <module name="AvoidStarImport">
+        //      <property name="tokens" value="IMPORT"/>
+        //      <property name="allowStaticMemberImports" value="false"/>
+        //   </module>
+        return new int[] {TokenTypes.IMPORT, TokenTypes.STATIC_IMPORT};
+    }
+
     /**
      * Sets the list of packages or classes to be exempt from the check.
      * The excludes can contain a .* or not.
@@ -121,12 +136,12 @@ public class AvoidStarImportCheck
 
     @Override
     public void visitToken(final DetailAST ast) {
-        if (!allowClassImports && TokenTypes.IMPORT == ast.getType()) {
+        if (!allowClassImports && ast.getType() == TokenTypes.IMPORT) {
             final DetailAST startingDot = ast.getFirstChild();
             logsStarredImportViolation(startingDot);
         }
         else if (!allowStaticMemberImports
-            && TokenTypes.STATIC_IMPORT == ast.getType()) {
+            && ast.getType() == TokenTypes.STATIC_IMPORT) {
             // must navigate past the static keyword
             final DetailAST startingDot = ast.getFirstChild().getNextSibling();
             logsStarredImportViolation(startingDot);
@@ -140,17 +155,10 @@ public class AvoidStarImportCheck
      */
     private void logsStarredImportViolation(DetailAST startingDot) {
         final FullIdent name = FullIdent.createFullIdent(startingDot);
-        if (isStaredImport(name) && !excludes.contains(name.getText())) {
-            log(startingDot.getLineNo(), MSG_KEY, name.getText());
+        final String importText = name.getText();
+        if (importText.endsWith(".*") && !excludes.contains(importText)) {
+            log(startingDot.getLineNo(), MSG_KEY, importText);
         }
     }
 
-    /**
-     * Checks is an import is a stared import.
-     * @param importIdent the full import identifier
-     * @return true if a start import false if not
-     */
-    private boolean isStaredImport(FullIdent importIdent) {
-        return null != importIdent && importIdent.getText().endsWith(".*");
-    }
 }

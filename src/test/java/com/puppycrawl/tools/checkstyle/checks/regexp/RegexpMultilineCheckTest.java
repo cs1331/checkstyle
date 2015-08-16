@@ -19,18 +19,22 @@
 
 package com.puppycrawl.tools.checkstyle.checks.regexp;
 
-import com.google.common.base.Charsets;
-import com.google.common.io.Files;
-import com.puppycrawl.tools.checkstyle.BaseFileSetCheckTestSupport;
-import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
+import static com.puppycrawl.tools.checkstyle.checks.regexp.MultilineDetector.EMPTY;
+import static com.puppycrawl.tools.checkstyle.checks.regexp.MultilineDetector.REGEXP_EXCEEDED;
+import static com.puppycrawl.tools.checkstyle.checks.regexp.MultilineDetector.REGEXP_MINIMUM;
+import static com.puppycrawl.tools.checkstyle.checks.regexp.MultilineDetector.STACKOVERFLOW;
+
+import java.io.File;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import java.io.File;
-
-import static com.puppycrawl.tools.checkstyle.checks.regexp.MultilineDetector.REGEXP_EXCEEDED;
+import com.google.common.base.Charsets;
+import com.google.common.io.Files;
+import com.puppycrawl.tools.checkstyle.BaseFileSetCheckTestSupport;
+import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 
 public class RegexpMultilineCheckTest extends BaseFileSetCheckTestSupport {
     @Rule public TemporaryFolder temporaryFolder = new TemporaryFolder();
@@ -101,6 +105,7 @@ public class RegexpMultilineCheckTest extends BaseFileSetCheckTestSupport {
     public void testCarriageReturn() throws Exception {
         final String illegal = "\\r";
         checkConfig.addAttribute("format", illegal);
+        checkConfig.addAttribute("maximum", "0");
         final String[] expected = {
             "1: " + getCheckMessage(REGEXP_EXCEEDED, illegal),
             "3: " + getCheckMessage(REGEXP_EXCEEDED, illegal),
@@ -114,9 +119,83 @@ public class RegexpMultilineCheckTest extends BaseFileSetCheckTestSupport {
 
     @Test
     public void testDefaultConfiguration() throws Exception {
-        final DefaultConfiguration checkConfig = createCheckConfig(RegexpMultilineCheck.class);
         final String[] expected = {
         };
         verify(checkConfig, getPath("InputSemantic.java"), expected);
     }
+
+    @Test
+    public void testEmptyFormat() throws Exception {
+        checkConfig.addAttribute("format", null);
+        final String[] expected = {
+            "0: " + getCheckMessage(EMPTY),
+        };
+        verify(checkConfig, getPath("InputSemantic.java"), expected);
+    }
+
+    @Test
+    public void testNoStackOverflowError() throws Exception {
+        // http://madbean.com/2004/mb2004-20/
+        checkConfig.addAttribute("format", "(x|y)*");
+
+        final String[] expected = {
+            "0: " + getCheckMessage(STACKOVERFLOW),
+        };
+
+        final File file = temporaryFolder.newFile();
+        Files.write(makeLargeXYString(), file, Charsets.UTF_8);
+
+        verify(checkConfig, file.getPath(), expected);
+    }
+
+    @Test
+    public void testMinimum() throws Exception {
+        final String illegal = "\\r";
+        checkConfig.addAttribute("format", illegal);
+        checkConfig.addAttribute("minimum", "5");
+        final String[] expected = {
+            "0: " + getCheckMessage(REGEXP_MINIMUM, "5", illegal),
+        };
+
+        final File file = temporaryFolder.newFile();
+        Files.write("", file, Charsets.UTF_8);
+
+        verify(checkConfig, file.getPath(), expected);
+    }
+
+    private static CharSequence makeLargeXYString() {
+        // now needs 10'000 or 100'000, as just 1000 is no longer enough today to provoke the StackOverflowError
+        final int size = 100000;
+        StringBuffer largeString = new StringBuffer(size);
+        for (int i = 0; i < size / 2; i++) {
+            largeString.append("xy");
+        }
+        return largeString;
+    }
+
+    @Test
+    public void testSetMessage() throws Exception {
+        final String illegal = "\\n";
+        checkConfig.addAttribute("format", illegal);
+        checkConfig.addAttribute("minimum", "500");
+        checkConfig.addAttribute("message", "someMessage");
+
+        String[] expected = new String[223];
+        for (int i = 0; i < 223; i++) {
+            expected[i] = i + ": someMessage";
+        }
+
+        verify(checkConfig, getPath("InputSemantic.java"), expected);
+    }
+
+    @Test
+    public void testGoodLimit() throws Exception {
+        final String illegal = "^import";
+        checkConfig.addAttribute("format", illegal);
+        checkConfig.addAttribute("maximum", "5000");
+        final String[] expected = {
+        };
+        verify(checkConfig, getPath("InputSemantic.java"), expected);
+    }
+
 }

@@ -19,11 +19,6 @@
 
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
-import com.google.common.collect.Sets;
-import com.puppycrawl.tools.checkstyle.api.Check;
-import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashSet;
@@ -31,42 +26,72 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.collect.Sets;
+import com.puppycrawl.tools.checkstyle.api.Check;
+import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
 /**
  * <p>
  * Check for ensuring that for loop control variables are not modified
  * inside the for block. An example is:
- * <p>
+ *
  * <pre>
- * <code>
+ * {@code
  * for (int i = 0; i &lt; 1; i++) {
  *     i++;//violation
  * }
- * </code>
+ * }
  * </pre>
- * </p>
+ * <p>
  * Rationale: If the control variable is modified inside the loop
- * body, the program flow becomes more difficult to follow.<br/>
+ * body, the program flow becomes more difficult to follow.<br>
  * See <a href="http://docs.oracle.com/javase/specs/jls/se8/html/jls-14.html#jls-14.14">
  * FOR statement</a> specification for more details.
- * </p>
- * Examples:
- * <p>
+ * <p>Examples:</p>
+ *
  * <pre>
- * &lt;module name=&quot;ModifiedControlVariableCheck&quot;&gt;
+ * &lt;module name=&quot;ModifiedControlVariable&quot;&gt;
  * &lt;/module&gt;
  * </pre>
- * </p>
+ *
  * Such loop would be supressed:
- * <p>
+ *
  * <pre>
- * <code>
- * for(int i=0;i < 10;) {
+ * {@code
+ * for(int i=0; i &lt; 10;) {
  *     i++;
  * }
- * </code>
+ * }
  * </pre>
+ *
+ * <p>
+ * By default, This Check validates
+ *  <a href = "http://docs.oracle.com/javase/specs/jls/se8/html/jls-14.html#jls-14.14.2">
+ * Enhanced For-Loop</a>.
  * </p>
+ * <p>
+ * Option 'skipEnhancedForLoopVariable' could be used to skip check of variable
+ *  from Enhanced For Loop.
+ * </p>
+ * <p>
+ * An example of how to configure the check so that it skips enhanced For Loop Variable is:
+ * </p>
+ * <pre>
+ * &lt;module name="ModifiedControlVariable"&gt;
+ *     &lt;property name="skipEnhancedForLoopVariable" value="true"/&gt;
+ * &lt;/module&gt;
+ * </pre>
+ * <p>Example:</p>
+ *
+ * <pre>
+ * {@code
+ * for (String line: lines) {
+ *     line = line.trim();   // it will skip this violation
+ * }
+ * }
+ * </pre>
+ *
  *
  * @author Daniel Grenner
  * @author <a href="mailto:piotr.listkiewicz@gmail.com">liscju</a>
@@ -92,35 +117,25 @@ public final class ModifiedControlVariableCheck extends Check {
     /** Stack of block parameters. */
     private final Deque<Deque<String>> variableStack = new ArrayDeque<>();
 
+    /** Controls whether to skip enhanced for-loop variable. */
+    private boolean skipEnhancedForLoopVariable;
+
+    /**
+     * Whether to skip enhanced for-loop variable or not.
+     * @param skipEnhancedForLoopVariable whether to skip enhanced for-loop variable
+     */
+    public void setSkipEnhancedForLoopVariable(boolean skipEnhancedForLoopVariable) {
+        this.skipEnhancedForLoopVariable = skipEnhancedForLoopVariable;
+    }
+
     @Override
     public int[] getDefaultTokens() {
-        return new int[] {
-            TokenTypes.OBJBLOCK,
-            TokenTypes.LITERAL_FOR,
-            TokenTypes.FOR_ITERATOR,
-            TokenTypes.FOR_EACH_CLAUSE,
-            TokenTypes.ASSIGN,
-            TokenTypes.PLUS_ASSIGN,
-            TokenTypes.MINUS_ASSIGN,
-            TokenTypes.STAR_ASSIGN,
-            TokenTypes.DIV_ASSIGN,
-            TokenTypes.MOD_ASSIGN,
-            TokenTypes.SR_ASSIGN,
-            TokenTypes.BSR_ASSIGN,
-            TokenTypes.SL_ASSIGN,
-            TokenTypes.BAND_ASSIGN,
-            TokenTypes.BXOR_ASSIGN,
-            TokenTypes.BOR_ASSIGN,
-            TokenTypes.INC,
-            TokenTypes.POST_INC,
-            TokenTypes.DEC,
-            TokenTypes.POST_DEC,
-        };
+        return getAcceptableTokens();
     }
 
     @Override
     public int[] getRequiredTokens() {
-        return getDefaultTokens();
+        return getAcceptableTokens();
     }
 
     @Override
@@ -186,10 +201,9 @@ public final class ModifiedControlVariableCheck extends Check {
                 checkIdent(ast);
                 break;
             default:
-                throw new IllegalStateException(ILLEGAL_TYPE_OF_TOKEN + ast.toString());
+                throw new IllegalStateException(ILLEGAL_TYPE_OF_TOKEN + ast);
         }
     }
-
 
     @Override
     public void leaveToken(DetailAST ast) {
@@ -198,10 +212,15 @@ public final class ModifiedControlVariableCheck extends Check {
                 leaveForIter(ast.getParent());
                 break;
             case TokenTypes.FOR_EACH_CLAUSE:
-                leaveForEach(ast);
+                if (!skipEnhancedForLoopVariable) {
+                    final DetailAST paramDef = ast.findFirstToken(TokenTypes.VARIABLE_DEF);
+                    leaveForEach(paramDef);
+                }
                 break;
             case TokenTypes.LITERAL_FOR:
-                leaveForDef(ast);
+                if (!getCurrentVariables().isEmpty()) {
+                    leaveForDef(ast);
+                }
                 break;
             case TokenTypes.OBJBLOCK:
                 exitBlock();
@@ -225,7 +244,7 @@ public final class ModifiedControlVariableCheck extends Check {
                 //we need that Tokens only at visitToken()
                 break;
             default:
-                throw new IllegalStateException(ILLEGAL_TYPE_OF_TOKEN + ast.toString());
+                throw new IllegalStateException(ILLEGAL_TYPE_OF_TOKEN + ast);
         }
     }
 
@@ -258,8 +277,7 @@ public final class ModifiedControlVariableCheck extends Check {
         if (!getCurrentVariables().isEmpty()) {
             final DetailAST identAST = ast.getFirstChild();
 
-            if (identAST != null
-                && identAST.getType() == TokenTypes.IDENT
+            if (identAST.getType() == TokenTypes.IDENT
                 && getCurrentVariables().contains(identAST.getText())) {
                 log(ast.getLineNo(), ast.getColumnNo(),
                     MSG_KEY, identAST.getText());
@@ -284,7 +302,7 @@ public final class ModifiedControlVariableCheck extends Check {
      * @param ast For Loop
      * @return Set of Variable Name which are managed by for
      */
-    private Set<String> getVariablesManagedByForLoop(DetailAST ast) {
+    private static Set<String> getVariablesManagedByForLoop(DetailAST ast) {
         final Set<String> initializedVariables = getForInitVariables(ast);
         final Set<String> iteratingVariables = getForIteratorVariables(ast);
 
@@ -293,11 +311,9 @@ public final class ModifiedControlVariableCheck extends Check {
 
     /**
      * Push current variables to the stack.
-     * @param forEach a for-each clause
+     * @param paramDef a for-each clause variable
      */
-    private void leaveForEach(DetailAST forEach) {
-        final DetailAST paramDef =
-            forEach.findFirstToken(TokenTypes.VARIABLE_DEF);
+    private void leaveForEach(DetailAST paramDef) {
         final DetailAST paramName = paramDef.findFirstToken(TokenTypes.IDENT);
         getCurrentVariables().push(paramName.getText());
     }
@@ -311,7 +327,6 @@ public final class ModifiedControlVariableCheck extends Check {
         if (forInitAST != null) {
             final Set<String> variablesManagedByForLoop = getVariablesManagedByForLoop(ast);
             popCurrentVariables(variablesManagedByForLoop.size());
-
         }
         else {
             // this is for-each loop, just pop veriables
@@ -335,7 +350,6 @@ public final class ModifiedControlVariableCheck extends Check {
      * @return set of variables initialized in for loop
      */
     private static Set<String> getForInitVariables(DetailAST ast) {
-        assert ast.getType() == TokenTypes.LITERAL_FOR;
         final Set<String> initializedVariables = new HashSet<>();
         final DetailAST forInitAST = ast.findFirstToken(TokenTypes.FOR_INIT);
 

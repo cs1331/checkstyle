@@ -19,9 +19,9 @@
 
 package com.puppycrawl.tools.checkstyle.checks.sizes;
 
+import com.puppycrawl.tools.checkstyle.api.Check;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.api.Check;
 
 /**
  * Checks for the number of defined types at the "outer" level.
@@ -69,7 +69,7 @@ public class OuterTypeNumberCheck extends Check {
 
     @Override
     public void visitToken(DetailAST ast) {
-        if (0 == currentDepth) {
+        if (currentDepth == 0) {
             outerNum++;
         }
         currentDepth++;

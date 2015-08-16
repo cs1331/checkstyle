@@ -19,10 +19,10 @@
 
 package com.puppycrawl.tools.checkstyle.checks.imports;
 
-import com.google.common.collect.Lists;
-
 import java.util.Deque;
 import java.util.List;
+
+import com.google.common.collect.Lists;
 
 /**
  * Represents the a tree of guards for controlling whether packages are allowed
@@ -46,7 +46,6 @@ class PkgControl {
      * @param pkgName the name of the package.
      */
     PkgControl(final String pkgName) {
-        assert pkgName != null;
         parent = null;
         fullPackage = pkgName;
     }
@@ -57,8 +56,6 @@ class PkgControl {
      * @param subPkg the sub package name.
      */
     PkgControl(final PkgControl parent, final String subPkg) {
-        assert parent != null;
-        assert subPkg != null;
         this.parent = parent;
         fullPackage = parent.getFullPackage() + "." + subPkg;
         parent.children.add(this);
@@ -119,7 +116,7 @@ class PkgControl {
         if (retVal != AccessResult.UNKNOWN) {
             return retVal;
         }
-        else if (parent == null) {
+        if (parent == null) {
             // we are the top, so default to not allowed.
             return AccessResult.DISALLOWED;
         }

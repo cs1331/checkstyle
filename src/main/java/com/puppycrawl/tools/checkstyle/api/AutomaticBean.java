@@ -19,12 +19,12 @@
 
 package com.puppycrawl.tools.checkstyle.api;
 
-import com.google.common.collect.Lists;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.List;
 import java.util.StringTokenizer;
+
 import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.beanutils.ConversionException;
 import org.apache.commons.beanutils.ConvertUtilsBean;
@@ -41,6 +41,8 @@ import org.apache.commons.beanutils.converters.IntegerConverter;
 import org.apache.commons.beanutils.converters.LongConverter;
 import org.apache.commons.beanutils.converters.ShortConverter;
 
+import com.google.common.collect.Lists;
+
 /**
  * A Java Bean that implements the component lifecycle interfaces by
  * calling the bean's setters for all configuration attributes.
@@ -50,7 +52,6 @@ public class AutomaticBean
     implements Configurable, Contextualizable {
     /** the configuration of this bean */
     private Configuration configuration;
-
 
     /**
      * Creates a BeanUtilsBean that is configured to use
@@ -112,100 +113,94 @@ public class AutomaticBean
      * is called to allow completion of the bean's local setup,
      * after that the method {@link #setupChild setupChild}
      * is called for each {@link Configuration#getChildren child Configuration}
-     * of <code>configuration</code>.
+     * of {@code configuration}.
      *
-     * @param configuration {@inheritDoc}
+     * @param config {@inheritDoc}
      * @throws CheckstyleException {@inheritDoc}
      * @see Configurable
      */
     @Override
-    public final void configure(Configuration configuration)
+    public final void configure(Configuration config)
         throws CheckstyleException {
-        this.configuration = configuration;
+        this.configuration = config;
 
-        final BeanUtilsBean beanUtils = createBeanUtilsBean();
-
-        final String[] attributes = configuration.getAttributeNames();
+        final String[] attributes = config.getAttributeNames();
 
         for (final String key : attributes) {
-            final String value = configuration.getAttribute(key);
+            final String value = config.getAttribute(key);
 
-            try {
-                // BeanUtilsBean.copyProperties silently ignores missing setters
-                // for key, so we have to go through great lengths here to
-                // figure out if the bean property really exists.
-                final PropertyDescriptor pd =
-                    PropertyUtils.getPropertyDescriptor(this, key);
-                if (pd == null || pd.getWriteMethod() == null) {
-                    throw new CheckstyleException(
-                        "Property '" + key + "' in module "
-                        + configuration.getName()
-                        + " does not exist, please check the documentation");
-                }
-
-                // finally we can set the bean property
-                beanUtils.copyProperty(this, key, value);
-            }
-            catch (final InvocationTargetException e) {
-                throw new CheckstyleException(
-                    "Cannot set property '" + key + "' in module "
-                    + configuration.getName() + " to '" + value
-                    + "': " + e.getTargetException().getMessage(), e);
-            }
-            catch (final IllegalAccessException | NoSuchMethodException e) {
-                throw new CheckstyleException(
-                    "cannot access " + key + " in "
-                    + this.getClass().getName(), e);
-            }
-            catch (final IllegalArgumentException | ConversionException e) {
-                throw new CheckstyleException(
-                    "illegal value '" + value + "' for property '" + key
-                    + "' of module " + configuration.getName(), e);
-            }
+            tryCopyProperty(config.getName(), key, value, true);
         }
 
         finishLocalSetup();
 
-        final Configuration[] childConfigs = configuration.getChildren();
+        final Configuration[] childConfigs = config.getChildren();
         for (final Configuration childConfig : childConfigs) {
             setupChild(childConfig);
         }
     }
 
     /**
+     * recheck property and try to copy it
+     * @param moduleName name of the module/class
+     * @param key key of value
+     * @param value value
+     * @param recheck whether to check for property existence before copy
+     * @throws CheckstyleException then property defined incorrectly
+     */
+    private void tryCopyProperty(String moduleName, String key, Object value, boolean recheck)
+            throws CheckstyleException {
+
+        final BeanUtilsBean beanUtils = createBeanUtilsBean();
+
+        try {
+            if (recheck) {
+                // BeanUtilsBean.copyProperties silently ignores missing setters
+                // for key, so we have to go through great lengths here to
+                // figure out if the bean property really exists.
+                final PropertyDescriptor pd =
+                        PropertyUtils.getPropertyDescriptor(this, key);
+                if (pd == null) {
+                    throw new CheckstyleException(
+                            "Property '" + key + "' in module "
+                             + moduleName
+                             + " does not exist, please check the documentation");
+                }
+            }
+            // finally we can set the bean property
+            beanUtils.copyProperty(this, key, value);
+        }
+        catch (final InvocationTargetException | IllegalAccessException
+                | NoSuchMethodException e) {
+            // There is no way to catch IllegalAccessException | NoSuchMethodException
+            // as we do PropertyUtils.getPropertyDescriptor before beanUtils.copyProperty
+            // so we have to join these exceptions with InvocationTargetException
+            // to satisfy UTs coverage
+            throw new CheckstyleException(
+                "Cannot set property '" + key + "' to '" + value
+                + "' in module "  + moduleName, e);
+        }
+        catch (final IllegalArgumentException | ConversionException e) {
+            throw new CheckstyleException(
+                "illegal value '" + value + "' for property '" + key
+                + "' of module " + moduleName, e);
+        }
+    }
+
+    /**
      * Implements the Contextualizable interface using bean introspection.
-     * @param context {@inheritDoc}
-     * @throws CheckstyleException {@inheritDoc}
      * @see Contextualizable
      */
     @Override
     public final void contextualize(Context context)
         throws CheckstyleException {
-        final BeanUtilsBean beanUtils = createBeanUtilsBean();
 
         final Collection<String> attributes = context.getAttributeNames();
 
         for (final String key : attributes) {
             final Object value = context.get(key);
 
-            try {
-                beanUtils.copyProperty(this, key, value);
-            }
-            catch (final InvocationTargetException e) {
-                throw new CheckstyleException("cannot set property "
-                    + key + " to value " + value + " in bean "
-                    + this.getClass().getName(), e);
-            }
-            catch (final IllegalAccessException e) {
-                throw new CheckstyleException(
-                    "cannot access " + key + " in "
-                    + this.getClass().getName(), e);
-            }
-            catch (final IllegalArgumentException | ConversionException e) {
-                throw new CheckstyleException(
-                    "illegal value '" + value + "' for property '" + key
-                    + "' of bean " + this.getClass().getName(), e);
-            }
+            tryCopyProperty(getClass().getName(), key, value, false);
         }
     }
 
@@ -226,6 +221,7 @@ public class AutomaticBean
      * @throws CheckstyleException if there is a configuration error.
      */
     protected void finishLocalSetup() throws CheckstyleException {
+        // No code by default, should be overridden only by demand at subclasses
     }
 
     /**
@@ -239,6 +235,7 @@ public class AutomaticBean
      */
     protected void setupChild(Configuration childConf)
         throws CheckstyleException {
+        // No code by default, should be overridden only by demand at subclasses
     }
 
     /**
@@ -247,14 +244,9 @@ public class AutomaticBean
      * with this characters.
      */
     private static class RelaxedStringArrayConverter implements Converter {
-        /** {@inheritDoc} */
+        @SuppressWarnings({"unchecked", "rawtypes"})
         @Override
-        public Object convert(@SuppressWarnings("rawtypes") Class type,
-            Object value) {
-            if (null == type) {
-                throw new ConversionException("Cannot convert from null.");
-            }
-
+        public Object convert(Class type, Object value) {
             // Convert to a String and trim it for the tokenizer.
             final StringTokenizer st = new StringTokenizer(
                 value.toString().trim(), ",");

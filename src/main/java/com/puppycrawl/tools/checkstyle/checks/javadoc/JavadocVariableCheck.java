@@ -19,16 +19,16 @@
 
 package com.puppycrawl.tools.checkstyle.checks.javadoc;
 
+import java.util.regex.Pattern;
+
+import com.puppycrawl.tools.checkstyle.ScopeUtils;
 import com.puppycrawl.tools.checkstyle.Utils;
 import com.puppycrawl.tools.checkstyle.api.Check;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.FileContents;
 import com.puppycrawl.tools.checkstyle.api.Scope;
-import com.puppycrawl.tools.checkstyle.ScopeUtils;
 import com.puppycrawl.tools.checkstyle.api.TextBlock;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-
-import java.util.regex.Pattern;
 
 /**
  * Checks that a variable has Javadoc comment.
@@ -50,9 +50,6 @@ public class JavadocVariableCheck
     /** the visibility scope where Javadoc comments shouldn't be checked **/
     private Scope excludeScope;
 
-    /** the regular expression to ignore variable name */
-    private String ignoreNameRegexp;
-
     /** the pattern to ignore variable name */
     private Pattern ignoreNamePattern;
 
@@ -66,10 +63,10 @@ public class JavadocVariableCheck
 
     /**
      * Set the excludeScope.
-     * @param scope a <code>String</code> value
+     * @param excludeScope a {@code String} value
      */
-    public void setExcludeScope(String scope) {
-        excludeScope = Scope.getInstance(scope);
+    public void setExcludeScope(String excludeScope) {
+        this.excludeScope = Scope.getInstance(excludeScope);
     }
 
     /**
@@ -78,21 +75,7 @@ public class JavadocVariableCheck
      * @throws org.apache.commons.beanutils.ConversionException if unable to create Pattern object.
      */
     public void setIgnoreNamePattern(String regexp) {
-        ignoreNameRegexp = regexp;
-        if (!(regexp == null || regexp.length() == 0)) {
-            ignoreNamePattern = Utils.createPattern(regexp);
-        }
-        else {
-            ignoreNamePattern = null;
-        }
-    }
-
-    /**
-     * Gets the variable names to ignore in the check.
-     * @return true regexp string to define variable names to ignore.
-     */
-    public String getIgnoreNamePattern() {
-        return ignoreNameRegexp;
+        ignoreNamePattern = Utils.createPattern(regexp);
     }
 
     @Override
@@ -145,23 +128,23 @@ public class JavadocVariableCheck
             return false;
         }
 
-        final Scope scope;
+        final Scope customScope;
         if (ast.getType() == TokenTypes.ENUM_CONSTANT_DEF) {
-            scope = Scope.PUBLIC;
+            customScope = Scope.PUBLIC;
         }
         else {
             final DetailAST mods = ast.findFirstToken(TokenTypes.MODIFIERS);
             final Scope declaredScope = ScopeUtils.getScopeFromMods(mods);
-            scope =
+            customScope =
                 ScopeUtils.inInterfaceOrAnnotationBlock(ast)
                     ? Scope.PUBLIC : declaredScope;
         }
 
         final Scope surroundingScope = ScopeUtils.getSurroundingScope(ast);
 
-        return scope.isIn(this.scope) && surroundingScope.isIn(this.scope)
+        return customScope.isIn(scope) && surroundingScope.isIn(scope)
             && (excludeScope == null
-                || !scope.isIn(excludeScope)
+                || !customScope.isIn(excludeScope)
                 || !surroundingScope.isIn(excludeScope));
     }
 }

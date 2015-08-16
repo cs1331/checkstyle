@@ -19,10 +19,11 @@
 
 package com.puppycrawl.tools.checkstyle.checks;
 
+import java.io.File;
+
 import com.puppycrawl.tools.checkstyle.api.Check;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import java.io.File;
 
 /**
  * Checks that the outer type name and the file name match.
@@ -73,7 +74,14 @@ public class OuterTypeFilenameCheck extends Check {
     @Override
     public void visitToken(DetailAST ast) {
         final String outerTypeName = ast.findFirstToken(TokenTypes.IDENT).getText();
-        if (!seenFirstToken) {
+        if (seenFirstToken) {
+            final DetailAST modifiers = ast.findFirstToken(TokenTypes.MODIFIERS);
+            if (modifiers.findFirstToken(TokenTypes.LITERAL_PUBLIC) != null
+                    && ast.getParent() == null) {
+                hasPublic = true;
+            }
+        }
+        else {
 
             if (fileName.equals(outerTypeName)) {
                 validFirst = true;
@@ -82,19 +90,12 @@ public class OuterTypeFilenameCheck extends Check {
                 wrongType = ast;
             }
         }
-        else {
-            final DetailAST modifiers = ast.findFirstToken(TokenTypes.MODIFIERS);
-            if (modifiers.findFirstToken(TokenTypes.LITERAL_PUBLIC) != null
-                    && ast.getParent() == null) {
-                hasPublic = true;
-            }
-        }
         seenFirstToken = true;
     }
 
     @Override
     public void finishTree(DetailAST rootAST) {
-        if (!(validFirst || hasPublic) && wrongType != null) {
+        if (!validFirst && !hasPublic && wrongType != null) {
             log(wrongType.getLineNo(), "type.file.mismatch");
         }
     }

@@ -19,12 +19,11 @@
 
 package com.puppycrawl.tools.checkstyle.checks.sizes;
 
-import com.puppycrawl.tools.checkstyle.api.Check;
-import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import com.puppycrawl.tools.checkstyle.Utils;
 import java.util.regex.Pattern;
 
-import org.apache.commons.beanutils.ConversionException;
+import com.puppycrawl.tools.checkstyle.Utils;
+import com.puppycrawl.tools.checkstyle.api.Check;
+import com.puppycrawl.tools.checkstyle.api.DetailAST;
 
 /**
  * Checks for long lines.
@@ -92,7 +91,7 @@ public class LineLengthCheck extends Check {
     private Pattern ignorePattern;
 
     /**
-     * Creates a new <code>LineLengthCheck</code> instance.
+     * Creates a new {@code LineLengthCheck} instance.
      */
     public LineLengthCheck() {
         setIgnorePattern("^$");
@@ -112,7 +111,6 @@ public class LineLengthCheck extends Check {
             final int realLength = Utils.lengthExpandedTabs(
                 line, line.length(), getTabWidth());
 
-
             if (realLength > max
                 && !ignorePattern.matcher(line).find()) {
                 log(i + 1, MSG_KEY, max, realLength);
@@ -129,11 +127,9 @@ public class LineLengthCheck extends Check {
 
     /**
      * Set the ignore pattern.
-     * @param format a <code>String</code> value
-     * @throws ConversionException if unable to create Pattern object
+     * @param format a {@code String} value
      */
-    public void setIgnorePattern(String format)
-        throws ConversionException {
+    public final void setIgnorePattern(String format) {
         ignorePattern = Utils.createPattern(format);
     }
 }

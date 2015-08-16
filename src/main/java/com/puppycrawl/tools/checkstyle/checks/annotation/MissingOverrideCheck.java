@@ -23,24 +23,24 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.puppycrawl.tools.checkstyle.AnnotationUtility;
+import com.puppycrawl.tools.checkstyle.Utils;
 import com.puppycrawl.tools.checkstyle.api.Check;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.JavadocTagInfo;
 import com.puppycrawl.tools.checkstyle.api.TextBlock;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.Utils;
 
 /**
  * <p>
- * This class is used to verify that the {@link java.lang.Override Override}
+ * This class is used to verify that the {@link Override Override}
  * annotation is present when the inheritDoc javadoc tag is present.
  * </p>
  *
  * <p>
- * Rationale: The {@link java.lang.Override Override} annotation helps
+ * Rationale: The {@link Override Override} annotation helps
  * compiler tools ensure that an override is actually occurring.  It is
  * quite easy to accidentally overload a method or hide a static method
- * and using the {@link java.lang.Override Override} annotation points
+ * and using the {@link Override Override} annotation points
  * out these problems.
  * </p>
  *
@@ -57,10 +57,10 @@ import com.puppycrawl.tools.checkstyle.Utils;
  *
  * <p>
  * As a result of the aforementioned difference between Java 5 and Java 6, a
- * property called <code> javaFiveCompatibility </code> is available. This
+ * property called {@code javaFiveCompatibility } is available. This
  * property will only check classes, interfaces, etc. that do not contain the
  * extends or implements keyword or are not anonymous classes. This means it
- * only checks methods overridden from <code>java.lang.Object</code>
+ * only checks methods overridden from {@code java.lang.Object}
  *
  * <b>Java 5 Compatibility mode severely limits this check. It is recommended to
  * only use it on Java 5 source</b>
@@ -119,43 +119,38 @@ public final class MissingOverrideCheck extends Check {
      * @param compatibility compatibility or not
      */
     public void setJavaFiveCompatibility(final boolean compatibility) {
-        this.javaFiveCompatibility = compatibility;
+        javaFiveCompatibility = compatibility;
     }
 
-    /** {@inheritDoc} */
     @Override
     public int[] getDefaultTokens() {
-        return this.getRequiredTokens();
+        return getRequiredTokens();
     }
 
-    /** {@inheritDoc} */
     @Override
     public int[] getAcceptableTokens() {
-        return this.getRequiredTokens();
+        return getRequiredTokens();
     }
 
-    /** {@inheritDoc} */
     @Override
     public int[] getRequiredTokens() {
         return new int[]
         {TokenTypes.METHOD_DEF, };
     }
 
-    /** {@inheritDoc} */
     @Override
     public void visitToken(final DetailAST ast) {
         final TextBlock javadoc =
-            this.getFileContents().getJavadocBefore(ast.getLineNo());
+            getFileContents().getJavadocBefore(ast.getLineNo());
 
-
-        final boolean containastag = this.containsJavadocTag(javadoc);
+        final boolean containastag = containsJavadocTag(javadoc);
         if (containastag && !JavadocTagInfo.INHERIT_DOC.isValidOn(ast)) {
-            this.log(ast.getLineNo(), MSG_KEY_TAG_NOT_VALID_ON,
+            log(ast.getLineNo(), MSG_KEY_TAG_NOT_VALID_ON,
                 JavadocTagInfo.INHERIT_DOC.getText());
             return;
         }
 
-        if (this.javaFiveCompatibility) {
+        if (javaFiveCompatibility) {
             final DetailAST defOrNew = ast.getParent().getParent();
 
             if (defOrNew.branchContains(TokenTypes.EXTENDS_CLAUSE)
@@ -168,7 +163,7 @@ public final class MissingOverrideCheck extends Check {
         if (containastag
             && !AnnotationUtility.containsAnnotation(ast, OVERRIDE)
             && !AnnotationUtility.containsAnnotation(ast, FQ_OVERRIDE)) {
-            this.log(ast.getLineNo(), MSG_KEY_ANNOTATION_MISSING_OVERRIDE);
+            log(ast.getLineNo(), MSG_KEY_ANNOTATION_MISSING_OVERRIDE);
         }
     }
 
@@ -178,7 +173,7 @@ public final class MissingOverrideCheck extends Check {
      * @param javadoc the javadoc of the AST
      * @return true if contains the tag
      */
-    private boolean containsJavadocTag(final TextBlock javadoc) {
+    private static boolean containsJavadocTag(final TextBlock javadoc) {
         if (javadoc == null) {
             return false;
         }
@@ -187,7 +182,7 @@ public final class MissingOverrideCheck extends Check {
 
         for (final String line : lines) {
             final Matcher matchInheritDoc =
-                MissingOverrideCheck.MATCH_INHERITDOC.matcher(line);
+                MATCH_INHERITDOC.matcher(line);
 
             if (matchInheritDoc.find()) {
                 return true;

@@ -41,9 +41,12 @@ import com.puppycrawl.tools.checkstyle.BaseFileSetCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.Definitions;
 import com.puppycrawl.tools.checkstyle.Input15Extensions;
 import com.puppycrawl.tools.checkstyle.ConfigurationLoaderTest;
-import com.puppycrawl.tools.checkstyle.CheckStyleTask;
+import com.puppycrawl.tools.checkstyle.PackageNamesLoader;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.DefaultLogger;
+
+import static java.lang.Math.PI;
+import static com.puppycrawl.tools.checkstyle.checks.imports.RedundantImportCheck.MSG_SAME;
 
 /**
  * Test case for imports

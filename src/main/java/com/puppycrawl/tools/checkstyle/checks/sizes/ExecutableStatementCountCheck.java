@@ -19,11 +19,12 @@
 
 package com.puppycrawl.tools.checkstyle.checks.sizes;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
+
 import com.puppycrawl.tools.checkstyle.api.Check;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import java.util.ArrayDeque;
-import java.util.Deque;
 
 /**
  * Restricts the number of executable statements to a specified limit
@@ -51,7 +52,7 @@ public final class ExecutableStatementCountCheck
     /** Current method context. */
     private Context context;
 
-    /** Constructs a <code>ExecutableStatementCountCheck</code>. */
+    /** Constructs a {@code ExecutableStatementCountCheck}. */
     public ExecutableStatementCountCheck() {
         setMax(DEFAULT_MAX);
     }
@@ -209,10 +210,10 @@ public final class ExecutableStatementCountCheck
 
         /**
          * Increase count.
-         * @param count the count increment.
+         * @param addition the count increment.
          */
-        public void addCount(int count) {
-            this.count += count;
+        public void addCount(int addition) {
+            this.count += addition;
         }
 
         /**

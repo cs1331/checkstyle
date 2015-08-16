@@ -20,8 +20,8 @@
 package com.puppycrawl.tools.checkstyle.checks.design;
 
 import com.puppycrawl.tools.checkstyle.api.Check;
-import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
 /**
  * Implements Bloch, Effective Java, Item 17 -
@@ -35,7 +35,7 @@ import com.puppycrawl.tools.checkstyle.api.DetailAST;
  *
  * <p>
  * The check can be configured to also disallow marker interfaces like
- * <code>java.io.Serializable</code>, that do not contain methods or
+ * {@code java.io.Serializable}, that do not contain methods or
  * constants at all.
  * </p>
  *

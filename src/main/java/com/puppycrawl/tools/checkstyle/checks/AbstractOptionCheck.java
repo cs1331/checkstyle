@@ -43,12 +43,12 @@ public abstract class AbstractOptionCheck<T extends Enum<T>>
     private T option;
 
     /**
-     * Creates a new <code>AbstractOptionCheck</code> instance.
+     * Creates a new {@code AbstractOptionCheck} instance.
      * @param literalDefault the default option.
      * @param optionClass the class for the option. Required due to a quirk
      *        in the Java language.
      */
-    public AbstractOptionCheck(T literalDefault, Class<T> optionClass) {
+    protected AbstractOptionCheck(T literalDefault, Class<T> optionClass) {
         option = literalDefault;
         this.optionClass = optionClass;
     }
@@ -58,7 +58,7 @@ public abstract class AbstractOptionCheck<T extends Enum<T>>
      * @param optionStr string to decode option from
      * @throws ConversionException if unable to decode
      */
-    public void setOption(String optionStr) throws ConversionException {
+    public void setOption(String optionStr) {
         try {
             option = Enum.valueOf(optionClass, optionStr.trim().toUpperCase(Locale.ENGLISH));
         }
@@ -68,7 +68,7 @@ public abstract class AbstractOptionCheck<T extends Enum<T>>
     }
 
     /**
-     * @return the <code>AbstractOption</code> set
+     * @return the {@code AbstractOption} set
      */
     public T getAbstractOption() {
         // WARNING!! Do not rename this method to getOption(). It breaks

@@ -1,8 +1,14 @@
 #Eclipse project files
+#.classpath till https://issues.apache.org/jira/browse/MECLIPSE-735
+#.project till https://issues.apache.org/jira/browse/MECLIPSE-735
+.settings
+.externalToolBuilders
 .classpath
 .project
-.settings
 
+# Eclipse-CS Checkstyle Plug-In IDE configuration files
+.checkstyle
+ 
 #Netbeans project files
 nbactions.xml
 nb-configuration.xml

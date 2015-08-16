@@ -25,6 +25,9 @@ import java.util.List;
 
 /**
  * Checks the header of the source against a fixed header file.
+ * In default configuration,if header is not specified,
+ * the default value of header is set to null
+ * and the check does not rise any violations.
  *
  * @author Lars Kühne
  */
@@ -50,7 +53,7 @@ public class HeaderCheck extends AbstractHeaderCheck {
 
     /**
      * @param lineNo a line number
-     * @return if <code>lineNo</code> is one of the ignored header lines.
+     * @return if {@code lineNo} is one of the ignored header lines.
      */
     private boolean isIgnoreLine(int lineNo) {
         return Arrays.binarySearch(ignoreLines, lineNo) >= 0;
@@ -73,7 +76,7 @@ public class HeaderCheck extends AbstractHeaderCheck {
      * @param list comma separated list of line numbers to ignore in header.
      */
     public void setIgnoreLines(int... list) {
-        if (list == null || list.length == 0) {
+        if (list.length == 0) {
             ignoreLines = EMPTY_INT_ARRAY;
             return;
         }

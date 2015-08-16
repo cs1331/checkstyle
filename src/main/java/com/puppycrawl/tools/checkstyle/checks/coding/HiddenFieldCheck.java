@@ -19,19 +19,17 @@
 
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
-import com.google.common.base.Objects;
-import com.google.common.collect.Sets;
-import com.puppycrawl.tools.checkstyle.api.Check;
-import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import com.puppycrawl.tools.checkstyle.ScopeUtils;
-import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.Utils;
-
 import java.util.Locale;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import org.apache.commons.beanutils.ConversionException;
+import com.google.common.base.Objects;
+import com.google.common.collect.Sets;
+import com.puppycrawl.tools.checkstyle.ScopeUtils;
+import com.puppycrawl.tools.checkstyle.Utils;
+import com.puppycrawl.tools.checkstyle.api.Check;
+import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
 /**
  * <p>Checks that a local variable or a parameter does not shadow
@@ -106,9 +104,9 @@ import org.apache.commons.beanutils.ConversionException;
  *    &lt;property name="ignoreFormat" value="^test$"/&gt;
  * &lt;/module&gt;
  * </pre>
- * <p>
- * <code>
+ *
  * <pre>
+ * {@code
  * class SomeClass
  * {
  *     private List&lt;String&gt; test;
@@ -124,14 +122,13 @@ import org.apache.commons.beanutils.ConversionException;
  *         ...
  *     }
  * }
+ * }
  * </pre>
- * </code>
- * </p>
+ *
  * @author Dmitri Priimak
  */
 public class HiddenFieldCheck
     extends Check {
-
     /**
      * A key is pointing to the warning message text in "messages.properties"
      * file.
@@ -211,8 +208,8 @@ public class HiddenFieldCheck
     }
 
     /**
-     * Called to process tokens other than {@link TokenTypes.VARIABLE_DEF}
-     * and {@link TokenTypes.PARAMETER_DEF}
+     * Called to process tokens other than {@link TokenTypes#VARIABLE_DEF}
+     * and {@link TokenTypes#PARAMETER_DEF}
      *
      * @param ast token to process
      * @param type type of the token
@@ -284,15 +281,34 @@ public class HiddenFieldCheck
             final DetailAST nameAST = ast.findFirstToken(TokenTypes.IDENT);
             final String name = nameAST.getText();
 
-            if ((currentFrame.containsStaticField(name)
-                || !inStatic(ast) && currentFrame.containsInstanceField(name))
-                && (regexp == null || !getRegexp().matcher(name).find())
+            if (isStaticOrOnstanceField(ast, name)
+                && !isMatchingRegexp(name)
                 && !isIgnoredSetterParam(ast, name)
                 && !isIgnoredConstructorParam(ast)
                 && !isIgnoredParamOfAbstractMethod(ast)) {
                 log(nameAST, MSG_KEY, name);
             }
         }
+    }
+
+    /**
+     * check for static or instance field.
+     * @param ast token
+     * @param name identifier of token
+     * @return true if static or instance field
+     */
+    private boolean isStaticOrOnstanceField(DetailAST ast, String name) {
+        return currentFrame.containsStaticField(name)
+            || !inStatic(ast) && currentFrame.containsInstanceField(name);
+    }
+
+    /**
+     * check name by regExp
+     * @param name string value to check
+     * @return true is regexp is matching
+     */
+    private boolean isMatchingRegexp(String name) {
+        return regexp != null && regexp.matcher(name).find();
     }
 
     /**
@@ -396,8 +412,7 @@ public class HiddenFieldCheck
         // we should not capitalize the first character if the second
         // one is a capital one, since according to JavBeans spec
         // setXYzz() is a setter for XYzz property, not for xYzz one.
-        if (name != null && (name.length() == 1
-                || name.length() > 1 && !Character.isUpperCase(name.charAt(1)))) {
+        if (name.length() == 1 || !Character.isUpperCase(name.charAt(1))) {
             setterName = name.substring(0, 1).toUpperCase(Locale.ENGLISH) + name.substring(1);
         }
         return setterName;
@@ -436,7 +451,7 @@ public class HiddenFieldCheck
             final DetailAST method = ast.getParent().getParent();
             if (method.getType() == TokenTypes.METHOD_DEF) {
                 final DetailAST mods = method.findFirstToken(TokenTypes.MODIFIERS);
-                result = mods != null && mods.branchContains(TokenTypes.ABSTRACT);
+                result = mods.branchContains(TokenTypes.ABSTRACT);
             }
         }
         return result;
@@ -445,10 +460,8 @@ public class HiddenFieldCheck
     /**
      * Set the ignore format to the specified regular expression.
      * @param format a <code>String</code> value
-     * @throws ConversionException if unable to create Pattern object
      */
-    public void setIgnoreFormat(String format)
-        throws ConversionException {
+    public void setIgnoreFormat(String format) {
         regexp = Utils.createPattern(format);
     }
 
@@ -494,11 +507,6 @@ public class HiddenFieldCheck
     public void setIgnoreAbstractMethods(
         boolean ignoreAbstractMethods) {
         this.ignoreAbstractMethods = ignoreAbstractMethods;
-    }
-
-    /** @return the regexp to match against */
-    public Pattern getRegexp() {
-        return regexp;
     }
 
     /**
@@ -566,8 +574,8 @@ public class HiddenFieldCheck
          */
         public boolean containsInstanceField(String field) {
             return instanceFields.contains(field)
-                    || !isStaticType()
-                    && parent != null
+                    || parent != null
+                    && !isStaticType()
                     && parent.containsInstanceField(field);
 
         }
@@ -581,7 +589,6 @@ public class HiddenFieldCheck
             return staticFields.contains(field)
                     || parent != null
                     && parent.containsStaticField(field);
-
         }
 
         /**

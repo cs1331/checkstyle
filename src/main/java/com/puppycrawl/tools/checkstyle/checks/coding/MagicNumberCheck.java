@@ -21,30 +21,32 @@ package com.puppycrawl.tools.checkstyle.checks.coding;
 
 import java.util.Arrays;
 
+import com.puppycrawl.tools.checkstyle.ScopeUtils;
+import com.puppycrawl.tools.checkstyle.Utils;
 import com.puppycrawl.tools.checkstyle.api.Check;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import com.puppycrawl.tools.checkstyle.ScopeUtils;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import com.puppycrawl.tools.checkstyle.checks.CheckUtils;
 
 /**
  * <p>
- * Checks that there are no <a href="http://en.wikipedia.org/wiki/Magic_number_%28programming%29">
+ * Checks that there are no <a href="https://en.wikipedia.org/wiki/Magic_number_%28programming%29">
  * &quot;magic numbers&quot;</a> where a magic
  * number is a numeric literal that is not defined as a constant.
  * By default, -1, 0, 1, and 2 are not considered to be magic numbers.
  * </p>
- * <p>
+ *
+ * Constant definition is any variable/field that has 'final' modifier.
  * It is fine to have one constant defining multiple numeric literals within one expression:
  * <pre>
- * <code>static final int SECONDS_PER_DAY = 24 * 60 * 60;
+ * {@code static final int SECONDS_PER_DAY = 24 * 60 * 60;
  * static final double SPECIAL_RATIO = 4.0 / 3.0;
  * static final double SPECIAL_SUM = 1 + Math.E;
  * static final double SPECIAL_DIFFERENCE = 4 - Math.PI;
  * static final Border STANDARD_BORDER = BorderFactory.createEmptyBorder(3, 3, 3, 3);
- * static final Integer ANSWER_TO_THE_ULTIMATE_QUESTION_OF_LIFE = new Integer(42);</code>
+ * static final Integer ANSWER_TO_THE_ULTIMATE_QUESTION_OF_LIFE = new Integer(42);}
  * </pre>
- * </p>
+ *
  * <p>
  * Check have following options:
  * ignoreHashCodeMethod - ignore magic numbers in hashCode methods;
@@ -60,7 +62,7 @@ import com.puppycrawl.tools.checkstyle.checks.CheckUtils;
  * results is following violations:
  * </p>
  * <pre>
- * <code>
+ * {@code
  *   {@literal @}MyAnnotation(6) // violation
  *   class MyClass {
  *       private field = 7; // violation
@@ -70,7 +72,7 @@ import com.puppycrawl.tools.checkstyle.checks.CheckUtils;
  *          int j = j + 8; // violation
  *       }
  *   }
- * </code>
+ * }
  * </pre>
  * <p>
  * To configure the check so that it checks floating-point numbers
@@ -88,19 +90,49 @@ import com.puppycrawl.tools.checkstyle.checks.CheckUtils;
  * results is following violations:
  * </p>
  * <pre>
- * <code>
+ * {@code
  *   {@literal @}MyAnnotation(6) // no violation
  *   class MyClass {
  *       private field = 7; // no violation
  *
  *       void foo() {
  *          int i = i + 1; // no violation
- *          int j = j + 8; // violation
+ *          int j = j + (int)0.5; // no violation
  *       }
  *   }
- * </code>
+ * }
  * </pre>
- *
+ * <p>
+ * Config example of constantWaiverParentToken option:
+ * </p>
+ * <pre>
+ *   &lt;module name=&quot;MagicNumber&quot;&gt;
+ *       &lt;property name=&quot;constantWaiverParentToken&quot; value=&quot;ASSIGN,ARRAY_INIT,EXPR,
+ *       UNARY_PLUS, UNARY_MINUS, TYPECAST, ELIST, DIV, PLUS &quot;/&gt;
+ *   &lt;/module&gt;
+ * </pre>
+ * <p>
+ * result is following violation:
+ * </p>
+ * <pre>
+ * {@code
+ * class TestMethodCall {
+ *     public void method2() {
+ *         final TestMethodCall dummyObject = new TestMethodCall(62);    //violation
+ *         final int a = 3;        // ok as waiver is ASSIGN
+ *         final int [] b = {4, 5} // ok as waiver is ARRAY_INIT
+ *         final int c = -3;       // ok as waiver is UNARY_MINUS
+ *         final int d = +4;       // ok as waiver is UNARY_PLUS
+ *         final int e = method(1, 2) // ELIST is there but violation due to METHOD_CALL
+ *         final int x = 3 * 4;    // violation
+ *         final int y = 3 / 4;    // ok as waiver is DIV
+ *         final int z = 3 + 4;    // ok as waiver is PLUS
+ *         final int w = 3 - 4;    // violation
+ *         final int x = (int)(3.4);    //ok as waiver is TYPECAST
+ *     }
+ * }
+ * }
+ * </pre>
  * @author Rick Giles
  * @author Lars Kühne
  * @author Daniel Solano Gómez
@@ -117,7 +149,7 @@ public class MagicNumberCheck extends Check {
      * The token types that are allowed in the AST path from the
      * number literal to the enclosing constant definition.
      */
-    private static final int[] ALLOWED_PATH_TOKENTYPES = {
+    private int[] constantWaiverParentToken = {
         TokenTypes.ASSIGN,
         TokenTypes.ARRAY_INIT,
         TokenTypes.EXPR,
@@ -133,10 +165,6 @@ public class MagicNumberCheck extends Check {
         TokenTypes.MINUS,
     };
 
-    static {
-        Arrays.sort(ALLOWED_PATH_TOKENTYPES);
-    }
-
     /** the numbers to ignore in the check, sorted */
     private double[] ignoreNumbers = {-1, 0, 1, 2};
 
@@ -149,14 +177,17 @@ public class MagicNumberCheck extends Check {
     /** Whether to ignore magic numbers in field declaration. */
     private boolean ignoreFieldDeclaration;
 
+    /**
+     * Constructor for MagicNumber Check.
+     * Sort the allowedTokensBetweenMagicNumberAndConstDef array for binary search.
+     */
+    public MagicNumberCheck() {
+        Arrays.sort(constantWaiverParentToken);
+    }
+
     @Override
     public int[] getDefaultTokens() {
-        return new int[] {
-            TokenTypes.NUM_DOUBLE,
-            TokenTypes.NUM_FLOAT,
-            TokenTypes.NUM_INT,
-            TokenTypes.NUM_LONG,
-        };
+        return getAcceptableTokens();
     }
 
     @Override
@@ -188,17 +219,31 @@ public class MagicNumberCheck extends Check {
             }
         }
         else {
-            DetailAST astNode = ast.getParent();
-            while (astNode != constantDefAST) {
-                final int type = astNode.getType();
-                if (Arrays.binarySearch(ALLOWED_PATH_TOKENTYPES, type) < 0) {
-                    reportMagicNumber(ast);
-                    break;
-                }
-
-                astNode = astNode.getParent();
+            final boolean found = isMagicNumberExists(ast, constantDefAST);
+            if (found) {
+                reportMagicNumber(ast);
             }
         }
+    }
+
+    /**
+     * is magic number some where at ast tree
+     * @param ast ast token
+     * @param constantDefAST constant ast
+     * @return true if magic number is present
+     */
+    private boolean isMagicNumberExists(DetailAST ast, DetailAST constantDefAST) {
+        boolean found = false;
+        DetailAST astNode = ast.getParent();
+        while (astNode != constantDefAST) {
+            final int type = astNode.getType();
+            if (Arrays.binarySearch(constantWaiverParentToken, type) < 0) {
+                found = true;
+                break;
+            }
+            astNode = astNode.getParent();
+        }
+        return found;
     }
 
     /**
@@ -207,7 +252,7 @@ public class MagicNumberCheck extends Check {
      * @return the constant def or null if ast is not
      * contained in a constant definition
      */
-    private DetailAST findContainingConstantDef(DetailAST ast) {
+    private static DetailAST findContainingConstantDef(DetailAST ast) {
         DetailAST varDefAST = ast;
         while (varDefAST != null
                 && varDefAST.getType() != TokenTypes.VARIABLE_DEF
@@ -269,7 +314,7 @@ public class MagicNumberCheck extends Check {
      * @return {@code true} if {@code ast} is in the scope of a valid hash
      * code method
      */
-    private boolean isInHashCodeMethod(DetailAST ast) {
+    private static boolean isInHashCodeMethod(DetailAST ast) {
         // if not in a code block, can't be in hashCode()
         if (!ScopeUtils.inCodeBlock(ast)) {
             return false;
@@ -277,12 +322,12 @@ public class MagicNumberCheck extends Check {
 
         // find the method definition AST
         DetailAST methodDefAST = ast.getParent();
-        while (null != methodDefAST
-                && TokenTypes.METHOD_DEF != methodDefAST.getType()) {
+        while (methodDefAST != null
+                && methodDefAST.getType() != TokenTypes.METHOD_DEF) {
             methodDefAST = methodDefAST.getParent();
         }
 
-        if (null == methodDefAST) {
+        if (methodDefAST == null) {
             return false;
         }
 
@@ -296,13 +341,9 @@ public class MagicNumberCheck extends Check {
         // Check for no arguments.
         final DetailAST paramAST =
             methodDefAST.findFirstToken(TokenTypes.PARAMETERS);
-        if (0 != paramAST.getChildCount()) {
-            return false;
-        }
-
         // we are in a 'public int hashCode()' method! The compiler will ensure
         // the method returns an 'int' and is public.
-        return true;
+        return paramAST.getChildCount() == 0;
     }
 
     /**
@@ -328,7 +369,7 @@ public class MagicNumberCheck extends Check {
      *
      * @return {@code true} if {@code ast} is in the scope of field declaration
      */
-    private boolean isFieldDeclaration(DetailAST ast) {
+    private static boolean isFieldDeclaration(DetailAST ast) {
         DetailAST varDefAST = ast;
         while (varDefAST != null
                 && varDefAST.getType() != TokenTypes.VARIABLE_DEF) {
@@ -338,10 +379,20 @@ public class MagicNumberCheck extends Check {
         // contains variable declaration
         // and it is directly inside class declaration
         return varDefAST != null
-                && varDefAST.getParent().getParent().getType()
-                    == TokenTypes.CLASS_DEF;
+                && varDefAST.getParent().getParent().getType() == TokenTypes.CLASS_DEF;
     }
 
+    /**
+     * sets the tokens which are allowed between Magic Number and defined Object.
+     * @param tokens The string representation of the tokens interested in
+     */
+    public void setConstantWaiverParentToken(String... tokens) {
+        constantWaiverParentToken = new int[tokens.length];
+        for (int i = 0; i < tokens.length; i++) {
+            constantWaiverParentToken[i] = Utils.getTokenId(tokens[i]);
+        }
+        Arrays.sort(constantWaiverParentToken);
+    }
 
     /**
      * Sets the numbers to ignore in the check.

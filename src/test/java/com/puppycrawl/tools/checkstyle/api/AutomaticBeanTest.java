@@ -19,23 +19,115 @@
 
 package com.puppycrawl.tools.checkstyle.api;
 
-import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import java.lang.reflect.InvocationTargetException;
+
+import org.apache.commons.beanutils.ConversionException;
 import org.junit.Test;
 
+import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
+import com.puppycrawl.tools.checkstyle.DefaultContext;
+
 public class AutomaticBeanTest {
-    private static class TestBean extends AutomaticBean {
-        public void setName(String name) {
+
+    @Test
+    public void testConfigure_NoSuchAttribute() {
+        final TestBean testBean = new TestBean();
+        final DefaultConfiguration conf = new DefaultConfiguration("testConf");
+        conf.addAttribute("NonExisting", "doesn't matter");
+        try {
+            testBean.configure(conf);
+        }
+        catch (CheckstyleException ex) {
+            assertNull(ex.getCause());
+            assertTrue(ex.getMessage().startsWith("Property '" + "NonExisting" + "' in module "));
         }
     }
 
-    private final DefaultConfiguration conf = new DefaultConfiguration(
-            "testConf");
+    @Test
+    public void testConfigure_NoSuchAttribute2() {
+        final TestBean testBean = new TestBean();
+        final DefaultConfiguration conf = new DefaultConfiguration("testConf");
+        conf.addAttribute("privateField", "doesn't matter");
+        try {
+            testBean.configure(conf);
+        }
+        catch (CheckstyleException ex) {
+            assertNull(ex.getCause());
+            assertTrue(ex.getMessage().startsWith("Property '" + "privateField" + "' in module "));
+        }
+    }
 
-    private final TestBean testBean = new TestBean();
+    @Test
+    public void testSetupChildFromBaseClass() throws CheckstyleException {
+        final TestBean testBean = new TestBean();
+        testBean.setupChild(null);
+    }
 
-    @Test(expected = CheckstyleException.class)
-    public void testNoSuchAttribute() throws CheckstyleException {
-        conf.addAttribute("NonExisting", "doesn't matter");
-        testBean.configure(conf);
+    @Test
+    public void testContextualize_InvocationTargetException() {
+        final TestBean testBean = new TestBean();
+        DefaultContext context = new DefaultContext();
+        context.add("exceptionalMethod", 123f);
+        try {
+            testBean.contextualize(context);
+            fail();
+        }
+        catch (CheckstyleException ex) {
+            assertTrue(ex.getCause() instanceof InvocationTargetException);
+            assertTrue(ex.getMessage().startsWith("Cannot set property "));
+        }
+    }
+
+    @Test
+    public void testContextualize_ConversionException() {
+        final TestBean testBean = new TestBean();
+        DefaultContext context = new DefaultContext();
+        context.add("val", "some string");
+        try {
+            testBean.contextualize(context);
+            fail();
+        }
+        catch (CheckstyleException ex) {
+            assertTrue(ex.getCause() instanceof ConversionException);
+            assertTrue(ex.getMessage().startsWith("illegal value "));
+        }
+    }
+
+    @SuppressWarnings("unused")
+    public class TestBean extends AutomaticBean {
+
+        private String privateField;
+
+        private String wrong;
+
+        private int val;
+
+        public void setWrong(String wrong) {
+            this.wrong = wrong;
+        }
+
+        public void setVal(int val) {
+            this.val = val;
+        }
+
+        public void setExceptionalMethod(String value) {
+            throw new IllegalStateException("for UT");
+        }
+
+        public void setName(String name) {
+        }
+
+        /**
+         * just for code coverage
+         * @param childConf a child of this component's Configuration
+         */
+        @Override
+        protected void setupChild(Configuration childConf) throws CheckstyleException {
+            super.setupChild(childConf);
+        }
     }
 }

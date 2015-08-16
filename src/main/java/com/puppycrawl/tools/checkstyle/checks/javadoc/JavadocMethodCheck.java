@@ -19,24 +19,7 @@
 
 package com.puppycrawl.tools.checkstyle.checks.javadoc;
 
-import antlr.collections.AST;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import com.puppycrawl.tools.checkstyle.api.FileContents;
-import com.puppycrawl.tools.checkstyle.api.FullIdent;
-import com.puppycrawl.tools.checkstyle.api.JavadocTagInfo;
-import com.puppycrawl.tools.checkstyle.api.Scope;
-import com.puppycrawl.tools.checkstyle.ScopeUtils;
-import com.puppycrawl.tools.checkstyle.api.TextBlock;
-import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.Utils;
-import com.puppycrawl.tools.checkstyle.checks.AbstractTypeAwareCheck;
-import com.puppycrawl.tools.checkstyle.checks.CheckUtils;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -44,6 +27,22 @@ import java.util.ListIterator;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import antlr.collections.AST;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import com.puppycrawl.tools.checkstyle.ScopeUtils;
+import com.puppycrawl.tools.checkstyle.Utils;
+import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import com.puppycrawl.tools.checkstyle.api.FileContents;
+import com.puppycrawl.tools.checkstyle.api.FullIdent;
+import com.puppycrawl.tools.checkstyle.api.JavadocTagInfo;
+import com.puppycrawl.tools.checkstyle.api.Scope;
+import com.puppycrawl.tools.checkstyle.api.TextBlock;
+import com.puppycrawl.tools.checkstyle.api.TokenTypes;
+import com.puppycrawl.tools.checkstyle.checks.AbstractTypeAwareCheck;
+import com.puppycrawl.tools.checkstyle.checks.CheckUtils;
 
 /**
  * Checks the Javadoc of a method or constructor.
@@ -197,7 +196,7 @@ public class JavadocMethodCheck extends AbstractTypeAwareCheck {
     private boolean allowMissingPropertyJavadoc;
 
     /** List of annotations that could allow missed documentation. */
-    private List<String> allowedAnnotations = Arrays.asList("Override");
+    private List<String> allowedAnnotations = Collections.singletonList("Override");
 
     /** Method names that match this pattern do not require javadoc blocks. */
     private Pattern ignoreMethodNamesRegex;
@@ -244,7 +243,7 @@ public class JavadocMethodCheck extends AbstractTypeAwareCheck {
     /**
      * Set the scope.
      *
-     * @param from a <code>String</code> value
+     * @param from a {@code String} value
      */
     public void setScope(String from) {
         scope = Scope.getInstance(from);
@@ -253,17 +252,17 @@ public class JavadocMethodCheck extends AbstractTypeAwareCheck {
     /**
      * Set the excludeScope.
      *
-     * @param scope a <code>String</code> value
+     * @param excludeScope a {@code String} value
      */
-    public void setExcludeScope(String scope) {
-        excludeScope = Scope.getInstance(scope);
+    public void setExcludeScope(String excludeScope) {
+        this.excludeScope = Scope.getInstance(excludeScope);
     }
 
     /**
      * controls whether to allow documented exceptions that are not declared if
      * they are a subclass of java.lang.RuntimeException.
      *
-     * @param flag a <code>Boolean</code> value
+     * @param flag a {@code Boolean} value
      */
     public void setAllowUndeclaredRTE(boolean flag) {
         allowUndeclaredRTE = flag;
@@ -273,7 +272,7 @@ public class JavadocMethodCheck extends AbstractTypeAwareCheck {
      * controls whether to allow documented exception that are subclass of one
      * of declared exceptions.
      *
-     * @param flag a <code>Boolean</code> value
+     * @param flag a {@code Boolean} value
      */
     public void setAllowThrowsTagsForSubclasses(boolean flag) {
         allowThrowsTagsForSubclasses = flag;
@@ -283,7 +282,7 @@ public class JavadocMethodCheck extends AbstractTypeAwareCheck {
      * controls whether to allow a method which has parameters to omit matching
      * param tags in the javadoc. Defaults to false.
      *
-     * @param flag a <code>Boolean</code> value
+     * @param flag a {@code Boolean} value
      */
     public void setAllowMissingParamTags(boolean flag) {
         allowMissingParamTags = flag;
@@ -294,7 +293,7 @@ public class JavadocMethodCheck extends AbstractTypeAwareCheck {
      * exceptions to omit matching throws tags in the javadoc. Defaults to
      * false.
      *
-     * @param flag a <code>Boolean</code> value
+     * @param flag a {@code Boolean} value
      */
     public void setAllowMissingThrowsTags(boolean flag) {
         allowMissingThrowsTags = flag;
@@ -304,7 +303,7 @@ public class JavadocMethodCheck extends AbstractTypeAwareCheck {
      * controls whether to allow a method which returns non-void type to omit
      * the return tag in the javadoc. Defaults to false.
      *
-     * @param flag a <code>Boolean</code> value
+     * @param flag a {@code Boolean} value
      */
     public void setAllowMissingReturnTag(boolean flag) {
         allowMissingReturnTag = flag;
@@ -314,7 +313,7 @@ public class JavadocMethodCheck extends AbstractTypeAwareCheck {
      * Controls whether to ignore errors when there is no javadoc. Defaults to
      * false.
      *
-     * @param flag a <code>Boolean</code> value
+     * @param flag a {@code Boolean} value
      */
     public void setAllowMissingJavadoc(boolean flag) {
         allowMissingJavadoc = flag;
@@ -324,7 +323,7 @@ public class JavadocMethodCheck extends AbstractTypeAwareCheck {
      * Controls whether to ignore errors when there is no javadoc for a
      * property accessor (setter/getter methods). Defaults to false.
      *
-     * @param flag a <code>Boolean</code> value
+     * @param flag a {@code Boolean} value
      */
     public void setAllowMissingPropertyJavadoc(final boolean flag) {
         allowMissingPropertyJavadoc = flag;
@@ -402,7 +401,7 @@ public class JavadocMethodCheck extends AbstractTypeAwareCheck {
      * @param methodDef Some javadoc.
      * @return Some javadoc.
      */
-    private int getMethodsNumberOfLine(DetailAST methodDef) {
+    private static int getMethodsNumberOfLine(DetailAST methodDef) {
         int numberOfLines;
         final DetailAST lcurly = methodDef.getLastChild();
         final DetailAST rcurly = lcurly.getLastChild();
@@ -427,9 +426,9 @@ public class JavadocMethodCheck extends AbstractTypeAwareCheck {
      * The JavadocMethodCheck is about to report a missing Javadoc.
      * This hook can be used by derived classes to allow a missing javadoc
      * in some situations.  The default implementation checks
-     * <code>allowMissingJavadoc</code> and
-     * <code>allowMissingPropertyJavadoc</code> properties, do not forget
-     * to call <code>super.isMissingJavadocAllowed(ast)</code> in case
+     * {@code allowMissingJavadoc} and
+     * {@code allowMissingPropertyJavadoc} properties, do not forget
+     * to call {@code super.isMissingJavadocAllowed(ast)} in case
      * you want to keep this logic.
      * @param ast the tree node for the method or constructor.
      * @return True if this method or constructor doesn't need Javadoc.
@@ -464,15 +463,15 @@ public class JavadocMethodCheck extends AbstractTypeAwareCheck {
      * Whether we should check this node.
      *
      * @param ast a given node.
-     * @param scope the scope of the node.
+     * @param nodeScope the scope of the node.
      * @return whether we should check a given node.
      */
-    private boolean shouldCheck(final DetailAST ast, final Scope scope) {
+    private boolean shouldCheck(final DetailAST ast, final Scope nodeScope) {
         final Scope surroundingScope = ScopeUtils.getSurroundingScope(ast);
 
-        return scope.isIn(this.scope)
-                && surroundingScope.isIn(this.scope)
-                && (excludeScope == null || !scope.isIn(excludeScope)
+        return nodeScope.isIn(scope)
+                && surroundingScope.isIn(scope)
+                && (excludeScope == null || !nodeScope.isIn(excludeScope)
                     || !surroundingScope.isIn(excludeScope));
     }
 
@@ -494,7 +493,7 @@ public class JavadocMethodCheck extends AbstractTypeAwareCheck {
             // Check for inheritDoc
             boolean hasInheritDocTag = false;
             while (it.hasNext() && !hasInheritDocTag) {
-                hasInheritDocTag |= it.next().isInheritDocTag();
+                hasInheritDocTag = it.next().isInheritDocTag();
             }
 
             checkParamTags(tags, ast, !hasInheritDocTag);
@@ -546,7 +545,7 @@ public class JavadocMethodCheck extends AbstractTypeAwareCheck {
      * @param ast the token of the method/constructor
      * @return the scope of the method/constructor
      */
-    private Scope calculateScope(final DetailAST ast) {
+    private static Scope calculateScope(final DetailAST ast) {
         final DetailAST mods = ast.findFirstToken(TokenTypes.MODIFIERS);
         final Scope declaredScope = ScopeUtils.getScopeFromMods(mods);
         return ScopeUtils.inInterfaceOrAnnotationBlock(ast) ? Scope.PUBLIC
@@ -560,7 +559,7 @@ public class JavadocMethodCheck extends AbstractTypeAwareCheck {
      * @param comment the Javadoc comment
      * @return the tags found
      */
-    private List<JavadocTag> getMethodTags(TextBlock comment) {
+    private static List<JavadocTag> getMethodTags(TextBlock comment) {
         final String[] lines = comment.getText();
         final List<JavadocTag> tags = Lists.newArrayList();
         int currentLine = comment.getStartLineNo() - 1;
@@ -631,10 +630,7 @@ public class JavadocMethodCheck extends AbstractTypeAwareCheck {
             }
             else if (noargMultilineStart.find()) {
                 final String p1 = noargMultilineStart.group(1);
-                int col = noargMultilineStart.start(1) - 1;
-                if (i == 0) {
-                    col += comment.getStartColNo();
-                }
+                final int col = noargMultilineStart.start(1) - 1;
 
                 // Look for the rest of the comment if all we saw was
                 // the tag and the name. Stop when we see '*/' (end of
@@ -644,13 +640,12 @@ public class JavadocMethodCheck extends AbstractTypeAwareCheck {
                 while (remIndex < lines.length) {
                     final Matcher multilineCont = MATCH_JAVADOC_MULTILINE_CONT
                             .matcher(lines[remIndex]);
-                    if (multilineCont.find()) {
-                        remIndex = lines.length;
-                        final String lFin = multilineCont.group(1);
-                        if (!lFin.equals(NEXT_TAG)
-                            && !lFin.equals(END_JAVADOC)) {
-                            tags.add(new JavadocTag(currentLine, col, p1));
-                        }
+                    multilineCont.find();
+                    remIndex = lines.length;
+                    final String lFin = multilineCont.group(1);
+                    if (!lFin.equals(NEXT_TAG)
+                        && !lFin.equals(END_JAVADOC)) {
+                        tags.add(new JavadocTag(currentLine, col, p1));
                     }
                     remIndex++;
                 }
@@ -665,7 +660,7 @@ public class JavadocMethodCheck extends AbstractTypeAwareCheck {
      * @param ast the method node.
      * @return the list of parameter nodes for ast.
      */
-    private List<DetailAST> getParameters(DetailAST ast) {
+    private static List<DetailAST> getParameters(DetailAST ast) {
         final DetailAST params = ast.findFirstToken(TokenTypes.PARAMETERS);
         final List<DetailAST> retVal = Lists.newArrayList();
 
@@ -735,7 +730,7 @@ public class JavadocMethodCheck extends AbstractTypeAwareCheck {
 
             // Loop looking for matching param
             final Iterator<DetailAST> paramIt = params.iterator();
-            final String arg1 = tag.getArg1();
+            final String arg1 = tag.getFirstArg();
             while (paramIt.hasNext()) {
                 final DetailAST param = paramIt.next();
                 if (param.getText().equals(arg1)) {
@@ -792,12 +787,11 @@ public class JavadocMethodCheck extends AbstractTypeAwareCheck {
      * @param ast the method node.
      * @return whether the method is a function.
      */
-    private boolean isFunction(DetailAST ast) {
+    private static boolean isFunction(DetailAST ast) {
         boolean retVal = false;
         if (ast.getType() == TokenTypes.METHOD_DEF) {
             final DetailAST typeAST = ast.findFirstToken(TokenTypes.TYPE);
-            if (typeAST != null
-                && typeAST.findFirstToken(TokenTypes.LITERAL_VOID) == null) {
+            if (typeAST.findFirstToken(TokenTypes.LITERAL_VOID) == null) {
                 retVal = true;
             }
         }
@@ -863,10 +857,10 @@ public class JavadocMethodCheck extends AbstractTypeAwareCheck {
             tagIt.remove();
 
             // Loop looking for matching throw
-            final String documentedEx = tag.getArg1();
-            final Token token = new Token(tag.getArg1(), tag.getLineNo(), tag
+            final String documentedEx = tag.getFirstArg();
+            final Token token = new Token(tag.getFirstArg(), tag.getLineNo(), tag
                     .getColumnNo());
-            final ClassInfo documentedCI = createClassInfo(token,
+            final AbstractClassInfo documentedCI = createClassInfo(token,
                     getCurrentClassName());
             boolean found = foundThrows.contains(documentedEx);
 
@@ -908,7 +902,7 @@ public class JavadocMethodCheck extends AbstractTypeAwareCheck {
                 if (reqd && validateThrows) {
                     log(tag.getLineNo(), tag.getColumnNo(),
                         MSG_UNUSED_TAG,
-                        JavadocTagInfo.THROWS.getText(), tag.getArg1());
+                        JavadocTagInfo.THROWS.getText(), tag.getFirstArg());
 
                 }
             }
@@ -933,7 +927,7 @@ public class JavadocMethodCheck extends AbstractTypeAwareCheck {
      * @param ast the AST to check with
      * @return whether the AST represents a setter method
      */
-    private boolean isSetterMethod(final DetailAST ast) {
+    private static boolean isSetterMethod(final DetailAST ast) {
         // Check have a method with exactly 7 children which are all that
         // is allowed in a proper setter method which does not throw any
         // exceptions.
@@ -958,8 +952,7 @@ public class JavadocMethodCheck extends AbstractTypeAwareCheck {
 
         // Check that is had only one parameter
         final DetailAST params = ast.findFirstToken(TokenTypes.PARAMETERS);
-        if (params == null
-                || params.getChildCount(TokenTypes.PARAMETER_DEF) != 1) {
+        if (params.getChildCount(TokenTypes.PARAMETER_DEF) != 1) {
             return false;
         }
 
@@ -973,12 +966,7 @@ public class JavadocMethodCheck extends AbstractTypeAwareCheck {
         }
 
         final AST expr = slist.getFirstChild();
-        if (expr.getType() != TokenTypes.EXPR
-                || expr.getFirstChild().getType() != TokenTypes.ASSIGN) {
-            return false;
-        }
-
-        return true;
+        return expr.getFirstChild().getType() == TokenTypes.ASSIGN;
     }
 
     /**
@@ -986,7 +974,7 @@ public class JavadocMethodCheck extends AbstractTypeAwareCheck {
      * @param ast the AST to check with
      * @return whether the AST represents a getter method
      */
-    private boolean isGetterMethod(final DetailAST ast) {
+    private static boolean isGetterMethod(final DetailAST ast) {
         // Check have a method with exactly 7 children which are all that
         // is allowed in a proper getter method which does not throw any
         // exceptions.
@@ -1010,8 +998,7 @@ public class JavadocMethodCheck extends AbstractTypeAwareCheck {
 
         // Check that is had only one parameter
         final DetailAST params = ast.findFirstToken(TokenTypes.PARAMETERS);
-        if (params == null
-                || params.getChildCount(TokenTypes.PARAMETER_DEF) > 0) {
+        if (params.getChildCount(TokenTypes.PARAMETER_DEF) > 0) {
             return false;
         }
 
@@ -1024,12 +1011,8 @@ public class JavadocMethodCheck extends AbstractTypeAwareCheck {
         }
 
         final AST expr = slist.getFirstChild();
-        if (expr.getType() != TokenTypes.LITERAL_RETURN
-                || expr.getFirstChild().getType() != TokenTypes.EXPR) {
-            return false;
-        }
+        return expr.getType() == TokenTypes.LITERAL_RETURN;
 
-        return true;
     }
 
     /** Stores useful information about declared exception. */
@@ -1037,14 +1020,14 @@ public class JavadocMethodCheck extends AbstractTypeAwareCheck {
         /** does the exception have throws tag associated with. */
         private boolean found;
         /** class information associated with this exception. */
-        private final ClassInfo classInfo;
+        private final AbstractClassInfo classInfo;
 
         /**
-         * Creates new instance for <code>FullIdent</code>.
+         * Creates new instance for {@code FullIdent}.
          *
          * @param classInfo clas info
          */
-        ExceptionInfo(ClassInfo classInfo) {
+        ExceptionInfo(AbstractClassInfo classInfo) {
             this.classInfo = classInfo;
         }
 

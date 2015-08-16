@@ -19,9 +19,6 @@
 
 package com.puppycrawl.tools.checkstyle.checks;
 
-import com.google.common.io.Closeables;
-import com.puppycrawl.tools.checkstyle.api.AbstractFileSetCheck;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -29,6 +26,9 @@ import java.util.List;
 import java.util.Locale;
 
 import org.apache.commons.beanutils.ConversionException;
+
+import com.google.common.io.Closeables;
+import com.puppycrawl.tools.checkstyle.api.AbstractFileSetCheck;
 
 /**
  * <p>
@@ -79,9 +79,8 @@ public class NewlineAtEndOfFileCheck
     @Override
     protected void processFiltered(File file, List<String> lines) {
         // Cannot use lines as the line separators have been removed!
-        RandomAccessFile randomAccessFile = null;
         try {
-            randomAccessFile = new RandomAccessFile(file, "r");
+            final RandomAccessFile randomAccessFile = new RandomAccessFile(file, "r");
             boolean threw = true;
             try {
                 if (!endsWithNewline(randomAccessFile)) {
@@ -93,7 +92,7 @@ public class NewlineAtEndOfFileCheck
                 Closeables.close(randomAccessFile, threw);
             }
         }
-        catch (final IOException e) {
+        catch (final IOException ignored) {
             log(0, MSG_KEY_UNABLE_OPEN, file.getPath());
         }
     }

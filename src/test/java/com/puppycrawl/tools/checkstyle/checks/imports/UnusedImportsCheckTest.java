@@ -19,12 +19,16 @@
 
 package com.puppycrawl.tools.checkstyle.checks.imports;
 
-import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
-import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
+import static com.puppycrawl.tools.checkstyle.checks.imports.UnusedImportsCheck.MSG_KEY;
+import static org.junit.Assert.assertArrayEquals;
+
 import java.io.File;
+
 import org.junit.Test;
 
-import static com.puppycrawl.tools.checkstyle.checks.imports.UnusedImportsCheck.MSG_KEY;
+import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
+import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
+import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
 public class UnusedImportsCheckTest extends BaseCheckTestSupport {
     @Test
@@ -52,7 +56,7 @@ public class UnusedImportsCheckTest extends BaseCheckTestSupport {
             "40:8: " + getCheckMessage(MSG_KEY, "com.puppycrawl.tools.checkstyle.Definitions"),
             "41:8: " + getCheckMessage(MSG_KEY, "com.puppycrawl.tools.checkstyle.Input15Extensions"),
             "42:8: " + getCheckMessage(MSG_KEY, "com.puppycrawl.tools.checkstyle.ConfigurationLoaderTest"),
-            "43:8: " + getCheckMessage(MSG_KEY, "com.puppycrawl.tools.checkstyle.CheckStyleTask"),
+            "43:8: " + getCheckMessage(MSG_KEY, "com.puppycrawl.tools.checkstyle.PackageNamesLoader"),
             "44:8: " + getCheckMessage(MSG_KEY, "com.puppycrawl.tools.checkstyle.DefaultConfiguration"),
             "45:8: " + getCheckMessage(MSG_KEY, "com.puppycrawl.tools.checkstyle.DefaultLogger"),
         };
@@ -96,4 +100,67 @@ public class UnusedImportsCheckTest extends BaseCheckTestSupport {
         verify(checkConfig, getPath("imports" + File.separator
                 + "InputImportBug.java"), expected);
     }
+
+    @Test
+    public void testGetRequiredTokens() {
+        UnusedImportsCheck testCheckObject =
+                new UnusedImportsCheck();
+        int[] actual = testCheckObject.getRequiredTokens();
+        int[] expected = new int[]{
+            TokenTypes.IDENT,
+            TokenTypes.IMPORT,
+            TokenTypes.STATIC_IMPORT,
+            // Definitions that may contain Javadoc...
+            TokenTypes.PACKAGE_DEF,
+            TokenTypes.ANNOTATION_DEF,
+            TokenTypes.ANNOTATION_FIELD_DEF,
+            TokenTypes.ENUM_DEF,
+            TokenTypes.ENUM_CONSTANT_DEF,
+            TokenTypes.CLASS_DEF,
+            TokenTypes.INTERFACE_DEF,
+            TokenTypes.METHOD_DEF,
+            TokenTypes.CTOR_DEF,
+            TokenTypes.VARIABLE_DEF,
+        };
+
+        assertArrayEquals(expected, actual);
+    }
+
+    @Test
+    public void testGetAcceptableTokens() {
+        UnusedImportsCheck testCheckObject =
+                new UnusedImportsCheck();
+        int[] actual = testCheckObject.getAcceptableTokens();
+        int[] expected = new int[]{
+            TokenTypes.IDENT,
+            TokenTypes.IMPORT,
+            TokenTypes.STATIC_IMPORT,
+            // Definitions that may contain Javadoc...
+            TokenTypes.PACKAGE_DEF,
+            TokenTypes.ANNOTATION_DEF,
+            TokenTypes.ANNOTATION_FIELD_DEF,
+            TokenTypes.ENUM_DEF,
+            TokenTypes.ENUM_CONSTANT_DEF,
+            TokenTypes.CLASS_DEF,
+            TokenTypes.INTERFACE_DEF,
+            TokenTypes.METHOD_DEF,
+            TokenTypes.CTOR_DEF,
+            TokenTypes.VARIABLE_DEF,
+        };
+
+        assertArrayEquals(expected, actual);
+    }
+
+    @Test
+    public void testFileInUnnamedPackage() throws Exception {
+        final DefaultConfiguration checkConfig = createCheckConfig(UnusedImportsCheck.class);
+        final String[] expected = {
+            "3:8: " + getCheckMessage(MSG_KEY, "java.util.Arrays"),
+            "4:8: " + getCheckMessage(MSG_KEY, "java.lang.String"),
+        };
+        verify(checkConfig, new File("src/test/resources-noncompilable/com/puppycrawl/tools/"
+                + "checkstyle/imports/"
+                + "InputRedundantImportCheck_UnnamedPackage.java").getCanonicalPath(), expected);
+    }
+
 }

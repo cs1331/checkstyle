@@ -19,16 +19,17 @@
 
 package com.puppycrawl.tools.checkstyle.checks.metrics;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
+
 import com.puppycrawl.tools.checkstyle.api.Check;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import java.util.ArrayDeque;
-import java.util.Deque;
 
 /**
  * This check calculates the Non Commenting Source Statements (NCSS) metric for
  * java source files and methods. The check adheres to the <a
- * href="http://www.kclee.com/clemens/java/javancss/">JavaNCSS specification
+ * href="http://www.kclee.com/clemens/java/javancss">JavaNCSS specification
  * </a> and gives the same results as the JavaNCSS tool.
  *
  * The NCSS-metric tries to determine complexity of methods, classes and files
@@ -67,13 +68,13 @@ public class JavaNCSSCheck extends Check {
     private static final int METHOD_MAX_NCSS = 50;
 
     /** maximum ncss for a complete source file */
-    private int fileMax = FILE_MAX_NCSS;
+    private int fileMaximum = FILE_MAX_NCSS;
 
     /** maximum ncss for a class */
-    private int classMax = CLASS_MAX_NCSS;
+    private int classMaximum = CLASS_MAX_NCSS;
 
     /** maximum ncss for a method */
-    private int methodMax = METHOD_MAX_NCSS;
+    private int methodMaximum = METHOD_MAX_NCSS;
 
     /** list containing the stacked counters */
     private Deque<Counter> counters;
@@ -192,11 +193,11 @@ public class JavaNCSSCheck extends Check {
     public void visitToken(DetailAST ast) {
         final int tokenType = ast.getType();
 
-        if (TokenTypes.CLASS_DEF == tokenType
-            || TokenTypes.METHOD_DEF == tokenType
-            || TokenTypes.CTOR_DEF == tokenType
-            || TokenTypes.STATIC_INIT == tokenType
-            || TokenTypes.INSTANCE_INIT == tokenType) {
+        if (tokenType == TokenTypes.CLASS_DEF
+            || tokenType == TokenTypes.METHOD_DEF
+            || tokenType == TokenTypes.CTOR_DEF
+            || tokenType == TokenTypes.STATIC_INIT
+            || tokenType == TokenTypes.INSTANCE_INIT) {
             //add a counter for this class/method
             counters.push(new Counter());
         }
@@ -204,8 +205,8 @@ public class JavaNCSSCheck extends Check {
         //check if token is countable
         if (isCountable(ast)) {
             //increment the stacked counters
-            for (final Counter c : counters) {
-                c.increment();
+            for (final Counter counter : counters) {
+                counter.increment();
             }
         }
     }
@@ -213,27 +214,27 @@ public class JavaNCSSCheck extends Check {
     @Override
     public void leaveToken(DetailAST ast) {
         final int tokenType = ast.getType();
-        if (TokenTypes.METHOD_DEF == tokenType
-            || TokenTypes.CTOR_DEF == tokenType
-            || TokenTypes.STATIC_INIT == tokenType
-            || TokenTypes.INSTANCE_INIT == tokenType) {
+        if (tokenType == TokenTypes.METHOD_DEF
+            || tokenType == TokenTypes.CTOR_DEF
+            || tokenType == TokenTypes.STATIC_INIT
+            || tokenType == TokenTypes.INSTANCE_INIT) {
             //pop counter from the stack
             final Counter counter = counters.pop();
 
             final int count = counter.getCount();
-            if (count > methodMax) {
+            if (count > methodMaximum) {
                 log(ast.getLineNo(), ast.getColumnNo(), MSG_METHOD,
-                        count, methodMax);
+                        count, methodMaximum);
             }
         }
-        else if (TokenTypes.CLASS_DEF == tokenType) {
+        else if (tokenType == TokenTypes.CLASS_DEF) {
             //pop counter from the stack
             final Counter counter = counters.pop();
 
             final int count = counter.getCount();
-            if (count > classMax) {
+            if (count > classMaximum) {
                 log(ast.getLineNo(), ast.getColumnNo(), MSG_CLASS,
-                        count, classMax);
+                        count, classMaximum);
             }
         }
     }
@@ -244,40 +245,40 @@ public class JavaNCSSCheck extends Check {
         final Counter counter = counters.pop();
 
         final int count = counter.getCount();
-        if (count > fileMax) {
+        if (count > fileMaximum) {
             log(rootAST.getLineNo(), rootAST.getColumnNo(), MSG_FILE,
-                    count, fileMax);
+                    count, fileMaximum);
         }
     }
 
     /**
      * Sets the maximum ncss for a file.
      *
-     * @param fileMax
+     * @param fileMaximum
      *            the maximum ncss
      */
-    public void setFileMaximum(int fileMax) {
-        this.fileMax = fileMax;
+    public void setFileMaximum(int fileMaximum) {
+        this.fileMaximum = fileMaximum;
     }
 
     /**
      * Sets the maximum ncss for a class.
      *
-     * @param classMax
+     * @param classMaximum
      *            the maximum ncss
      */
-    public void setClassMaximum(int classMax) {
-        this.classMax = classMax;
+    public void setClassMaximum(int classMaximum) {
+        this.classMaximum = classMaximum;
     }
 
     /**
      * Sets the maximum ncss for a method.
      *
-     * @param methodMax
+     * @param methodMaximum
      *            the maximum ncss
      */
-    public void setMethodMaximum(int methodMax) {
-        this.methodMax = methodMax;
+    public void setMethodMaximum(int methodMaximum) {
+        this.methodMaximum = methodMaximum;
     }
 
     /**
@@ -287,17 +288,17 @@ public class JavaNCSSCheck extends Check {
      *            the AST
      * @return true if the token is countable
      */
-    private boolean isCountable(DetailAST ast) {
+    private static boolean isCountable(DetailAST ast) {
         boolean countable = true;
 
         final int tokenType = ast.getType();
 
         //check if an expression is countable
-        if (TokenTypes.EXPR == tokenType) {
+        if (tokenType == TokenTypes.EXPR) {
             countable = isExpressionCountable(ast);
         }
         //check if an variable definition is countable
-        else if (TokenTypes.VARIABLE_DEF == tokenType) {
+        else if (tokenType == TokenTypes.VARIABLE_DEF) {
             countable = isVariableDefCountable(ast);
         }
         return countable;
@@ -309,15 +310,15 @@ public class JavaNCSSCheck extends Check {
      * @param ast the AST
      * @return true if the variable definition is countable, false otherwise
      */
-    private boolean isVariableDefCountable(DetailAST ast) {
+    private static boolean isVariableDefCountable(DetailAST ast) {
         boolean countable = false;
 
         //count variable defs only if they are direct child to a slist or
         // object block
         final int parentType = ast.getParent().getType();
 
-        if (TokenTypes.SLIST == parentType
-            || TokenTypes.OBJBLOCK == parentType) {
+        if (parentType == TokenTypes.SLIST
+            || parentType == TokenTypes.OBJBLOCK) {
             final DetailAST prevSibling = ast.getPreviousSibling();
 
             //is countable if no previous sibling is found or
@@ -325,7 +326,7 @@ public class JavaNCSSCheck extends Check {
             //This is done because multiple assignment on one line are countes
             // as 1
             countable = prevSibling == null
-                    || TokenTypes.COMMA != prevSibling.getType();
+                    || prevSibling.getType() != TokenTypes.COMMA;
         }
 
         return countable;
@@ -337,8 +338,8 @@ public class JavaNCSSCheck extends Check {
      * @param ast the AST
      * @return true if the expression is countable, false otherwise
      */
-    private boolean isExpressionCountable(DetailAST ast) {
-        boolean countable = true;
+    private static boolean isExpressionCountable(DetailAST ast) {
+        boolean countable;
 
         //count expressions only if they are direct child to a slist (method
         // body, for loop...)
@@ -355,7 +356,7 @@ public class JavaNCSSCheck extends Check {
                 //don't count if or loop conditions
                 final DetailAST prevSibling = ast.getPreviousSibling();
                 countable = prevSibling == null
-                    || TokenTypes.LPAREN != prevSibling.getType();
+                    || prevSibling.getType() != TokenTypes.LPAREN;
                 break;
             default :
                 countable = false;

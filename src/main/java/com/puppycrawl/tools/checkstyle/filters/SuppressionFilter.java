@@ -19,13 +19,13 @@
 
 package com.puppycrawl.tools.checkstyle.filters;
 
+import java.util.Objects;
+
 import com.puppycrawl.tools.checkstyle.api.AuditEvent;
 import com.puppycrawl.tools.checkstyle.api.AutomaticBean;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 import com.puppycrawl.tools.checkstyle.api.Filter;
 import com.puppycrawl.tools.checkstyle.api.FilterSet;
-
-import java.util.Objects;
 
 /**
  * <p>
@@ -50,7 +50,6 @@ public class SuppressionFilter
         filters = SuppressionsLoader.loadSuppressions(fileName);
     }
 
-    /** {@inheritDoc} */
     @Override
     public boolean accept(AuditEvent event) {
         return filters.accept(event);
@@ -64,8 +63,8 @@ public class SuppressionFilter
         if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        final SuppressionFilter that = (SuppressionFilter) obj;
-        return Objects.equals(filters, that.filters);
+        final SuppressionFilter suppressionFilter = (SuppressionFilter) obj;
+        return Objects.equals(filters, suppressionFilter.filters);
     }
 
     @Override

@@ -24,16 +24,16 @@ import java.util.Arrays;
 import antlr.collections.AST;
 
 import com.puppycrawl.tools.checkstyle.api.Check;
-import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
 /**
  * <p>
  * Checks for assignments in subexpressions, such as in
- * <code>String s = Integer.toString(i = 2);</code>.
+ * {@code String s = Integer.toString(i = 2);}.
  * </p>
  * <p>
- * Rationale: With the exception of <code>for</code> iterators, all assignments
+ * Rationale: With the exception of {@code for} iterators, all assignments
  * should occur in their own toplevel statement to increase readability.
  * With inner assignments like the above it is difficult to see all places
  * where a variable is set.
@@ -191,7 +191,7 @@ public class InnerAssignmentCheck
         }
         final DetailAST expr = ast.getParent();
         final AST exprNext = expr.getNextSibling();
-        return exprNext != null && exprNext.getType() == TokenTypes.SEMI;
+        return exprNext.getType() == TokenTypes.SEMI;
     }
 
     /**
@@ -208,7 +208,7 @@ public class InnerAssignmentCheck
      * @param ast assignment AST
      * @return whether the context of the assignemt AST indicates the idiom
      */
-    private boolean isInWhileIdiom(DetailAST ast) {
+    private static boolean isInWhileIdiom(DetailAST ast) {
         if (!isComparison(ast.getParent())) {
             return false;
         }
@@ -237,20 +237,25 @@ public class InnerAssignmentCheck
      * one of the allowed type paths
      */
     private static boolean isInContext(DetailAST ast, int[]... contextSet) {
+        boolean found = false;
         for (int[] element : contextSet) {
             DetailAST current = ast;
-            final int len = element.length;
-            for (int j = 0; j < len; j++) {
+            for (int anElement : element) {
                 current = current.getParent();
-                final int expectedType = element[j];
-                if (current == null || current.getType() != expectedType) {
+                final int expectedType = anElement;
+                if (current.getType() == expectedType) {
+                    found = true;
+                }
+                else {
+                    found = false;
                     break;
                 }
-                if (j == len - 1) {
-                    return true;
-                }
+            }
+
+            if (found) {
+                break;
             }
         }
-        return false;
+        return found;
     }
 }

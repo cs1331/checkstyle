@@ -37,7 +37,7 @@ public class ForHandler extends BlockParentHandler {
      * @param parent        the parent handler
      */
     public ForHandler(IndentationCheck indentCheck,
-        DetailAST ast, ExpressionHandler parent) {
+        DetailAST ast, AbstractExpressionHandler parent) {
         super(indentCheck, "for", ast, parent);
     }
 
@@ -76,14 +76,6 @@ public class ForHandler extends BlockParentHandler {
             new LineWrappingHandler(getIndentCheck(), getMainAst(),
                 getForLoopRightParen(getMainAst()));
         lineWrap.checkIndentation();
-    }
-
-    @Override
-    public IndentLevel suggestedChildLevel(ExpressionHandler child) {
-        if (child instanceof ElseHandler) {
-            return getLevel();
-        }
-        return super.suggestedChildLevel(child);
     }
 
     /**

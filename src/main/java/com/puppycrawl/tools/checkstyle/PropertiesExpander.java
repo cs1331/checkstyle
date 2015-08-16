@@ -23,14 +23,14 @@ import java.util.Properties;
 
 /**
  * Resolves external properties from an
- * underlying <code>Properties</code> object.
+ * underlying {@code Properties} object.
  *
  * @author lkuehne
  */
 public final class PropertiesExpander
     implements PropertyResolver {
     /** the underlying Properties object. */
-    private final Properties properties;
+    private final Properties properties = new Properties();
 
     /**
      * Creates a new PropertiesExpander.
@@ -42,10 +42,9 @@ public final class PropertiesExpander
         if (properties == null) {
             throw new IllegalArgumentException("cannot pass null");
         }
-        this.properties = properties;
+        this.properties.putAll(properties);
     }
 
-    /** {@inheritDoc} */
     @Override
     public String resolve(String propertyName) {
         return properties.getProperty(propertyName);

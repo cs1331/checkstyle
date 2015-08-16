@@ -21,9 +21,12 @@ package com.puppycrawl.tools.checkstyle.checks;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
-import com.google.common.collect.Sets;
+
 import java.util.Set;
+
 import org.junit.Test;
+
+import com.google.common.collect.Sets;
 
 public class ClassResolverTest {
     @Test
@@ -56,6 +59,7 @@ public class ClassResolverTest {
         }
 
         imps.add("java.text.ChoiceFormat");
+        cr = new ClassResolver(Thread.currentThread().getContextClassLoader(), null, imps);
         cr.resolve("ChoiceFormat", "");
 
         cr = new ClassResolver(Thread.currentThread().getContextClassLoader(),

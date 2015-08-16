@@ -21,11 +21,14 @@ package com.puppycrawl.tools.checkstyle.api;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import com.puppycrawl.tools.checkstyle.TreeWalker;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.text.MessageFormat;
+
 import org.junit.Test;
+
+import com.puppycrawl.tools.checkstyle.TreeWalker;
 
 /**
  * TestCase to check DetailAST.
@@ -62,6 +65,47 @@ public class DetailASTTest {
     }
 
     @Test
+    public void testSetSiblingNull() {
+        final DetailAST root = new DetailAST();
+        final DetailAST firstLevelA = new DetailAST();
+
+        root.setFirstChild(firstLevelA);
+
+        assertEquals(1, root.getChildCount());
+
+        firstLevelA.setParent(root);
+        firstLevelA.addPreviousSibling(null);
+        firstLevelA.addNextSibling(null);
+
+        assertEquals(1, root.getChildCount());
+    }
+
+    @Test
+    public void testInsertSiblingBetween() {
+        final DetailAST root = new DetailAST();
+        final DetailAST firstLevelA = new DetailAST();
+        final DetailAST firstLevelB = new DetailAST();
+        final DetailAST firstLevelC = new DetailAST();
+
+        assertEquals(0, root.getChildCount());
+
+        root.setFirstChild(firstLevelA);
+        firstLevelA.setParent(root);
+
+        assertEquals(1, root.getChildCount());
+
+        firstLevelA.addNextSibling(firstLevelB);
+        firstLevelB.setParent(root);
+
+        assertEquals(firstLevelB, firstLevelA.getNextSibling());
+
+        firstLevelA.addNextSibling(firstLevelC);
+        firstLevelC.setParent(root);
+
+        assertEquals(firstLevelC, firstLevelA.getNextSibling());
+    }
+
+    @Test
     public void testTreeStructure() throws Exception {
         checkDir(new File("src/test/resources/com/puppycrawl/tools/checkstyle"));
     }
@@ -85,7 +129,7 @@ public class DetailASTTest {
         }
     }
 
-    private void checkFile(String filename) throws Exception {
+    private static void checkFile(String filename) throws Exception {
         final FileText text = new FileText(new File(filename),
                            System.getProperty("file.encoding", "UTF-8"));
         final FileContents contents = new FileContents(text);
@@ -95,7 +139,7 @@ public class DetailASTTest {
         }
     }
 
-    private void checkTree(final DetailAST node,
+    private static void checkTree(final DetailAST node,
                            final DetailAST parent,
                            final DetailAST prev,
                            final String filename,

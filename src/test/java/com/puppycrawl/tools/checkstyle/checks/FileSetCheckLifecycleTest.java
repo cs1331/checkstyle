@@ -20,18 +20,20 @@
 package com.puppycrawl.tools.checkstyle.checks;
 
 import static org.junit.Assert.assertTrue;
+
+import java.io.File;
+import java.util.List;
+import java.util.Locale;
+
+import org.junit.Test;
+
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.Checker;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.TreeWalker;
 import com.puppycrawl.tools.checkstyle.api.AbstractFileSetCheck;
 import com.puppycrawl.tools.checkstyle.api.Configuration;
-import java.io.File;
-import java.util.List;
-import java.util.Locale;
-
 import com.puppycrawl.tools.checkstyle.checks.imports.AvoidStarImportCheck;
-import org.junit.Test;
 
 public class FileSetCheckLifecycleTest
     extends BaseCheckTestSupport {
@@ -41,33 +43,6 @@ public class FileSetCheckLifecycleTest
         final DefaultConfiguration dc = new DefaultConfiguration("root");
         dc.addChild(checkConfig);
         return dc;
-    }
-
-    public static class TestFileSetCheck extends AbstractFileSetCheck {
-        private static boolean destroyed;
-        private static boolean fileContentAvailable;
-
-        @Override
-        public void destroy() {
-            destroyed = true;
-        }
-
-        public static boolean isDestroyed() {
-            return destroyed;
-        }
-
-        public static boolean isFileContentAvailable() {
-            return fileContentAvailable;
-        }
-
-        @Override
-        protected void processFiltered(File file, List<String> lines) {
-        }
-
-        @Override
-        public void finishProcessing() {
-            fileContentAvailable = FileContentsHolder.getContents() != null;
-        }
     }
 
     @Test
@@ -99,7 +74,6 @@ public class FileSetCheckLifecycleTest
         checker.configure(dc);
         checker.addListener(new BriefLogger(stream));
 
-
         checker.addFileSetCheck(new TestFileSetCheck());
 
         final String[] expected = {
@@ -109,5 +83,32 @@ public class FileSetCheckLifecycleTest
 
         assertTrue("FileContent should be available during finishProcessing() call",
                 TestFileSetCheck.isFileContentAvailable());
+    }
+
+    public static class TestFileSetCheck extends AbstractFileSetCheck {
+        private static boolean destroyed;
+        private static boolean fileContentAvailable;
+
+        @Override
+        public void destroy() {
+            destroyed = true;
+        }
+
+        public static boolean isDestroyed() {
+            return destroyed;
+        }
+
+        public static boolean isFileContentAvailable() {
+            return fileContentAvailable;
+        }
+
+        @Override
+        protected void processFiltered(File file, List<String> lines) {
+        }
+
+        @Override
+        public void finishProcessing() {
+            fileContentAvailable = FileContentsHolder.getContents() != null;
+        }
     }
 }

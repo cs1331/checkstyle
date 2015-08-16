@@ -59,7 +59,7 @@ public class DefaultLogger
     private int errorCount;
 
     /**
-     * Creates a new <code>DefaultLogger</code> instance.
+     * Creates a new {@code DefaultLogger} instance.
      * @param os where to log infos and errors
      * @param closeStreamsAfterUse if oS should be closed in auditFinished()
      * @exception UnsupportedEncodingException if there is a problem to use UTF-8 encoding
@@ -71,11 +71,11 @@ public class DefaultLogger
     }
 
     /**
-     * Creates a new <code>DefaultLogger</code> instance.
+     * Creates a new {@code DefaultLogger} instance.
      *
-     * @param infoStream the <code>OutputStream</code> for info messages
+     * @param infoStream the {@code OutputStream} for info messages
      * @param closeInfoAfterUse auditFinished should close infoStream
-     * @param errorStream the <code>OutputStream</code> for error messages
+     * @param errorStream the {@code OutputStream} for error messages
      * @param closeErrorAfterUse auditFinished should close errorStream
      * @exception UnsupportedEncodingException if there is a problem to use UTF-8 encoding
      */
@@ -96,13 +96,12 @@ public class DefaultLogger
     /**
      * Print an Emacs compliant line on the error stream.
      * If the column number is non zero, then also display it.
-     * @param evt {@inheritDoc}
      * @see AuditListener
      **/
     @Override
     public void addError(AuditEvent evt) {
         final SeverityLevel severityLevel = evt.getSeverityLevel();
-        if (SeverityLevel.IGNORE != severityLevel) {
+        if (severityLevel != SeverityLevel.IGNORE) {
 
             final String fileName = evt.getFileName();
             final String message = evt.getMessage();
@@ -116,17 +115,16 @@ public class DefaultLogger
             if (evt.getColumn() > 0) {
                 sb.append(':').append(evt.getColumn());
             }
-            if (SeverityLevel.WARNING == severityLevel) {
+            if (severityLevel == SeverityLevel.WARNING) {
                 sb.append(": warning");
             }
             sb.append(": ").append(message);
-            errorWriter.println(sb.toString());
+            errorWriter.println(sb);
 
             errorCount++;
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void addException(AuditEvent evt, Throwable throwable) {
         synchronized (errorWriter) {
@@ -135,22 +133,20 @@ public class DefaultLogger
         }
     }
 
-    /** {@inheritDoc} */
     @Override
     public void auditStarted(AuditEvent evt) {
     }
 
-    /** {@inheritDoc} */
     @Override
     public void fileFinished(AuditEvent evt) {
+        // No need to implement this method in this class
     }
 
-    /** {@inheritDoc} */
     @Override
     public void fileStarted(AuditEvent evt) {
+        // No need to implement this method in this class
     }
 
-    /** {@inheritDoc} */
     @Override
     public void auditFinished(AuditEvent evt) {
         infoWriter.println("Audit done. Errors (potential points off):\n"

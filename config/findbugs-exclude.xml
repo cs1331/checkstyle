@@ -12,7 +12,7 @@
     <Match>
       <!-- Looks like catch Exception and throw BuidException is normal practice in ANT, so we follow their style -->
       <!-- Example: https://git-wip-us.apache.org/repos/asf?p=ant.git;a=blob;f=src/main/org/apache/tools/ant/taskdefs/Checksum.java;h=7a94ca098baf241b175a6bab3dda092aed835ada;hb=HEAD#l574 -->
-      <Class name="com.puppycrawl.tools.checkstyle.CheckStyleTask" />
+      <Class name="com.puppycrawl.tools.checkstyle.ant.CheckstyleAntTask" />
       <Method name="createChecker" />
       <Bug pattern="REC_CATCH_EXCEPTION" />
     </Match>
@@ -74,11 +74,19 @@
       <Bug pattern="BC_UNCONFIRMED_CAST" />
     </Match>
     <Match>
+      <!-- Support both getFileName() and getFilename() -->
+      <and>
+        <Class name="com.puppycrawl.tools.checkstyle.api.FileContents" />
+        <Method name="~setFile[nN]ame" />
+      </and>
+      <Bug pattern="NM_CONFUSING" />
+    </Match>
+    <Match>
       <!-- false positive, beginTree is a kind of constructor for Checks -->
       <Or>
-        <Class name="com.puppycrawl.tools.checkstyle.checks.DeclarationCollector" />
+        <Class name="com.puppycrawl.tools.checkstyle.checks.AbstractDeclarationCollector" />
         <Class name="com.puppycrawl.tools.checkstyle.checks.OuterTypeFilenameCheck" />
-        <Class name="com.puppycrawl.tools.checkstyle.checks.RegexpCheck" />
+        <Class name="com.puppycrawl.tools.checkstyle.checks.regexp.RegexpCheck" />
         <!-- createJavadocNode is private and can not be launched without visitToken-->
         <Class name="com.puppycrawl.tools.checkstyle.checks.javadoc.AbstractJavadocCheck" />
         <!-- has only one public method and all nitialized inthat method-->
@@ -88,5 +96,11 @@
         <Class name="com.puppycrawl.tools.checkstyle.checks.regexp.RegexpSinglelineCheck" />
       </Or>
       <Bug pattern="UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR" />
+    </Match>
+    <Match>
+        <!-- maxLineLength is deprecated since 6.10 release -->
+        <Class name="com.puppycrawl.tools.checkstyle.checks.blocks.LeftCurlyCheck" />
+        <Field name="maxLineLength" />
+        <Bug pattern="URF_UNREAD_FIELD" />
     </Match>
 </FindBugsFilter>

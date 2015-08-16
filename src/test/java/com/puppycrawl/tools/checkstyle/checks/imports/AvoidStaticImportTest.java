@@ -19,12 +19,16 @@
 
 package com.puppycrawl.tools.checkstyle.checks.imports;
 
-import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
-import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
+import static com.puppycrawl.tools.checkstyle.checks.imports.AvoidStaticImportCheck.MSG_KEY;
+import static org.junit.Assert.assertArrayEquals;
+
 import java.io.File;
+
 import org.junit.Test;
 
-import static com.puppycrawl.tools.checkstyle.checks.imports.AvoidStaticImportCheck.MSG_KEY;
+import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
+import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
+import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
 public class AvoidStaticImportTest
     extends BaseCheckTestSupport {
@@ -39,6 +43,8 @@ public class AvoidStaticImportTest
             "26: " + getCheckMessage(MSG_KEY, "javax.swing.WindowConstants.*"),
             "27: " + getCheckMessage(MSG_KEY, "java.io.File.createTempFile"),
             "28: " + getCheckMessage(MSG_KEY, "java.io.File.pathSeparator"),
+            "29: " + getCheckMessage(MSG_KEY, "com.puppycrawl.tools.checkstyle.imports.InputAvoidStaticImportNestedClass.InnerClass"),
+            "30: " + getCheckMessage(MSG_KEY, "com.puppycrawl.tools.checkstyle.imports.InputAvoidStaticImportNestedClass.InnerClass.one"),
         };
 
         verify(checkConfig, getPath("imports" + File.separator + "InputAvoidStaticImportCheck.java"), expected);
@@ -50,10 +56,12 @@ public class AvoidStaticImportTest
         final DefaultConfiguration checkConfig =
             createCheckConfig(AvoidStaticImportCheck.class);
         checkConfig.addAttribute("excludes", "java.io.File.*,sun.net.ftpclient.FtpClient.*");
-        // allow the java.io.File.*/sun.net.ftpclient.FtpClient.* star imports
+        // allow the "java.io.File.*" AND "sun.net.ftpclient.FtpClient.*" star imports
         final String[] expected = {
             "25: " + getCheckMessage(MSG_KEY, "javax.swing.WindowConstants.*"),
             "26: " + getCheckMessage(MSG_KEY, "javax.swing.WindowConstants.*"),
+            "29: " + getCheckMessage(MSG_KEY, "com.puppycrawl.tools.checkstyle.imports.InputAvoidStaticImportNestedClass.InnerClass"),
+            "30: " + getCheckMessage(MSG_KEY, "com.puppycrawl.tools.checkstyle.imports.InputAvoidStaticImportNestedClass.InnerClass.one"),
         };
         verify(checkConfig, getPath("imports" + File.separator + "InputAvoidStaticImportCheck.java"), expected);
     }
@@ -70,6 +78,8 @@ public class AvoidStaticImportTest
             "26: " + getCheckMessage(MSG_KEY, "javax.swing.WindowConstants.*"),
             "27: " + getCheckMessage(MSG_KEY, "java.io.File.createTempFile"),
             "28: " + getCheckMessage(MSG_KEY, "java.io.File.pathSeparator"),
+            "29: " + getCheckMessage(MSG_KEY, "com.puppycrawl.tools.checkstyle.imports.InputAvoidStaticImportNestedClass.InnerClass"),
+            "30: " + getCheckMessage(MSG_KEY, "com.puppycrawl.tools.checkstyle.imports.InputAvoidStaticImportNestedClass.InnerClass.one"),
         };
         verify(checkConfig, getPath("imports" + File.separator + "InputAvoidStaticImportCheck.java"), expected);
     }
@@ -80,17 +90,48 @@ public class AvoidStaticImportTest
         final DefaultConfiguration checkConfig =
             createCheckConfig(AvoidStaticImportCheck.class);
         checkConfig.addAttribute(
-            "excludes",
-            "java.io.File.listRoots.listRoots, javax.swing.WindowConstants,"
+            "excludes", //should NOT mask anything
+            "java.io.File.listRoots.listRoots, javax.swing.WindowConstants, javax.swing.*,"
             + "sun.net.ftpclient.FtpClient.*FtpClient, sun.net.ftpclient.FtpClientjunk, java.io.File.listRootsmorejunk");
-        // allow the java.io.File.listRoots member imports
         final String[] expected = {
             "23: " + getCheckMessage(MSG_KEY, "java.io.File.listRoots"),
             "25: " + getCheckMessage(MSG_KEY, "javax.swing.WindowConstants.*"),
             "26: " + getCheckMessage(MSG_KEY, "javax.swing.WindowConstants.*"),
             "27: " + getCheckMessage(MSG_KEY, "java.io.File.createTempFile"),
             "28: " + getCheckMessage(MSG_KEY, "java.io.File.pathSeparator"),
+            "29: " + getCheckMessage(MSG_KEY, "com.puppycrawl.tools.checkstyle.imports.InputAvoidStaticImportNestedClass.InnerClass"),
+            "30: " + getCheckMessage(MSG_KEY, "com.puppycrawl.tools.checkstyle.imports.InputAvoidStaticImportNestedClass.InnerClass.one"),
         };
         verify(checkConfig, getPath("imports" + File.separator + "InputAvoidStaticImportCheck.java"), expected);
     }
+
+    @Test
+    public void testInnerClassMemberExcludesStar()
+        throws Exception {
+        final DefaultConfiguration checkConfig =
+            createCheckConfig(AvoidStaticImportCheck.class);
+        checkConfig.addAttribute(
+            "excludes", //should mask com.puppycrawl.tools.checkstyle.imports.InputAvoidStaticImportNestedClass.InnerClass.one
+            "com.puppycrawl.tools.checkstyle.imports.InputAvoidStaticImportNestedClass.InnerClass.*");
+        final String[] expected = {
+            "23: " + getCheckMessage(MSG_KEY, "java.io.File.listRoots"),
+            "25: " + getCheckMessage(MSG_KEY, "javax.swing.WindowConstants.*"),
+            "26: " + getCheckMessage(MSG_KEY, "javax.swing.WindowConstants.*"),
+            "27: " + getCheckMessage(MSG_KEY, "java.io.File.createTempFile"),
+            "28: " + getCheckMessage(MSG_KEY, "java.io.File.pathSeparator"),
+            "29: " + getCheckMessage(MSG_KEY, "com.puppycrawl.tools.checkstyle.imports.InputAvoidStaticImportNestedClass.InnerClass"),
+        };
+        verify(checkConfig, getPath("imports" + File.separator + "InputAvoidStaticImportCheck.java"), expected);
+    }
+
+    @Test
+    public void testGetAcceptableTokens() {
+        AvoidStaticImportCheck testCheckObject =
+                new AvoidStaticImportCheck();
+        int[] actual = testCheckObject.getAcceptableTokens();
+        int[] expected = new int[]{TokenTypes.STATIC_IMPORT};
+
+        assertArrayEquals(expected, actual);
+    }
+
 }

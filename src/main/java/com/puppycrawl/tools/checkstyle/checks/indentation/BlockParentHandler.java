@@ -41,11 +41,11 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  *
  * @author jrichard
  */
-public class BlockParentHandler extends ExpressionHandler {
+public class BlockParentHandler extends AbstractExpressionHandler {
     /**
      * Children checked by parent handlers.
      */
-    private static final int[] CHECKED_CHILDREN = new int[] {
+    private static final int[] CHECKED_CHILDREN = {
         TokenTypes.VARIABLE_DEF,
         TokenTypes.EXPR,
         TokenTypes.OBJBLOCK,
@@ -65,7 +65,7 @@ public class BlockParentHandler extends ExpressionHandler {
      * @param parent        the parent handler
      */
     public BlockParentHandler(IndentationCheck indentCheck,
-        String name, DetailAST ast, ExpressionHandler parent) {
+        String name, DetailAST ast, AbstractExpressionHandler parent) {
         super(indentCheck, name, ast, parent);
     }
 
@@ -108,7 +108,7 @@ public class BlockParentHandler extends ExpressionHandler {
      */
     protected boolean hasLabelBefore() {
         final DetailAST parent = getToplevelAST().getParent();
-        return parent != null && parent.getType() == TokenTypes.LABELED_STAT
+        return parent.getType() == TokenTypes.LABELED_STAT
             && parent.getLineNo() == getToplevelAST().getLineNo();
     }
 
@@ -146,10 +146,6 @@ public class BlockParentHandler extends ExpressionHandler {
      */
     protected DetailAST getRCurly() {
         final DetailAST slist = getMainAst().findFirstToken(TokenTypes.SLIST);
-        if (slist == null) {
-            return null;
-        }
-
         return slist.findFirstToken(TokenTypes.RCURLY);
     }
 
@@ -296,8 +292,7 @@ public class BlockParentHandler extends ExpressionHandler {
         // if we have multileveled expected level then we should
         // try to suggest single level to children using curlies'
         // levels.
-        if (getLevel().isMultiLevel() && hasCurlys()
-            && !areOnSameLine(getLCurly(), getRCurly())) {
+        if (getLevel().isMultiLevel() && hasCurlys()) {
             if (startsLine(getLCurly())) {
                 return new IndentLevel(expandedTabsColumnNo(getLCurly()) + getBasicOffset());
             }
@@ -311,14 +306,14 @@ public class BlockParentHandler extends ExpressionHandler {
     }
 
     @Override
-    public IndentLevel suggestedChildLevel(ExpressionHandler child) {
+    public IndentLevel suggestedChildLevel(AbstractExpressionHandler child) {
         return getChildrenExpectedLevel();
     }
 
     /**
-     * A shortcut for <code>IndentationCheck</code> property.
+     * A shortcut for {@code IndentationCheck} property.
      * @return value of lineWrappingIndentation property
-     *         of <code>IndentationCheck</code>
+     *         of {@code IndentationCheck}
      */
     private int getLineWrappingIndent() {
         return getIndentCheck().getLineWrappingIndentation();

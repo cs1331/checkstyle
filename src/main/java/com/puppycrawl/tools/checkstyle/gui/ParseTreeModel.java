@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // checkstyle: Checks Java source code for adherence to a set of rules.
-// Copyright (C) 2001-2002  Oliver Burn
+// Copyright (C) 2001-2015 the original author or authors.
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -19,8 +19,11 @@
 
 package com.puppycrawl.tools.checkstyle.gui;
 
+import javax.swing.tree.TreePath;
+
 import antlr.ASTFactory;
 import antlr.collections.AST;
+
 import com.puppycrawl.tools.checkstyle.Utils;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
@@ -31,8 +34,8 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  * @author Lars Kühne
  */
 public class ParseTreeModel extends AbstractTreeTableModel {
-    private static final String[] COLUMN_NAMES = new String[]{
-        "Tree", "Type", "Line", "Column", "Text"
+    private static final String[] COLUMN_NAMES = {
+        "Tree", "Type", "Line", "Column", "Text",
     };
 
     public ParseTreeModel(DetailAST parseTree) {
@@ -46,13 +49,13 @@ public class ParseTreeModel extends AbstractTreeTableModel {
         return (DetailAST) factory.create(TokenTypes.EOF, "ROOT");
     }
 
-    void setParseTree(DetailAST parseTree) {
+    final void setParseTree(DetailAST parseTree) {
         final DetailAST root = (DetailAST) getRoot();
         root.setFirstChild(parseTree);
         final Object[] path = {root};
         // no need to setup remaining info, as the call results in a
         // table structure changed event anyway - we just pass nulls
-        fireTreeStructureChanged(this, path, null, null);
+        fireTreeStructureChanged(this, path, null, (Object[]) null);
     }
 
     @Override
@@ -104,6 +107,7 @@ public class ParseTreeModel extends AbstractTreeTableModel {
 
     @Override
     public void setValueAt(Object aValue, Object node, int column) {
+        // No code, tree is read-only
     }
 
     @Override
@@ -124,4 +128,8 @@ public class ParseTreeModel extends AbstractTreeTableModel {
         return ast.getChildCount();
     }
 
+    @Override
+    public void valueForPathChanged(TreePath path, Object newValue) {
+        //No Code, as tree is read-only
+    }
 }

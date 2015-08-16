@@ -19,10 +19,11 @@
 
 package com.puppycrawl.tools.checkstyle.checks.indentation;
 
-import com.puppycrawl.tools.checkstyle.api.Check;
-import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import java.util.ArrayDeque;
 import java.util.Deque;
+
+import com.puppycrawl.tools.checkstyle.api.Check;
+import com.puppycrawl.tools.checkstyle.api.DetailAST;
 
 /**
  * Checks correct indentation of Java Code.
@@ -108,7 +109,7 @@ public class IndentationCheck extends Check {
     private boolean forceStrictCondition;
 
     /** handlers currently in use */
-    private final Deque<ExpressionHandler> handlers = new ArrayDeque<>();
+    private final Deque<AbstractExpressionHandler> handlers = new ArrayDeque<>();
 
     /** factory from which handlers are distributed */
     private final HandlerFactory handlerFactory = new HandlerFactory();
@@ -198,7 +199,7 @@ public class IndentationCheck extends Check {
      * @return the throws indentation level
      */
     public int getThrowsIndent() {
-        return this.throwsIndentationAmount;
+        return throwsIndentationAmount;
     }
 
     /**
@@ -216,7 +217,7 @@ public class IndentationCheck extends Check {
      * @return the initialisation indentation level
      */
     public int getArrayInitIndent() {
-        return this.arrayInitIndentationAmount;
+        return arrayInitIndentationAmount;
     }
 
     /**
@@ -227,7 +228,6 @@ public class IndentationCheck extends Check {
     public int getLineWrappingIndentation() {
         return lineWrappingIndentation;
     }
-
 
     /**
      * Set the line-wrapping indentation level.
@@ -248,7 +248,7 @@ public class IndentationCheck extends Check {
      * @see java.text.MessageFormat
      */
     public void indentationLog(int line, String key, Object... args) {
-        super.log(line, key, args);
+        log(line, key, args);
     }
 
     /**
@@ -269,12 +269,14 @@ public class IndentationCheck extends Check {
     public void beginTree(DetailAST ast) {
         handlerFactory.clearCreatedHandlers();
         handlers.clear();
-        handlers.push(new PrimordialHandler(this));
+        final PrimordialHandler primordialHandler = new PrimordialHandler(this);
+        handlers.push(primordialHandler);
+        primordialHandler.checkIndentation();
     }
 
     @Override
     public void visitToken(DetailAST ast) {
-        final ExpressionHandler handler = handlerFactory.getHandler(this, ast,
+        final AbstractExpressionHandler handler = handlerFactory.getHandler(this, ast,
             handlers.peek());
         handlers.push(handler);
         handler.checkIndentation();

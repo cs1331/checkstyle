@@ -19,16 +19,34 @@
 
 package com.puppycrawl.tools.checkstyle.checks.javadoc;
 
+import static com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck.JAVADOC_MISSING;
+import static org.junit.Assert.assertArrayEquals;
+
+import java.io.File;
+
+import org.junit.Test;
+
 import com.puppycrawl.tools.checkstyle.BaseCheckTestSupport;
 import com.puppycrawl.tools.checkstyle.DefaultConfiguration;
 import com.puppycrawl.tools.checkstyle.api.Scope;
-import java.io.File;
-import org.junit.Test;
-
-import static com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocVariableCheck.JAVADOC_MISSING;
+import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
 public class JavadocVariableCheckTest
     extends BaseCheckTestSupport {
+
+    @Test
+    public void testGetAcceptableTokens() {
+        JavadocVariableCheck javadocVariableCheck = new JavadocVariableCheck();
+
+        int[] actual = javadocVariableCheck.getAcceptableTokens();
+        int[] expected = new int[]{
+            TokenTypes.VARIABLE_DEF,
+            TokenTypes.ENUM_CONSTANT_DEF,
+        };
+
+        assertArrayEquals(expected, actual);
+    }
+
     @Test
     public void testDefault()
         throws Exception {
@@ -249,6 +267,56 @@ public class JavadocVariableCheckTest
             "101:9: " + getCheckMessage(JAVADOC_MISSING),
             "102:9: " + getCheckMessage(JAVADOC_MISSING),
             "103:9: " + getCheckMessage(JAVADOC_MISSING),
+        };
+        verify(checkConfig,
+                getPath("javadoc" + File.separator + "InputNoJavadoc.java"),
+                expected);
+    }
+
+    @Test
+    public void testDoNotIgnoreAnythingWhenIgnoreNamePatternIsEmpty()
+        throws Exception {
+        final DefaultConfiguration checkConfig =
+                createCheckConfig(JavadocVariableCheck.class);
+        checkConfig.addAttribute("ignoreNamePattern", "");
+        final String[] expected = {
+            "5:5: " + getCheckMessage(JAVADOC_MISSING),
+            "6:5: " + getCheckMessage(JAVADOC_MISSING),
+            "7:5: " + getCheckMessage(JAVADOC_MISSING),
+            "8:5: " + getCheckMessage(JAVADOC_MISSING),
+            "16:9: " + getCheckMessage(JAVADOC_MISSING),
+            "17:9: " + getCheckMessage(JAVADOC_MISSING),
+            "18:9: " + getCheckMessage(JAVADOC_MISSING),
+            "19:9: " + getCheckMessage(JAVADOC_MISSING),
+            "28:9: " + getCheckMessage(JAVADOC_MISSING),
+            "29:9: " + getCheckMessage(JAVADOC_MISSING),
+            "30:9: " + getCheckMessage(JAVADOC_MISSING),
+            "31:9: " + getCheckMessage(JAVADOC_MISSING),
+            "40:9: " + getCheckMessage(JAVADOC_MISSING),
+            "41:9: " + getCheckMessage(JAVADOC_MISSING),
+            "42:9: " + getCheckMessage(JAVADOC_MISSING),
+            "43:9: " + getCheckMessage(JAVADOC_MISSING),
+            "53:5: " + getCheckMessage(JAVADOC_MISSING),
+            "54:5: " + getCheckMessage(JAVADOC_MISSING),
+            "55:5: " + getCheckMessage(JAVADOC_MISSING),
+            "56:5: " + getCheckMessage(JAVADOC_MISSING),
+            "64:9: " + getCheckMessage(JAVADOC_MISSING),
+            "65:9: " + getCheckMessage(JAVADOC_MISSING),
+            "66:9: " + getCheckMessage(JAVADOC_MISSING),
+            "67:9: " + getCheckMessage(JAVADOC_MISSING),
+            "76:9: " + getCheckMessage(JAVADOC_MISSING),
+            "77:9: " + getCheckMessage(JAVADOC_MISSING),
+            "78:9: " + getCheckMessage(JAVADOC_MISSING),
+            "79:9: " + getCheckMessage(JAVADOC_MISSING),
+            "88:9: " + getCheckMessage(JAVADOC_MISSING),
+            "89:9: " + getCheckMessage(JAVADOC_MISSING),
+            "90:9: " + getCheckMessage(JAVADOC_MISSING),
+            "91:9: " + getCheckMessage(JAVADOC_MISSING),
+            "100:9: " + getCheckMessage(JAVADOC_MISSING),
+            "101:9: " + getCheckMessage(JAVADOC_MISSING),
+            "102:9: " + getCheckMessage(JAVADOC_MISSING),
+            "103:9: " + getCheckMessage(JAVADOC_MISSING),
+            "113:9: " + getCheckMessage(JAVADOC_MISSING),
         };
         verify(checkConfig,
                 getPath("javadoc" + File.separator + "InputNoJavadoc.java"),

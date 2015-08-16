@@ -19,10 +19,10 @@
 
 package com.puppycrawl.tools.checkstyle.checks.design;
 
+import com.puppycrawl.tools.checkstyle.ScopeUtils;
 import com.puppycrawl.tools.checkstyle.api.Check;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.Scope;
-import com.puppycrawl.tools.checkstyle.ScopeUtils;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
 /**
@@ -80,13 +80,7 @@ public class DesignForExtensionCheck extends Check {
         if (ScopeUtils.inInterfaceOrAnnotationBlock(ast)) {
             return;
         }
-
-        // method is ok if it is private or abstract or final
-        final DetailAST modifiers = ast.findFirstToken(TokenTypes.MODIFIERS);
-        if (modifiers.branchContains(TokenTypes.LITERAL_PRIVATE)
-            || modifiers.branchContains(TokenTypes.ABSTRACT)
-            || modifiers.branchContains(TokenTypes.FINAL)
-            || modifiers.branchContains(TokenTypes.LITERAL_STATIC)) {
+        if (isPrivateOrFinalOrAbstract(ast)) {
             return;
         }
 
@@ -114,6 +108,33 @@ public class DesignForExtensionCheck extends Check {
             return;
         }
 
+        if (hasDefaultOrExplNonPrivateCtor(classDef)) {
+            final String name = ast.findFirstToken(TokenTypes.IDENT).getText();
+            log(ast.getLineNo(), ast.getColumnNo(),
+                MSG_KEY, name);
+        }
+    }
+
+    /**
+     * check for modifiers
+     * @param ast modifier ast
+     * @return tru in modifier is in checked ones
+     */
+    private static boolean isPrivateOrFinalOrAbstract(DetailAST ast) {
+        // method is ok if it is private or abstract or final
+        final DetailAST modifiers = ast.findFirstToken(TokenTypes.MODIFIERS);
+        return modifiers.branchContains(TokenTypes.LITERAL_PRIVATE)
+                || modifiers.branchContains(TokenTypes.ABSTRACT)
+                || modifiers.branchContains(TokenTypes.FINAL)
+                || modifiers.branchContains(TokenTypes.LITERAL_STATIC);
+    }
+
+    /**
+     * has Default Or Expl Non Private Ctor
+     * @param classDef class ast
+     * @return true if Check should make a violation
+     */
+    private static boolean hasDefaultOrExplNonPrivateCtor(DetailAST classDef) {
         // check if subclassing is prevented by having only private ctors
         final DetailAST objBlock = classDef.findFirstToken(TokenTypes.OBJBLOCK);
 
@@ -127,7 +148,7 @@ public class DesignForExtensionCheck extends Check {
                 hasDefaultConstructor = false;
 
                 final DetailAST ctorMods =
-                    candidate.findFirstToken(TokenTypes.MODIFIERS);
+                        candidate.findFirstToken(TokenTypes.MODIFIERS);
                 if (!ctorMods.branchContains(TokenTypes.LITERAL_PRIVATE)) {
                     hasExplNonPrivateCtor = true;
                     break;
@@ -136,14 +157,7 @@ public class DesignForExtensionCheck extends Check {
             candidate = candidate.getNextSibling();
         }
 
-        if (hasDefaultConstructor || hasExplNonPrivateCtor) {
-            final String name = ast.findFirstToken(TokenTypes.IDENT).getText();
-            log(ast.getLineNo(), ast.getColumnNo(),
-                MSG_KEY, name);
-        }
-
-
-
+        return hasDefaultConstructor || hasExplNonPrivateCtor;
     }
 
     /**
@@ -151,7 +165,7 @@ public class DesignForExtensionCheck extends Check {
      * @param ast the start node for searching
      * @return the CLASS_DEF node.
      */
-    private DetailAST findContainingClass(DetailAST ast) {
+    private static DetailAST findContainingClass(DetailAST ast) {
         DetailAST searchAST = ast;
         while (searchAST.getType() != TokenTypes.CLASS_DEF
                && searchAST.getType() != TokenTypes.ENUM_DEF) {

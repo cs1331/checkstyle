@@ -27,11 +27,11 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  *
  * @author jrichard
  */
-public class LabelHandler extends ExpressionHandler {
+public class LabelHandler extends AbstractExpressionHandler {
     /**
      * The types of expressions that are children of a label.
      */
-    private static final int[] LABEL_CHILDREN = new int[] {
+    private static final int[] LABEL_CHILDREN = {
         TokenTypes.IDENT,
     };
 
@@ -44,7 +44,7 @@ public class LabelHandler extends ExpressionHandler {
      * @param parent        the parent handler
      */
     public LabelHandler(IndentationCheck indentCheck,
-        DetailAST expr, ExpressionHandler parent) {
+        DetailAST expr, AbstractExpressionHandler parent) {
         super(indentCheck, "label", expr, parent);
     }
 

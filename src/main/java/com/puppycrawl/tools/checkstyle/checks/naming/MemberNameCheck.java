@@ -19,8 +19,8 @@
 
 package com.puppycrawl.tools.checkstyle.checks.naming;
 
-import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.ScopeUtils;
+import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
 /**
@@ -51,7 +51,7 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  */
 public class MemberNameCheck
     extends AbstractAccessControlNameCheck {
-    /** Creates a new <code>MemberNameCheck</code> instance. */
+    /** Creates a new {@code MemberNameCheck} instance. */
     public MemberNameCheck() {
         super("^[a-z][a-zA-Z0-9]*$");
     }
@@ -70,8 +70,7 @@ public class MemberNameCheck
     protected final boolean mustCheckName(DetailAST ast) {
         final DetailAST modifiersAST =
             ast.findFirstToken(TokenTypes.MODIFIERS);
-        final boolean isStatic = modifiersAST != null
-            && modifiersAST.branchContains(TokenTypes.LITERAL_STATIC);
+        final boolean isStatic = modifiersAST.branchContains(TokenTypes.LITERAL_STATIC);
 
         return !isStatic && !ScopeUtils.inInterfaceOrAnnotationBlock(ast)
             && !ScopeUtils.isLocalVariableDef(ast)

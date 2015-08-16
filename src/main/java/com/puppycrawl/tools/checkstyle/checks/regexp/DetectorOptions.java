@@ -19,9 +19,9 @@
 
 package com.puppycrawl.tools.checkstyle.checks.regexp;
 
-import com.puppycrawl.tools.checkstyle.api.AbstractViolationReporter;
-
 import java.util.regex.Pattern;
+
+import com.puppycrawl.tools.checkstyle.api.AbstractViolationReporter;
 
 /**
  * Options for a detector.
@@ -183,7 +183,7 @@ class DetectorOptions {
      * @return the pattern to use when matching.
      */
     public Pattern getPattern() {
-        final int options = ignoreCase ? compileFlags
+        final int options = isIgnoreCase() ? compileFlags
                 | Pattern.CASE_INSENSITIVE : compileFlags;
         return Pattern.compile(format, options);
     }

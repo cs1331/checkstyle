@@ -19,20 +19,21 @@
 
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
+
+import com.puppycrawl.tools.checkstyle.ScopeUtils;
 import com.puppycrawl.tools.checkstyle.api.Check;
 import com.puppycrawl.tools.checkstyle.api.DetailAST;
 import com.puppycrawl.tools.checkstyle.api.Scope;
-import com.puppycrawl.tools.checkstyle.ScopeUtils;
 import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import java.util.ArrayDeque;
-import java.util.Deque;
 
 /**
  * <p>
  * Checks that the parts of a class or interface declaration
  * appear in the order suggested by the
  * <a
- * href="http://www.oracle.com/technetwork/java/codeconvtoc-136057.html"
+ * href="http://www.oracle.com/technetwork/java/javase/documentation/codeconventions-141855.html#1852"
  * >Code Conventions for the Java Programming Language</a>.
  *
  *
@@ -46,6 +47,50 @@ import java.util.Deque;
  * <li> Constructors </li>
  * <li> Methods </li>
  * </ol>
+ *
+ * <p>
+ * Available options:
+ * <ul>
+ * <li>ignoreModifiers</li>
+ * <li>ignoreConstructors</li>
+ * <li>ignoreMethods</li>
+ * </ul>
+ *
+ * <p>
+ * Purpose of <b>ignore*</b> option is to ignore related violations,
+ * however it still impacts on other class members.
+ *
+ * <p>
+ * For example:
+ * <pre><code>
+ *     class K {
+ *         int a;
+ *         void m(){}
+ *         K(){}  &lt;-- "Constructor definition in wrong order"
+ *         int b; &lt;-- "Instance variable definition in wrong order"
+ *     }
+ * </code></pre>
+ *
+ * <p>
+ * With <b>ignoreConstructors</b> option:
+ * <pre><code>
+ *     class K {
+ *         int a;
+ *         void m(){}
+ *         K(){}
+ *         int b; &lt;-- "Instance variable definition in wrong order"
+ *     }
+ * </code></pre>
+ *
+ * <p>
+ * With <b>ignoreConstructors</b> option and without a method definition in a source class:
+ * <pre><code>
+ *     class K {
+ *         int a;
+ *         K(){}
+ *         int b; &lt;-- "Instance variable definition in wrong order"
+ *     }
+ * </code></pre>
  *
  * <p>
  * An example of how to configure the check is:
@@ -106,17 +151,6 @@ public class DeclarationOrderCheck extends Check {
      */
     private final Deque<ScopeState> scopeStates = new ArrayDeque<>();
 
-    /**
-     * private class to encapsulate the state
-     */
-    private static class ScopeState {
-        /** The state the check is in */
-        private int currentScopeState = STATE_STATIC_VARIABLE_DEF;
-
-        /** The sub-state the check is in */
-        private Scope declarationAccess = Scope.PUBLIC;
-    }
-
     /** If true, ignores the check to constructors. */
     private boolean ignoreConstructors;
     /** If true, ignore the check to methods. */
@@ -147,7 +181,6 @@ public class DeclarationOrderCheck extends Check {
     @Override
     public void visitToken(DetailAST ast) {
         final int parentType = ast.getParent().getType();
-        ScopeState state;
 
         switch (ast.getType()) {
             case TokenTypes.OBJBLOCK:
@@ -159,74 +192,103 @@ public class DeclarationOrderCheck extends Check {
                     return;
                 }
 
-                state = scopeStates.peek();
-                if (state.currentScopeState > STATE_CTOR_DEF) {
-                    if (!ignoreConstructors) {
-                        log(ast, MSG_CONSTRUCTOR);
-                    }
-                }
-                else {
-                    state.currentScopeState = STATE_CTOR_DEF;
-                }
+                processConstructor(ast);
                 break;
 
             case TokenTypes.METHOD_DEF:
-                state = scopeStates.peek();
+
                 if (parentType != TokenTypes.OBJBLOCK) {
                     return;
                 }
 
-                if (state.currentScopeState > STATE_METHOD_DEF) {
-                    if (!ignoreMethods) {
-                        log(ast, MSG_METHOD);
-                    }
-                }
-                else {
-                    state.currentScopeState = STATE_METHOD_DEF;
-                }
+                processMethod(ast);
                 break;
 
             case TokenTypes.MODIFIERS:
                 if (parentType != TokenTypes.VARIABLE_DEF
-                    || ast.getParent().getParent().getType()
+                        || ast.getParent().getParent().getType()
                         != TokenTypes.OBJBLOCK) {
                     return;
                 }
 
-                state = scopeStates.peek();
-                if (ast.findFirstToken(TokenTypes.LITERAL_STATIC) != null) {
-                    if (state.currentScopeState > STATE_STATIC_VARIABLE_DEF) {
-                        if (!ignoreModifiers
-                            || state.currentScopeState > STATE_INSTANCE_VARIABLE_DEF) {
-                            log(ast, MSG_STATIC);
-                        }
-                    }
-                    else {
-                        state.currentScopeState = STATE_STATIC_VARIABLE_DEF;
-                    }
-                }
-                else {
-                    if (state.currentScopeState > STATE_INSTANCE_VARIABLE_DEF) {
-                        log(ast, MSG_INSTANCE);
-                    }
-                    else if (state.currentScopeState == STATE_STATIC_VARIABLE_DEF) {
-                        state.declarationAccess = Scope.PUBLIC;
-                        state.currentScopeState = STATE_INSTANCE_VARIABLE_DEF;
-                    }
-                }
-
-                final Scope access = ScopeUtils.getScopeFromMods(ast);
-                if (state.declarationAccess.compareTo(access) > 0) {
-                    if (!ignoreModifiers) {
-                        log(ast, MSG_ACCESS);
-                    }
-                }
-                else {
-                    state.declarationAccess = access;
-                }
+                processModifiers(ast);
                 break;
 
             default:
+                break;
+        }
+    }
+
+    /**
+     * process constructor
+     * @param ast constructor AST
+     */
+    private void processConstructor(DetailAST ast) {
+
+        final ScopeState state = scopeStates.peek();
+        if (state.currentScopeState > STATE_CTOR_DEF) {
+            if (!ignoreConstructors) {
+                log(ast, MSG_CONSTRUCTOR);
+            }
+        }
+        else {
+            state.currentScopeState = STATE_CTOR_DEF;
+        }
+    }
+
+    /**
+     * process Method Token
+     * @param ast ,ethod token AST
+     */
+    private void processMethod(DetailAST ast) {
+
+        final ScopeState state = scopeStates.peek();
+        if (state.currentScopeState > STATE_METHOD_DEF) {
+            if (!ignoreMethods) {
+                log(ast, MSG_METHOD);
+            }
+        }
+        else {
+            state.currentScopeState = STATE_METHOD_DEF;
+        }
+    }
+
+    /**
+     * process modifiers
+     * @param ast ast of Modifiers
+     */
+    private void processModifiers(DetailAST ast) {
+
+        final ScopeState state = scopeStates.peek();
+        if (ast.findFirstToken(TokenTypes.LITERAL_STATIC) != null) {
+            if (state.currentScopeState > STATE_STATIC_VARIABLE_DEF) {
+                if (!ignoreModifiers
+                    || state.currentScopeState > STATE_INSTANCE_VARIABLE_DEF) {
+                    log(ast, MSG_STATIC);
+                }
+            }
+            else {
+                state.currentScopeState = STATE_STATIC_VARIABLE_DEF;
+            }
+        }
+        else {
+            if (state.currentScopeState > STATE_INSTANCE_VARIABLE_DEF) {
+                log(ast, MSG_INSTANCE);
+            }
+            else if (state.currentScopeState == STATE_STATIC_VARIABLE_DEF) {
+                state.declarationAccess = Scope.PUBLIC;
+                state.currentScopeState = STATE_INSTANCE_VARIABLE_DEF;
+            }
+        }
+
+        final Scope access = ScopeUtils.getScopeFromMods(ast);
+        if (state.declarationAccess.compareTo(access) > 0) {
+            if (!ignoreModifiers) {
+                log(ast, MSG_ACCESS);
+            }
+        }
+        else {
+            state.declarationAccess = access;
         }
     }
 
@@ -259,5 +321,16 @@ public class DeclarationOrderCheck extends Check {
      */
     public void setIgnoreModifiers(boolean ignoreModifiers) {
         this.ignoreModifiers = ignoreModifiers;
+    }
+
+    /**
+     * private class to encapsulate the state
+     */
+    private static class ScopeState {
+        /** The state the check is in */
+        private int currentScopeState = STATE_STATIC_VARIABLE_DEF;
+
+        /** The sub-state the check is in */
+        private Scope declarationAccess = Scope.PUBLIC;
     }
 }

@@ -7,12 +7,12 @@
   <bannerLeft>
     <alt>Checkstyle</alt>
     <href>http://checkstyle.sourceforge.net</href>
-    <src>images/checkstyle_logo_small_64.png</src>
+    <src>images/header-checkstyle-logo.png</src>
   </bannerLeft>
   <bannerRight>
     <alt>Checkstyle</alt>
     <href>http://checkstyle.sourceforge.net</href>
-    <src>images/logo.png</src>
+    <src>images/header-right-ruller.png</src>
   </bannerRight>
   
   <publishDate position="right" />
@@ -21,14 +21,14 @@
   <poweredBy>
     <logo name="GitHub" href="https://github.com/checkstyle/checkstyle" 
     	img="images/github_logo_social_coding_outlined.png" 
-    	width="120" height="45"/>
+          />
     <logo name="SourceForge"
           img="images/sflogo.gif"
-          href="http://sourceforge.net/projects/checkstyle"
+          href="http://sourceforge.net/projects/checkstyle/"
           />
     <logo name="Twitter"
           img="images/twitter_button.png"
-          href="https://twitter.com/checkstyle_java"
+          href="https://twitter.com/checkstyle_java/"
           />
     <logo name="Stackoverflow"
           img="images/stackoverflow.jpeg"
@@ -44,7 +44,7 @@
           />
     <logo name="Google+"
           img="images/Google-Plus-Logo-120x38.png"
-          href="https://plus.google.com/u/0/108692338295483568100/posts"
+          href="https://plus.google.com/108692338295483568100/posts"
           />
   </poweredBy>
   

@@ -57,8 +57,7 @@ class HtmlTag {
      */
     HtmlTag(String id, int lineNo, int position, boolean closedTag,
             boolean incomplete, String text) {
-        this.id = !"".equals(id) && id.charAt(0) == '/'
-            ? id.substring(1) : id;
+        this.id = id;
         this.lineNo = lineNo;
         this.position = position;
         this.text = text;
@@ -76,18 +75,15 @@ class HtmlTag {
 
     /**
      * Indicates if this tag is a close (end) tag.
-     * @return <code>true</code> is this is a close tag.
+     * @return {@code true} is this is a close tag.
      */
     public boolean isCloseTag() {
-        if (position == text.length() - 1) {
-            return false;
-        }
-        return text.charAt(position + 1) == '/';
+        return position != text.length() - 1 && text.charAt(position + 1) == '/';
     }
 
     /**
      * Indicates if this tag is a self-closed XHTML style.
-     * @return <code>true</code> is this is a self-closed tag.
+     * @return {@code true} is this is a self-closed tag.
      */
     public boolean isClosedTag() {
         return closedTag;
@@ -95,7 +91,7 @@ class HtmlTag {
 
     /**
      * Indicates if this tag is incomplete (has no close &gt;).
-     * @return <code>true</code> if the tag is incomplete.
+     * @return {@code true} if the tag is incomplete.
      */
     public boolean isIncompleteTag() {
         return incomplete;
@@ -123,7 +119,7 @@ class HtmlTag {
     public String toString() {
         final int startOfText = position;
         final int endOfText =
-            Math.min(startOfText + HtmlTag.MAX_TEXT_LEN, text.length());
+            Math.min(startOfText + MAX_TEXT_LEN, text.length());
         return text.substring(startOfText, endOfText);
     }
 }

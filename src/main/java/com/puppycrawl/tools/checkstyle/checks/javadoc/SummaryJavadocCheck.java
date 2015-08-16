@@ -22,22 +22,22 @@ package com.puppycrawl.tools.checkstyle.checks.javadoc;
 import java.util.regex.Pattern;
 
 import com.google.common.base.CharMatcher;
+import com.puppycrawl.tools.checkstyle.Utils;
 import com.puppycrawl.tools.checkstyle.api.DetailNode;
 import com.puppycrawl.tools.checkstyle.api.JavadocTokenTypes;
-import com.puppycrawl.tools.checkstyle.Utils;
 
 /**
  * <p>
- * Checks that <a href="
- * http://www.oracle.com/technetwork/java/javase/documentation/index-137868.html#firstsentence">
+ * Checks that <a href=
+ * "http://www.oracle.com/technetwork/java/javase/documentation/index-137868.html#firstsentence">
  * Javadoc summary sentence</a> does not contain phrases that are not recommended to use.
- * By default Check validate that first sentence is not empty:</p><br/>
+ * By default Check validate that first sentence is not empty:</p><br>
  * <pre>
  * &lt;module name=&quot;SummaryJavadocCheck&quot;/&gt;
  * </pre>
  * <p>
  * To ensure that summary do not contain phrase like "This method returns" , use following config:
- * <p>
+ *
  * <pre>
  * &lt;module name=&quot;SummaryJavadocCheck&quot;&gt;
  *     &lt;property name=&quot;forbiddenSummaryFragments&quot;
@@ -46,13 +46,14 @@ import com.puppycrawl.tools.checkstyle.Utils;
  * </pre>
  * <p>
  * To specify period symbol at the end of first javadoc sentence - use following config:
+ * </p>
  * <pre>
  * &lt;module name=&quot;SummaryJavadocCheck&quot;&gt;
  *     &lt;property name=&quot;period&quot;
  *     value=&quot;period&quot;/&gt;
  * &lt;/module&gt;
  * </pre>
- * </p>
+ *
  *
  * @author max
  * @author <a href="mailto:nesterenko-aleksey@list.ru">Aleksey Nesterenko</a>
@@ -124,7 +125,7 @@ public class SummaryJavadocCheck extends AbstractJavadocCheck {
      * @param ast Javadoc root node.
      * @return first sentence.
      */
-    private String getFirstSentence(DetailNode ast) {
+    private static String getFirstSentence(DetailNode ast) {
         final StringBuilder result = new StringBuilder();
         for (DetailNode child : ast.getChildren()) {
             if (child.getType() != JavadocTokenTypes.JAVADOC_INLINE_TAG
@@ -144,7 +145,7 @@ public class SummaryJavadocCheck extends AbstractJavadocCheck {
      * @param textNode node with javadoc text.
      * @return String with chars till first dot.
      */
-    private String getCharsTillDot(DetailNode textNode) {
+    private static String getCharsTillDot(DetailNode textNode) {
         final StringBuilder result = new StringBuilder();
         for (DetailNode child : textNode.getChildren()) {
             result.append(child.getText());

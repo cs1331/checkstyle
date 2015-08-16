@@ -19,17 +19,17 @@
 
 package com.puppycrawl.tools.checkstyle.checks.coding;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.puppycrawl.tools.checkstyle.api.Check;
-import com.puppycrawl.tools.checkstyle.api.DetailAST;
-import com.puppycrawl.tools.checkstyle.api.TokenTypes;
-import com.puppycrawl.tools.checkstyle.Utils;
 import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.puppycrawl.tools.checkstyle.Utils;
+import com.puppycrawl.tools.checkstyle.api.Check;
+import com.puppycrawl.tools.checkstyle.api.DetailAST;
+import com.puppycrawl.tools.checkstyle.api.TokenTypes;
 
 /**
  * Checks for multiple occurrences of the same string literal within a
@@ -91,9 +91,9 @@ public class MultipleStringLiteralsCheck extends Check {
      * @throws org.apache.commons.beanutils.ConversionException
      *         if unable to create Pattern object
      */
-    public void setIgnoreStringsRegexp(String ignoreStringsRegexp) {
+    public final void setIgnoreStringsRegexp(String ignoreStringsRegexp) {
         if (ignoreStringsRegexp != null
-            && ignoreStringsRegexp.length() > 0) {
+            && !ignoreStringsRegexp.isEmpty()) {
             pattern = Utils.createPattern(ignoreStringsRegexp);
         }
         else {

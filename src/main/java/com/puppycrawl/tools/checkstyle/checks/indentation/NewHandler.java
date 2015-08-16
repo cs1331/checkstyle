@@ -27,7 +27,7 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  * @author o_sukhodolsky
  * @author Ilja Dubinin
  */
-public class NewHandler extends ExpressionHandler {
+public class NewHandler extends AbstractExpressionHandler {
     /**
      * Construct an instance of this handler with the given indentation check,
      * abstract syntax tree, and parent handler.
@@ -38,7 +38,7 @@ public class NewHandler extends ExpressionHandler {
      */
     public NewHandler(IndentationCheck indentCheck,
                       DetailAST ast,
-                      ExpressionHandler parent) {
+                      AbstractExpressionHandler parent) {
         super(indentCheck, "operator new", ast, parent);
     }
 
@@ -50,34 +50,7 @@ public class NewHandler extends ExpressionHandler {
         }
 
         final DetailAST lparen = getMainAst().findFirstToken(TokenTypes.LPAREN);
-        final DetailAST rparen = getMainAst().findFirstToken(TokenTypes.RPAREN);
         checkLParen(lparen);
-
-        if (rparen == null || lparen == null
-            || rparen.getLineNo() == lparen.getLineNo()) {
-            return;
-        }
-
-        if (getMainAst().getType() != TokenTypes.OBJBLOCK) {
-            return;
-        }
-
-        // if this method name is on the same line as a containing
-        // method, don't indent, this allows expressions like:
-        //    method("my str" + method2(
-        //        "my str2"));
-        // as well as
-        //    method("my str" +
-        //        method2(
-        //            "my str2"));
-        //
-
-        checkExpressionSubtree(
-            getMainAst().findFirstToken(TokenTypes.ELIST),
-            new IndentLevel(getLevel(), getBasicOffset()),
-            false, true);
-
-        checkRParen(lparen, rparen);
     }
 
     @Override

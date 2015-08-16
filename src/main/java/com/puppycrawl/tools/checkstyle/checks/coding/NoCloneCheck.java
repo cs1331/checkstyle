@@ -122,9 +122,7 @@ package com.puppycrawl.tools.checkstyle.checks.coding;
  *
  *
  * @author Travis Schneeberger
- * @see java.lang.Object#clone()
- * @see java.lang.Cloneable
- * @see java.lang.CloneNotSupportedException
+ * @see Object#clone()
  */
 public class NoCloneCheck extends AbstractIllegalMethodCheck {
 
