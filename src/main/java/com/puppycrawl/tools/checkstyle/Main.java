@@ -96,7 +96,7 @@ public final class Main {
     /** Name for the option '-j'. */
     private static final String OPTION_J_NAME = "j";
 
-    /** NAme for the option '--javadocTree'. */
+    /** Name for the option '--javadocTree'. */
     private static final String OPTION_JAVADOC_TREE_NAME = "javadocTree";
 
     /** Name for the option '-J'. */
@@ -273,26 +273,23 @@ public final class Main {
             catch (CheckstyleException ignored) {
                 result.add(String.format("Could not find config XML file '%s'.", configLocation));
             }
+        }
 
-            // validate optional parameters
-            if (cmdLine.hasOption(OPTION_F_NAME)) {
-                final String format = cmdLine.getOptionValue(OPTION_F_NAME);
-                if (!PLAIN_FORMAT_NAME.equals(format) && !XML_FORMAT_NAME.equals(format)) {
-                    result.add(String.format("Invalid output format."
-                            + " Found '%s' but expected '%s' or '%s'.",
-                            format, PLAIN_FORMAT_NAME, XML_FORMAT_NAME));
-                }
-            }
-            if (cmdLine.hasOption(OPTION_P_NAME)) {
-                final String propertiesLocation = cmdLine.getOptionValue(OPTION_P_NAME);
-                final File file = new File(propertiesLocation);
-                if (!file.exists()) {
-                    result.add(String.format("Could not find file '%s'.", propertiesLocation));
-                }
+        // validate optional parameters
+        if (cmdLine.hasOption(OPTION_F_NAME)) {
+            final String format = cmdLine.getOptionValue(OPTION_F_NAME);
+            if (!PLAIN_FORMAT_NAME.equals(format) && !XML_FORMAT_NAME.equals(format)) {
+                result.add(String.format("Invalid output format."
+                        + " Found '%s' but expected '%s' or '%s'.",
+                        format, PLAIN_FORMAT_NAME, XML_FORMAT_NAME));
             }
         }
-        else {
-            result.add("Must specify a config XML file.");
+        if (cmdLine.hasOption(OPTION_P_NAME)) {
+            final String propertiesLocation = cmdLine.getOptionValue(OPTION_P_NAME);
+            final File file = new File(propertiesLocation);
+            if (!file.exists()) {
+                result.add(String.format("Could not find file '%s'.", propertiesLocation));
+            }
         }
 
         return result;
@@ -375,7 +372,17 @@ public final class Main {
             conf.format = PLAIN_FORMAT_NAME;
         }
         conf.outputLocation = cmdLine.getOptionValue(OPTION_O_NAME);
-        conf.configLocation = cmdLine.getOptionValue(OPTION_C_NAME);
+        if (cmdLine.hasOption(OPTION_C_NAME)) {
+            conf.configLocation = cmdLine.getOptionValue(OPTION_C_NAME);
+        } else {
+            if (cmdLine.hasOption("j")) {
+                conf.configLocation = Main.class.getClassLoader()
+                            .getResource("cs1331_javadoc_checks.xml").toString();
+            } else {
+                conf.configLocation = Main.class.getClassLoader()
+                            .getResource("cs1331_checks.xml").toString();
+            }
+        }
         conf.propertiesLocation = cmdLine.getOptionValue(OPTION_P_NAME);
         conf.files = filesToProcess;
         return conf;
