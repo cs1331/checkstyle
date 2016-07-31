@@ -72,6 +72,9 @@ public final class Main {
     /** Name for the option 'c'. */
     private static final String OPTION_C_NAME = "c";
 
+    /** Name for the option 'a'. */
+    private static final String OPTION_A_NAME = "a";
+
     /** Name for the option 'f'. */
     private static final String OPTION_F_NAME = "f";
 
@@ -192,8 +195,9 @@ public final class Main {
         }
         finally {
             // return exit code base on validation of Checker
-            if (errorCounter != 0 && !cliViolations) {
-                System.out.println(String.format("Checkstyle ends with %d errors.", errorCounter));
+            if (!cliViolations) {
+                System.out.println("Checkstyle ends. Errors (potential points off):");
+                System.err.println(errorCounter);
             }
             if (exitStatus != 0) {
                 System.exit(exitStatus);
@@ -354,6 +358,12 @@ public final class Main {
 
             // run Checker
             result = runCheckstyle(config);
+
+            if (commandLine.hasOption(OPTION_A_NAME)) {
+                config.configLocation = Main.class.getClassLoader()
+                        .getResource("cs1331_javadoc_checks.xml").toString();
+                result += runCheckstyle(config);
+            }
         }
 
         return result;
@@ -375,13 +385,8 @@ public final class Main {
         if (cmdLine.hasOption(OPTION_C_NAME)) {
             conf.configLocation = cmdLine.getOptionValue(OPTION_C_NAME);
         } else {
-            if (cmdLine.hasOption("j")) {
-                conf.configLocation = Main.class.getClassLoader()
-                            .getResource("cs1331_javadoc_checks.xml").toString();
-            } else {
-                conf.configLocation = Main.class.getClassLoader()
-                            .getResource("cs1331_checks.xml").toString();
-            }
+            conf.configLocation = Main.class.getClassLoader()
+                        .getResource("cs1331_checks.xml").toString();
         }
         conf.propertiesLocation = cmdLine.getOptionValue(OPTION_P_NAME);
         conf.files = filesToProcess;
@@ -422,7 +427,6 @@ public final class Main {
         final Checker checker = new Checker();
 
         try {
-
             final ClassLoader moduleClassLoader = Checker.class.getClassLoader();
             checker.setModuleClassLoader(moduleClassLoader);
             checker.configure(config);
@@ -430,7 +434,6 @@ public final class Main {
 
             // run Checker
             errorCounter = checker.process(cliOptions.files);
-
         }
         finally {
             checker.destroy();
@@ -597,6 +600,7 @@ public final class Main {
     private static Options buildOptions() {
         final Options options = new Options();
         options.addOption(OPTION_C_NAME, true, "Sets the check configuration file to use.");
+        options.addOption(OPTION_A_NAME, false, "Use both Regular and Javadoc CS1331 check configurations.");
         options.addOption(OPTION_O_NAME, true, "Sets the output file. Defaults to stdout");
         options.addOption(OPTION_P_NAME, true, "Loads the properties file");
         options.addOption(OPTION_F_NAME, true, String.format(
