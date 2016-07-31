@@ -27,7 +27,6 @@
     </module>
 
     <module name="TreeWalker">
-
         <!-- Checks for Naming Conventions.                  -->
         <!-- See http://checkstyle.sf.net/config_naming.html -->
         <module name="ConstantName"/>
@@ -52,7 +51,6 @@
         <module name="LineLength"/>
         <module name="MethodLength"/>
         <module name="ParameterNumber"/>
-
 
         <!-- Checks for whitespace                               -->
         <!-- See http://checkstyle.sf.net/config_whitespace.html -->
@@ -107,7 +105,6 @@
         <module name="UpperEll"/>
         <module name="Indentation"/>
         <module name="AnnotationLocation"/>
-        <module name="NonEmptyAtclauseDescription"/>
         <module name="DefaultComesLast"/>
         <module name="CovariantEquals"/>
         <module name="StringLiteralEquality"/>
@@ -116,5 +113,4 @@
             <property name="ignoreSetter" value="true"/>
         </module>
     </module>
-
 </module>
